@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PlayerValue | Market Opportunities</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <main class="main-content">
+            <div id="breadcrumbs-container"></div>
+            
+            <header class="page-header" style="flex-direction: column; align-items: flex-start; gap: 6px;">
+                <h1 class="page-title">Market Opportunities</h1>
+                <p class="page-subtitle">Players whose statistical performance suggests a higher valuation than recorded market price.</p>
+            </header>
+
+            <div class="filter-bar">
+                <div class="filter-group">
+                    <label class="filter-label">Position</label>
+                    <select id="o-position" class="filter-input">
+                        <option value="">All Positions</option>
+                        <option value="ST">ST</option><option value="LW">LW</option><option value="RW">RW</option>
+                        <option value="AM">AM</option><option value="CM">CM</option><option value="DM">DM</option>
+                        <option value="CB">CB</option><option value="LB">LB</option><option value="RB">RB</option>
+                        <option value="GK">GK</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">Max Age</label>
+                    <input type="number" id="o-max-age" class="filter-input" placeholder="e.g. 25">
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">Min Gap %</label>
+                    <input type="number" id="o-min-gap" class="filter-input" placeholder="e.g. 20">
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">Max Market Value (M€)</label>
+                    <input type="number" id="o-max-val" class="filter-input" placeholder="e.g. 10">
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Player</th>
+                            <th>Age</th>
+                            <th>Position</th>
+                            <th>Club</th>
+                            <th>Market Value</th>
+                            <th>Model Implied</th>
+                            <th>Gap %</th>
+                            <th>Confidence</th>
+                        </tr>
+                    </thead>
+                    <tbody id="opp-tbody"></tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/components.js"></script>
+    <script src="js/opportunities.js"></script>
+</body>
+</html>

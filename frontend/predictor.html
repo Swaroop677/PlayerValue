@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PlayerValue | Valuation Predictor</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <main class="main-content">
+            <div id="breadcrumbs-container"></div>
+
+            <header class="page-header">
+                <div>
+                    <h1 class="page-title">Valuation Predictor</h1>
+                    <p class="page-subtitle">Interactive what-if simulator: test player performance stat lines and compute model-implied market value in real-time.</p>
+                </div>
+            </header>
+
+            <div class="grid-2 mb-4" style="grid-template-columns: 1.15fr 0.85fr; gap: 24px;">
+                <!-- Form Inputs -->
+                <div class="card">
+                    <div class="card-header">
+                        <div>
+                            <h3 class="card-title">Performance Metrics & Profile</h3>
+                            <p class="card-subtitle">Adjust parameters to simulate market valuations</p>
+                        </div>
+                        <button class="btn btn-secondary" onclick="loadPreset('haaland')" style="font-size:12px; padding:6px 12px;">Haaland Preset</button>
+                    </div>
+
+                    <form id="predictor-form" onsubmit="runPrediction(event)">
+                        <div class="grid-2 mb-2">
+                            <div class="filter-group">
+                                <label class="filter-label">Position</label>
+                                <select id="p-position" class="filter-input">
+                                    <option value="ST" selected>Striker (ST)</option>
+                                    <option value="RW">Right Winger (RW)</option>
+                                    <option value="LW">Left Winger (LW)</option>
+                                    <option value="AM">Attacking Midfield (AM)</option>
+                                    <option value="CM">Central Midfield (CM)</option>
+                                    <option value="DM">Defensive Midfield (DM)</option>
+                                    <option value="CB">Centre-Back (CB)</option>
+                                    <option value="LB">Left-Back (LB)</option>
+                                    <option value="RB">Right-Back (RB)</option>
+                                    <option value="GK">Goalkeeper (GK)</option>
+                                </select>
+                            </div>
+                            <div class="filter-group">
+                                <label class="filter-label">Player Age</label>
+                                <input type="number" id="p-age" class="filter-input" value="23" min="16" max="42">
+                            </div>
+                        </div>
+
+                        <div class="grid-2 mb-2">
+                            <div class="filter-group">
+                                <label class="filter-label">League Strength (1.0 - 5.0)</label>
+                                <input type="number" id="p-league" class="filter-input" value="5.0" step="0.1" min="1.0" max="5.0">
+                            </div>
+                            <div class="filter-group">
+                                <label class="filter-label">Minutes Played</label>
+                                <input type="number" id="p-minutes" class="filter-input" value="2400" min="90" max="4000">
+                            </div>
+                        </div>
+
+                        <div style="font-size:11.5px; font-weight:700; color:var(--sky-500); text-transform:uppercase; margin:16px 0 8px 0;">Attacking & Playmaking</div>
+                        <div class="grid-3 mb-2">
+                            <div class="filter-group">
+                                <label class="filter-label">Goals</label>
+                                <input type="number" id="p-goals" class="filter-input" value="25" min="0">
+                            </div>
+                            <div class="filter-group">
+                                <label class="filter-label">Assists</label>
+                                <input type="number" id="p-assists" class="filter-input" value="7" min="0">
+                            </div>
+                            <div class="filter-group">
+                                <label class="filter-label">Expected Goals (xG)</label>
+                                <input type="number" id="p-xg" class="filter-input" value="22.4" step="0.1" min="0">
+                            </div>
+                        </div>
+
+                        <div class="grid-3 mb-2">
+                            <div class="filter-group">
+                                <label class="filter-label">Expected Assists (xA)</label>
+                                <input type="number" id="p-xa" class="filter-input" value="6.1" step="0.1" min="0">
+                            </div>
+                            <div class="filter-group">
+                                <label class="filter-label">Shots</label>
+                                <input type="number" id="p-shots" class="filter-input" value="95" min="0">
+                            </div>
+                            <div class="filter-group">
+                                <label class="filter-label">Key Passes</label>
+                                <input type="number" id="p-kp" class="filter-input" value="38" min="0">
+                            </div>
+                        </div>
+
+                        <div style="font-size:11.5px; font-weight:700; color:var(--text-secondary); text-transform:uppercase; margin:16px 0 8px 0;">Progression & Defending</div>
+                        <div class="grid-3 mb-4">
+                            <div class="filter-group">
+                                <label class="filter-label">Prog. Carries</label>
+                                <input type="number" id="p-prgc" class="filter-input" value="65" min="0">
+                            </div>
+                            <div class="filter-group">
+                                <label class="filter-label">Prog. Passes</label>
+                                <input type="number" id="p-prgp" class="filter-input" value="70" min="0">
+                            </div>
+                            <div class="filter-group">
+                                <label class="filter-label">Tackles</label>
+                                <input type="number" id="p-tkl" class="filter-input" value="18" min="0">
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary" style="width:100%; padding:12px; font-size:14.5px;">
+                            Calculate Implied Valuation
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Prediction Results -->
+                <div style="display:flex; flex-direction:column; gap:20px;">
+                    <div class="card" style="border: 1px solid var(--sky-soft);">
+                        <span class="badge badge-sky" style="margin-bottom:10px;">XGBoost Regressor</span>
+                        <div class="kpi-label">Model-Implied Valuation</div>
+                        <div id="pred-result-val" style="font-family:var(--font-heading); font-size:42px; font-weight:800; color:var(--sky-500); line-height:1.1; margin:6px 0 10px 0;">
+                            €--.-M
+                        </div>
+                        <div style="font-size:13px; color:var(--text-secondary);">
+                            Confidence Range: <strong id="pred-range-val" style="color:var(--text-primary)">€--M – €--M</strong>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <div>
+                                <h3 class="card-title">Key Value Drivers</h3>
+                                <p class="card-subtitle">Features influencing this model valuation</p>
+                            </div>
+                        </div>
+                        <div id="pred-drivers-container" style="display:flex; flex-direction:column; gap:8px;">
+                            <div style="font-size:13px; color:var(--text-muted)">Submit stat profile to view attribution weights.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/components.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            initPage('predictor');
+            runPrediction();
+        });
+
+        const PRESETS = {
+            haaland: {
+                position: 'ST', age: 24, league_strength: 5.0, minutes: 2600,
+                goals: 32, assists: 6, xg: 29.5, xa: 5.2, shots: 110, kp: 32,
+                progressive_carries: 45, progressive_passes: 40, tackles: 12
+            }
+        };
+
+        function loadPreset(key) {
+            const p = PRESETS[key];
+            if (!p) return;
+            document.getElementById('p-position').value = p.position;
+            document.getElementById('p-age').value = p.age;
+            document.getElementById('p-league').value = p.league_strength;
+            document.getElementById('p-minutes').value = p.minutes;
+            document.getElementById('p-goals').value = p.goals;
+            document.getElementById('p-assists').value = p.assists;
+            document.getElementById('p-xg').value = p.xg;
+            document.getElementById('p-xa').value = p.xa;
+            document.getElementById('p-shots').value = p.shots;
+            document.getElementById('p-kp').value = p.kp;
+            document.getElementById('p-prgc').value = p.progressive_carries;
+            document.getElementById('p-prgp').value = p.progressive_passes;
+            document.getElementById('p-tkl').value = p.tackles;
+            runPrediction();
+        }
+
+        async function runPrediction(e) {
+            if (e) e.preventDefault();
+            const payload = {
+                position: document.getElementById('p-position').value,
+                age: parseInt(document.getElementById('p-age').value) || 22,
+                league_strength: parseFloat(document.getElementById('p-league').value) || 5.0,
+                minutes: parseInt(document.getElementById('p-minutes').value) || 1800,
+                goals: parseInt(document.getElementById('p-goals').value) || 0,
+                assists: parseInt(document.getElementById('p-assists').value) || 0,
+                xg: parseFloat(document.getElementById('p-xg').value) || 0.0,
+                xa: parseFloat(document.getElementById('p-xa').value) || 0.0,
+                shots: parseFloat(document.getElementById('p-shots').value) || 0.0,
+                key_passes: parseFloat(document.getElementById('p-kp').value) || 0.0,
+                progressive_carries: parseFloat(document.getElementById('p-prgc').value) || 0.0,
+                progressive_passes: parseFloat(document.getElementById('p-prgp').value) || 0.0,
+                tackles: parseFloat(document.getElementById('p-tkl').value) || 0.0,
+                interceptions: 5.0, aerial_wins: 10.0, recoveries: 20.0, clean_sheets: 0
+            };
+
+            const valElem = document.getElementById('pred-result-val');
+            const rangeElem = document.getElementById('pred-range-val');
+            const driversElem = document.getElementById('pred-drivers-container');
+
+            valElem.textContent = 'Calculating...';
+
+            try {
+                const res = await fetch('/api/model/predict', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+
+                valElem.textContent = formatCurrency(data.predicted_value_eur);
+                rangeElem.textContent = `${formatCurrency(data.confidence_range_eur.low)} – ${formatCurrency(data.confidence_range_eur.high)}`;
+
+                if (data.top_factors && data.top_factors.length > 0) {
+                    driversElem.innerHTML = data.top_factors.map(f => `
+                        <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 14px; border-radius:var(--radius-sm); background:var(--bg-subtle); font-size:12.5px;">
+                            <span style="font-weight:600; color:var(--text-primary)">${f.feature}</span>
+                            <span class="badge ${f.direction === 'positive' ? 'val-badge positive' : 'val-badge negative'}">
+                                ${f.direction === 'positive' ? '+' : '-'} ${f.importance}% Weight
+                            </span>
+                        </div>
+                    `).join('');
+                }
+            } catch (err) {
+                console.error(err);
+                valElem.textContent = 'Error';
+            }
+        }
+    </script>
+</body>
+</html>

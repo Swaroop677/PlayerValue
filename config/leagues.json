@@ -1,0 +1,51 @@
+{
+  "leagues": [
+    {
+      "id": "GB1",
+      "name": "Premier League",
+      "country": "England",
+      "season": "2024-25",
+      "enabled": true,
+      "strength_rating": 5.0,
+      "fpl_supported": true
+    },
+    {
+      "id": "ES1",
+      "name": "La Liga",
+      "country": "Spain",
+      "season": "2024-25",
+      "enabled": false,
+      "strength_rating": 4.8,
+      "fpl_supported": false
+    },
+    {
+      "id": "L1",
+      "name": "Bundesliga",
+      "country": "Germany",
+      "season": "2024-25",
+      "enabled": false,
+      "strength_rating": 4.5,
+      "fpl_supported": false
+    },
+    {
+      "id": "IT1",
+      "name": "Serie A",
+      "country": "Italy",
+      "season": "2024-25",
+      "enabled": false,
+      "strength_rating": 4.6,
+      "fpl_supported": false
+    },
+    {
+      "id": "FR1",
+      "name": "Ligue 1",
+      "country": "France",
+      "season": "2024-25",
+      "enabled": false,
+      "strength_rating": 4.3,
+      "fpl_supported": false
+    }
+  ],
+  "cache_duration_hours": 6,
+  "default_currency": "EUR"
+}

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PlayerValue | Advanced Scouting</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        .scouting-layout { display: flex; gap: 24px; align-items: flex-start; }
+        .scouting-sidebar { width: 280px; flex-shrink: 0; }
+        .scouting-main { flex: 1; min-width: 0; }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <main class="main-content">
+            <div id="breadcrumbs-container"></div>
+            
+            <header class="page-header">
+                <div>
+                    <h1 class="page-title">Advanced Scouting Matrix</h1>
+                    <p class="page-subtitle">Multi-attribute filter matrix for talent scouting and player comparison.</p>
+                </div>
+                <button id="btn-compare" class="btn btn-primary" disabled>Compare Selected (0)</button>
+            </header>
+
+            <div class="scouting-layout">
+                <div class="scouting-sidebar card">
+                    <h3 style="font-size:15px; margin-bottom:14px;">Scouting Filters</h3>
+                    
+                    <div class="filter-group mb-2">
+                        <label class="filter-label">Position</label>
+                        <select id="s-position" class="filter-input">
+                            <option value="">All</option>
+                            <option value="ST">Striker</option><option value="LW">LW</option><option value="RW">RW</option>
+                            <option value="AM">AM</option><option value="CM">CM</option><option value="DM">DM</option>
+                            <option value="CB">CB</option><option value="LB">LB</option><option value="RB">RB</option>
+                            <option value="GK">GK</option>
+                        </select>
+                    </div>
+                    <div class="grid-2 mb-2">
+                        <div class="filter-group"><label class="filter-label">Min Age</label><input type="number" id="s-min-age" class="filter-input"></div>
+                        <div class="filter-group"><label class="filter-label">Max Age</label><input type="number" id="s-max-age" class="filter-input"></div>
+                    </div>
+                    <div class="filter-group mb-2">
+                        <label class="filter-label">Max Market Value (M€)</label>
+                        <input type="number" id="s-max-value" class="filter-input">
+                    </div>
+                    
+                    <h4 style="font-size:11.5px; font-weight:700; text-transform:uppercase; color:var(--text-muted); margin:18px 0 8px 0;">Performance (per 90)</h4>
+                    <div class="filter-group mb-2">
+                        <label class="filter-label">Min Minutes</label>
+                        <input type="number" id="s-min-mins" class="filter-input" placeholder="900">
+                    </div>
+                    <div class="filter-group mb-2">
+                        <label class="filter-label">Min Goals</label>
+                        <input type="number" step="0.1" id="s-min-goals" class="filter-input">
+                    </div>
+                    <div class="filter-group mb-2">
+                        <label class="filter-label">Min Assists</label>
+                        <input type="number" step="0.1" id="s-min-assists" class="filter-input">
+                    </div>
+                    <div class="filter-group mb-2">
+                        <label class="filter-label">Min Prog Passes</label>
+                        <input type="number" step="1" id="s-min-prog-p" class="filter-input">
+                    </div>
+                    <div class="filter-group mb-4">
+                        <label class="filter-label">Min Prog Carries</label>
+                        <input type="number" step="1" id="s-min-prog-c" class="filter-input">
+                    </div>
+
+                    <button id="btn-apply-filters" class="btn btn-secondary" style="width:100%;">Reset Filters</button>
+                </div>
+
+                <div class="scouting-main">
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th style="width:40px; text-align:center;">Select</th>
+                                    <th>Player</th>
+                                    <th>Pos</th>
+                                    <th>Age</th>
+                                    <th>Club</th>
+                                    <th>Market Value</th>
+                                    <th>Model Implied</th>
+                                    <th>Gap</th>
+                                </tr>
+                            </thead>
+                            <tbody id="scouting-tbody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/components.js"></script>
+    <script src="js/scouting.js"></script>
+</body>
+</html>

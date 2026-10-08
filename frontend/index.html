@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PlayerValue | Football Market Intelligence</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <main class="main-content">
+            <!-- Hero Section -->
+            <section class="hero-card">
+                <h1 class="hero-title">Football Market Intelligence</h1>
+                <p class="hero-subtitle">
+                    Model-implied valuations and performance analytics across 10 seasons of verified European football records.
+                </p>
+                <div class="hero-actions">
+                    <a href="players.html" class="btn btn-primary">Explore Players</a>
+                    <a href="predictor.html" class="btn btn-secondary">Open Predictor Tool</a>
+                </div>
+                <div class="search-bar" style="max-width: 520px;">
+                    <input type="text" id="global-search" placeholder="Search real players (e.g. Haaland, Saka, Mbappé)...">
+                </div>
+            </section>
+
+            <!-- KPI Summary Cards -->
+            <div id="kpi-container" class="kpi-grid"></div>
+
+            <!-- Charts Grid -->
+            <div class="grid-2 mb-4">
+                <div class="card">
+                    <div class="card-header">
+                        <div>
+                            <h3 class="card-title">Market Growth History</h3>
+                            <p class="card-subtitle">Aggregated valuation trend across top European leagues</p>
+                        </div>
+                        <span class="badge badge-sky">2015–2026</span>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="market-overview-chart"></canvas>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div>
+                            <h3 class="card-title">Valuation by Player Age</h3>
+                            <p class="card-subtitle">Market distribution curve across position tiers</p>
+                        </div>
+                        <span class="badge badge-sky">Distribution</span>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="value-age-chart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Top Opportunities / Arbitrage Table -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <div>
+                        <h3 class="card-title">Market Opportunities</h3>
+                        <p class="card-subtitle">Players whose statistical performance suggests a higher valuation than recorded</p>
+                    </div>
+                    <a href="opportunities.html" class="btn btn-secondary" style="font-size:12.5px; padding:6px 12px;">View All Opportunities</a>
+                </div>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Player</th>
+                                <th>Age</th>
+                                <th>Position</th>
+                                <th>Club</th>
+                                <th>Actual Value</th>
+                                <th>Model Implied</th>
+                                <th>Valuation Gap</th>
+                            </tr>
+                        </thead>
+                        <tbody id="undervalued-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Risers & Fallers Grid -->
+            <div class="grid-2 mb-4">
+                <div class="card">
+                    <div class="card-header">
+                        <div>
+                            <h3 class="card-title">Top Value Risers</h3>
+                            <p class="card-subtitle">Largest recorded market value gains</p>
+                        </div>
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Player</th>
+                                    <th>Previous</th>
+                                    <th>Current</th>
+                                    <th>Change</th>
+                                </tr>
+                            </thead>
+                            <tbody id="risers-tbody"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div>
+                            <h3 class="card-title">Top Value Fallers</h3>
+                            <p class="card-subtitle">Largest recorded market value decreases</p>
+                        </div>
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Player</th>
+                                    <th>Previous</th>
+                                    <th>Current</th>
+                                    <th>Change</th>
+                                </tr>
+                            </thead>
+                            <tbody id="fallers-tbody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Club Squad Valuation Rankings -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <div>
+                        <h3 class="card-title">Club Squad Valuation Rankings</h3>
+                        <p class="card-subtitle">Top 15 squads by aggregate market value</p>
+                    </div>
+                </div>
+                <div class="chart-container" style="height:320px;">
+                    <canvas id="club-squad-chart"></canvas>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/charts.js"></script>
+    <script src="js/components.js"></script>
+    <script src="js/dashboard.js"></script>
+</body>
+</html>

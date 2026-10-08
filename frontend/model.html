@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PlayerValue | Model Analytics</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <main class="main-content">
+            <div id="breadcrumbs-container"></div>
+            
+            <header class="page-header">
+                <h2 class="page-title">Model Analytics</h2>
+            </header>
+
+            <div id="model-container">
+                <div class="skeleton-card skeleton mb-4" style="height: 120px"></div>
+                <div class="skeleton-card skeleton mb-4" style="height: 400px"></div>
+            </div>
+            
+            <p class="text-center mt-4" style="font-size: 12px; color: var(--text-tertiary);">
+                Disclaimer: The model provides a statistical estimate based on historical patterns. It does not account for qualitative factors like player attitude, brand value, or complex contract situations.
+            </p>
+        </main>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/charts.js"></script>
+    <script src="js/components.js"></script>
+    <script src="js/model.js"></script>
+</body>
+</html>
