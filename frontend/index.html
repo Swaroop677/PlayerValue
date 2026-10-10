@@ -20,8 +20,9 @@
                     <a href="players.html" class="btn btn-primary">Explore Players</a>
                     <a href="predictor.html" class="btn btn-secondary">Open Predictor Tool</a>
                 </div>
-                <div class="search-bar" style="max-width: 520px;">
-                    <input type="text" id="global-search" placeholder="Search real players (e.g. Haaland, Saka, Mbappé)...">
+                <div class="search-box-wrap" style="max-width: 480px;">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" id="global-search" class="filter-input" placeholder="Search real players (e.g. Haaland, Saka, Mbappé)...">
                 </div>
             </section>
 
@@ -36,7 +37,7 @@
                             <h3 class="card-title">Market Growth History</h3>
                             <p class="card-subtitle">Aggregated valuation trend across top European leagues</p>
                         </div>
-                        <span class="badge badge-sky">2015–2026</span>
+                        <span class="badge" style="background:var(--color-primary-tint); color:var(--color-primary-dark); font-weight:700;">2015–2026</span>
                     </div>
                     <div class="chart-container">
                         <canvas id="market-overview-chart"></canvas>
@@ -49,7 +50,7 @@
                             <h3 class="card-title">Valuation by Player Age</h3>
                             <p class="card-subtitle">Market distribution curve across position tiers</p>
                         </div>
-                        <span class="badge badge-sky">Distribution</span>
+                        <span class="badge" style="background:var(--color-secondary-tint); color:var(--color-on-secondary); font-weight:700;">Distribution</span>
                     </div>
                     <div class="chart-container">
                         <canvas id="value-age-chart"></canvas>

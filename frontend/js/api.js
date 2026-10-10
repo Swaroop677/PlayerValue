@@ -1,6 +1,14 @@
+/**
+ * PlayerValue API Client with Client-Side Caching & Prefetching
+ */
+
 const API_BASE = '/api';
 
-async function fetchAPI(endpoint, params = {}) {
+// In-memory cache for API requests with 3-minute stale TTL
+const apiCache = new Map();
+const CACHE_TTL_MS = 180000;
+
+async function fetchAPI(endpoint, params = {}, options = {}) {
     const url = new URL(API_BASE + endpoint, window.location.origin);
     
     Object.keys(params).forEach(key => {
@@ -9,16 +17,39 @@ async function fetchAPI(endpoint, params = {}) {
         }
     });
 
+    const cacheKey = url.toString();
+    const useCache = options.cache !== false;
+
+    if (useCache && apiCache.has(cacheKey)) {
+        const cached = apiCache.get(cacheKey);
+        if (Date.now() - cached.timestamp < CACHE_TTL_MS) {
+            return cached.data;
+        }
+        apiCache.delete(cacheKey);
+    }
+
     try {
         const response = await fetch(url);
         if (!response.ok) {
             throw new Error(`API Error: ${response.status} ${response.statusText}`);
         }
-        return await response.json();
+        const data = await response.json();
+        if (useCache) {
+            apiCache.set(cacheKey, { timestamp: Date.now(), data });
+        }
+        return data;
     } catch (error) {
         console.error('API Fetch Error:', error);
         throw error;
     }
+}
+
+// Prefetch player details into cache on hover
+const prefetchedSet = new Set();
+function prefetchPlayer(id) {
+    if (!id || prefetchedSet.has(id)) return;
+    prefetchedSet.add(id);
+    fetchAPI(`/players/${id}`).catch(() => {});
 }
 
 async function getDashboard() {

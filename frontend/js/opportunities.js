@@ -52,24 +52,33 @@ async function loadData() {
 
         tbody.innerHTML = response.items.map(p => {
             const gap = (p.predicted_value_eur || 0) - (p.market_value_eur || 0);
-            const gapPercent = p.value_gap_percent || (p.market_value_eur ? (gap / p.market_value_eur) * 100 : 0);
-            const rating = Math.random() * 2 + 7; // Fake rating since backend might not have it
+            const gapPercent = p.value_gap_percent !== undefined && p.value_gap_percent !== null 
+                ? p.value_gap_percent 
+                : (p.market_value_eur ? (gap / p.market_value_eur) * 100 : 0);
 
             return `
-            <tr style="cursor: pointer" onclick="window.location.href='player.html?id=${p.id}'">
+            <tr onmouseenter="prefetchPlayer(${p.id})" style="cursor: pointer" onclick="window.location.href='player.html?id=${p.id}'">
                 <td>
-                    <div class="player-cell">
-                        ${createPlayerAvatar(p.name, p.primary_position, 'avatar-sm')}
-                        <span class="player-name">${p.name}</span>
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        ${createPlayerAvatar(p.name, p.primary_position)}
+                        <div>
+                            <div style="font-weight:600; color:var(--color-ink);">${p.name}</div>
+                            <div style="font-size:12px; color:var(--color-ink-muted);">${p.club_name || 'Free Agent'}</div>
+                        </div>
                     </div>
                 </td>
-                <td>${p.age}</td>
-                <td><span class="badge badge-position" style="background-color: ${getPositionColor(p.primary_position)}">${p.primary_position}</span></td>
+                <td class="tabular-nums">${p.age || '-'}</td>
+                <td><span class="${getPositionBadgeClass(p.primary_position)}">${p.primary_position}</span></td>
                 <td>${p.club_name || '-'}</td>
-                <td>${formatCurrency(p.market_value_eur)}</td>
-                <td style="color: var(--accent-purple); font-weight: 600">${formatCurrency(p.predicted_value_eur)}</td>
-                <td>${createValueBadge(gapPercent, true)}</td>
-                <td>${rating.toFixed(1)} / 10</td>
+                <td>${p.league_name || '-'}</td>
+                <td class="tabular-nums"><strong>${formatCurrency(p.market_value_eur)}</strong></td>
+                <td class="tabular-nums" style="color:var(--color-primary-dark); font-weight:600">${formatCurrency(p.predicted_value_eur)}</td>
+                <td>
+                    <div style="display:flex; flex-direction:column; gap:4px;">
+                        ${createValueBadge(gapPercent, true)}
+                        ${createMiniGapBar(gapPercent)}
+                    </div>
+                </td>
             </tr>
         `}).join('');
         

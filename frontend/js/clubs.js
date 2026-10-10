@@ -21,23 +21,23 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         let html = '';
         for (const [league, leagueClubs] of Object.entries(byLeague)) {
-            html += `<h3 class="mb-3 mt-4" style="border-bottom: 1px solid var(--border); padding-bottom: 8px;">${league}</h3>`;
-            html += `<div class="grid-4 mb-4">`;
+            html += `<h3 style="font-size:18px; font-weight:700; color:var(--color-ink); margin: 28px 0 16px 0; border-bottom: 1px solid var(--color-border); padding-bottom: 8px;">${league}</h3>`;
+            html += `<div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(240px, 1fr)); gap:18px; margin-bottom:28px;">`;
             
-            leagueClubs.sort((a,b) => b.total_market_value - a.total_market_value).forEach(c => {
+            leagueClubs.sort((a,b) => (b.total_market_value || 0) - (a.total_market_value || 0)).forEach(c => {
                 html += `
-                    <div class="card" style="cursor:pointer" onclick="window.location.href='club.html?id=${c.id}'">
-                        <div class="flex-between mb-3">
-                            <div class="player-avatar avatar-sm" style="background: var(--bg-tertiary)">${getInitials(c.name)}</div>
-                            <span class="badge badge-league">${c.country}</span>
+                    <div class="card card-interactive" style="cursor:pointer; padding:20px;" onclick="window.location.href='club.html?id=${c.id}'">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                            <div class="player-avatar" style="width:34px; height:34px; font-size:12px;">${getInitials(c.name)}</div>
+                            <span class="badge" style="background:var(--color-surface-alt); border:1px solid var(--color-border); color:var(--color-ink-soft);">${c.country}</span>
                         </div>
-                        <h4 class="mb-1">${c.name}</h4>
-                        <div style="font-size: 12px; color: var(--text-secondary)" class="mb-3">
+                        <h4 style="font-size:15px; font-weight:700; color:var(--color-ink); margin-bottom:4px;">${c.name}</h4>
+                        <div style="font-size: 12px; color: var(--color-ink-soft); margin-bottom:12px;">
                             Squad Size: ${c.squad_size} • Avg Age: ${formatNumber(c.avg_age, 1)}
                         </div>
-                        <div class="flex-between">
-                            <span style="font-size: 12px; color: var(--text-secondary)">Total Value</span>
-                            <strong>${formatCurrency(c.total_market_value)}</strong>
+                        <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--color-border); padding-top:8px;">
+                            <span style="font-size: 12px; color: var(--color-ink-muted)">Total Value</span>
+                            <strong class="tabular-nums">${formatCurrency(c.total_market_value)}</strong>
                         </div>
                     </div>
                 `;

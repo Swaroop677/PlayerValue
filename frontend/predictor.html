@@ -64,7 +64,7 @@
                             </div>
                         </div>
 
-                        <div style="font-size:11.5px; font-weight:700; color:var(--sky-500); text-transform:uppercase; margin:16px 0 8px 0;">Attacking & Playmaking</div>
+                        <div style="font-size:11.5px; font-weight:700; color:var(--color-primary-dark); text-transform:uppercase; margin:16px 0 8px 0;">Attacking & Playmaking</div>
                         <div class="grid-3 mb-2">
                             <div class="filter-group">
                                 <label class="filter-label">Goals</label>
@@ -95,7 +95,7 @@
                             </div>
                         </div>
 
-                        <div style="font-size:11.5px; font-weight:700; color:var(--text-secondary); text-transform:uppercase; margin:16px 0 8px 0;">Progression & Defending</div>
+                        <div style="font-size:11.5px; font-weight:700; color:var(--color-ink-soft); text-transform:uppercase; margin:16px 0 8px 0;">Progression & Defending</div>
                         <div class="grid-3 mb-4">
                             <div class="filter-group">
                                 <label class="filter-label">Prog. Carries</label>
@@ -119,14 +119,14 @@
 
                 <!-- Prediction Results -->
                 <div style="display:flex; flex-direction:column; gap:20px;">
-                    <div class="card" style="border: 1px solid var(--sky-soft);">
-                        <span class="badge badge-sky" style="margin-bottom:10px;">XGBoost Regressor</span>
+                    <div class="card" style="border: 1px solid var(--color-border);">
+                        <span class="badge" style="background:var(--color-primary-tint); color:var(--color-primary-dark); font-weight:700; margin-bottom:10px;">XGBoost Regressor</span>
                         <div class="kpi-label">Model-Implied Valuation</div>
-                        <div id="pred-result-val" style="font-family:var(--font-heading); font-size:42px; font-weight:800; color:var(--sky-500); line-height:1.1; margin:6px 0 10px 0;">
+                        <div id="pred-result-val" class="tabular-nums" style="font-size:42px; font-weight:800; color:var(--color-primary-dark); line-height:1.1; margin:6px 0 10px 0;">
                             €--.-M
                         </div>
-                        <div style="font-size:13px; color:var(--text-secondary);">
-                            Confidence Range: <strong id="pred-range-val" style="color:var(--text-primary)">€--M – €--M</strong>
+                        <div style="font-size:13px; color:var(--color-ink-soft);">
+                            Confidence Range: <strong id="pred-range-val" class="tabular-nums" style="color:var(--color-ink)">€--M – €--M</strong>
                         </div>
                     </div>
 
@@ -138,7 +138,7 @@
                             </div>
                         </div>
                         <div id="pred-drivers-container" style="display:flex; flex-direction:column; gap:8px;">
-                            <div style="font-size:13px; color:var(--text-muted)">Submit stat profile to view attribution weights.</div>
+                            <div style="font-size:13px; color:var(--color-ink-muted)">Submit stat profile to view attribution weights.</div>
                         </div>
                     </div>
                 </div>
@@ -220,8 +220,8 @@
 
                 if (data.top_factors && data.top_factors.length > 0) {
                     driversElem.innerHTML = data.top_factors.map(f => `
-                        <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 14px; border-radius:var(--radius-sm); background:var(--bg-subtle); font-size:12.5px;">
-                            <span style="font-weight:600; color:var(--text-primary)">${f.feature}</span>
+                        <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 14px; border-radius:var(--radius-sm); background:var(--color-surface-alt); font-size:12.5px;">
+                            <span style="font-weight:600; color:var(--color-ink)">${f.feature}</span>
                             <span class="badge ${f.direction === 'positive' ? 'val-badge positive' : 'val-badge negative'}">
                                 ${f.direction === 'positive' ? '+' : '-'} ${f.importance}% Weight
                             </span>

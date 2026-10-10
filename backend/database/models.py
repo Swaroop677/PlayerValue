@@ -188,6 +188,7 @@ class SeasonStats(Base):
         Index("ix_ss_player_id", "player_id"),
         Index("ix_ss_season", "season"),
         Index("ix_ss_player_season", "player_id", "season"),
+        Index("ix_ss_player_season_stats", "player_id", "season", "minutes", "goals", "assists"),
     )
 
     @property
@@ -263,6 +264,7 @@ class MarketValue(Base):
     __table_args__ = (
         Index("ix_mv_player_id", "player_id"),
         Index("ix_mv_date", "valuation_date"),
+        Index("ix_mv_player_date", "player_id", "valuation_date", "market_value_eur"),
     )
 
     def __repr__(self) -> str:
@@ -321,6 +323,7 @@ class ModelPrediction(Base):
     __table_args__ = (
         Index("ix_mp_player_id", "player_id"),
         Index("ix_mp_date", "prediction_date"),
+        Index("ix_mp_player_date", "player_id", "prediction_date", "predicted_value_eur", "difference_percent"),
     )
 
     def __repr__(self) -> str:

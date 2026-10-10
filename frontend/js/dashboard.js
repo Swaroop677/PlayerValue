@@ -54,7 +54,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                             ${createPlayerAvatar(p.name, p.primary_position, 'avatar-sm')}
                             <div>
                                 <span style="font-weight:700">${p.name}</span>
-                                <div style="font-size:11px; color:var(--text-secondary)">${p.club_name || ''}</div>
+                                <div style="font-size:11px; color:var(--color-ink-soft)">${p.club_name || ''}</div>
                             </div>
                         </div>
                     </td>
@@ -74,7 +74,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                             ${createPlayerAvatar(p.name, p.primary_position, 'avatar-sm')}
                             <div>
                                 <span style="font-weight:700">${p.name}</span>
-                                <div style="font-size:11px; color:var(--text-secondary)">${p.club_name || ''}</div>
+                                <div style="font-size:11px; color:var(--color-ink-soft)">${p.club_name || ''}</div>
                             </div>
                         </div>
                     </td>
@@ -94,15 +94,15 @@ document.addEventListener('DOMContentLoaded', async () => {
                             ${createPlayerAvatar(p.name, p.primary_position, 'avatar-sm')}
                             <div>
                                 <span style="font-weight:700">${p.name}</span>
-                                <div style="font-size:11px; color:var(--text-secondary)">${p.club_name || ''}</div>
+                                <div style="font-size:11px; color:var(--color-ink-soft)">${p.club_name || ''}</div>
                             </div>
                         </div>
                     </td>
                     <td>${p.age}</td>
-                    <td><span class="badge badge-position" style="background-color:${getPositionColor(p.primary_position)}">${p.primary_position}</span></td>
+                    <td><span class="${getPositionBadgeClass(p.primary_position)}">${p.primary_position}</span></td>
                     <td>${p.club_name || '-'}</td>
                     <td>${formatCurrency(p.market_value_eur)}</td>
-                    <td style="color:var(--sky-500); font-weight:600">${formatCurrency(p.predicted_value_eur)}</td>
+                    <td style="color:var(--color-primary-dark); font-weight:600">${formatCurrency(p.predicted_value_eur)}</td>
                     <td>${createValueBadge(p.value_gap_percent, true)}</td>
                 </tr>
             `).join('');
@@ -124,9 +124,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     createBarChart(
                         'club-squad-chart',
                         clubs.map(c => c.club_name),
-                        clubs.map(c => c.total_market_value_eur),
-                        false,
-                        '#00f2fe'
+                        clubs.map(c => c.total_market_value_eur)
                     );
                 }
             })

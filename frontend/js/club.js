@@ -27,11 +27,11 @@ function renderClub(club) {
     const container = document.getElementById('club-container');
     
     let html = `
-        <div class="profile-header mb-4" style="padding: 24px">
-            <div class="player-avatar avatar-lg" style="background: var(--bg-tertiary); border-radius: 16px;">${getInitials(club.name)}</div>
+        <div class="card mb-4" style="padding: 28px; display:flex; align-items:center; gap:20px;">
+            <div class="player-avatar" style="width: 56px; height: 56px; font-size: 20px; font-weight:800;">${getInitials(club.name)}</div>
             <div>
-                <h2 style="font-size: 28px; margin-bottom: 8px;">${club.name}</h2>
-                <div style="color: var(--text-secondary)">
+                <h2 style="font-size: 28px; font-weight:800; color:var(--color-ink); margin-bottom: 4px;">${club.name}</h2>
+                <div style="font-size: 14px; color: var(--color-ink-soft)">
                     ${club.league_name} • ${club.country}
                 </div>
             </div>
@@ -62,17 +62,17 @@ function renderClub(club) {
                             ${(club.roster || []).map(p => {
                                 const gapPercent = p.market_value_eur ? ((p.predicted_value_eur || 0) - p.market_value_eur) / p.market_value_eur * 100 : 0;
                                 return `
-                                <tr style="cursor:pointer" onclick="window.location.href='player.html?id=${p.id}'">
+                                <tr onmouseenter="prefetchPlayer(${p.id})" style="cursor:pointer" onclick="window.location.href='player.html?id=${p.id}'">
                                     <td>
-                                        <div class="player-cell">
-                                            ${createPlayerAvatar(p.name, p.primary_position, 'avatar-sm')}
-                                            <span>${p.name}</span>
+                                        <div style="display:flex; align-items:center; gap:10px;">
+                                            ${createPlayerAvatar(p.name, p.primary_position)}
+                                            <span style="font-weight:600; color:var(--color-ink);">${p.name}</span>
                                         </div>
                                     </td>
-                                    <td>${p.age}</td>
-                                    <td><span class="badge badge-position" style="background-color: ${getPositionColor(p.primary_position)}">${p.primary_position}</span></td>
-                                    <td>${formatCurrency(p.market_value_eur)}</td>
-                                    <td style="color: var(--accent-purple)">${formatCurrency(p.predicted_value_eur)}</td>
+                                    <td class="tabular-nums">${p.age}</td>
+                                    <td><span class="${getPositionBadgeClass(p.primary_position)}">${p.primary_position}</span></td>
+                                    <td class="tabular-nums"><strong>${formatCurrency(p.market_value_eur)}</strong></td>
+                                    <td class="tabular-nums" style="color: var(--color-primary-dark); font-weight:600;">${formatCurrency(p.predicted_value_eur)}</td>
                                     <td>${createValueBadge(gapPercent, true)}</td>
                                 </tr>
                                 `;

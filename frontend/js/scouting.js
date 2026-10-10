@@ -97,11 +97,11 @@ async function loadData() {
                         </div>
                     </div>
                 </td>
-                <td>${p.age}</td>
-                <td><span class="badge badge-position" style="background-color: ${getPositionColor(p.primary_position)}">${p.primary_position}</span></td>
+                <td class="tabular-nums">${p.age}</td>
+                <td><span class="${getPositionBadgeClass(p.primary_position)}">${p.primary_position}</span></td>
                 <td>${p.club_name || '-'}</td>
-                <td>${formatCurrency(p.market_value_eur)}</td>
-                <td style="color: var(--accent-purple)">${formatCurrency(p.predicted_value_eur)}</td>
+                <td class="tabular-nums"><strong>${formatCurrency(p.market_value_eur)}</strong></td>
+                <td class="tabular-nums" style="color: var(--color-primary-dark); font-weight: 600;">${formatCurrency(p.predicted_value_eur)}</td>
             </tr>
         `).join('');
         

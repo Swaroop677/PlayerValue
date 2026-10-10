@@ -7,7 +7,10 @@ from backend.api import players, clubs, scouting, dashboard, model
 
 app = FastAPI(title="PlayerValue API")
 
-# Configure CORS
+# Configure middleware
+from starlette.middleware.gzip import GZipMiddleware
+app.add_middleware(GZipMiddleware, minimum_size=1000)
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],

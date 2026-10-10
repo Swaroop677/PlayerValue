@@ -84,7 +84,7 @@ function renderModelPage(metrics, container) {
                         <tbody>
                             ${Object.entries(ed.position_metrics || {}).map(([pos, m]) => `
                                 <tr>
-                                    <td><span class="badge badge-sky">${pos}</span></td>
+                                    <td><span class="${getPositionBadgeClass(pos)}">${pos}</span></td>
                                     <td>${m.count}</td>
                                     <td>${formatCurrency(m.mae)}</td>
                                     <td>${formatNumber(m.r2, 3)}</td>
@@ -143,14 +143,14 @@ function renderModelPage(metrics, container) {
                 else if (r < 0.75) counts[6]++;
                 else counts[7]++;
             });
-            createBarChart('resid-chart', bins, counts, false, '#0EA5E9');
+            createBarChart('resid-chart', bins, counts, false);
         }
 
         // 3. Feature Importance Chart
         if (metrics.feature_names && metrics.feature_names.length > 0) {
             const labels = metrics.feature_names.slice(0, 14).map(f => f.replace('_per_90', '/90').replace('pos_', 'Pos: ').replace('_', ' ').toUpperCase());
             const vals = [28.4, 21.2, 14.8, 9.6, 7.2, 5.8, 4.3, 3.5, 2.9, 2.4, 1.8, 1.5, 1.2, 0.9];
-            createBarChart('feature-chart', labels, vals, true, '#0EA5E9');
+            createBarChart('feature-chart', labels, vals, true);
         }
     }, 100);
 }

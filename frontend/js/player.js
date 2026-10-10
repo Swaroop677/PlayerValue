@@ -38,19 +38,19 @@ function renderProfile(player, stats, history, transfers, prediction, similar) {
     const gapPercent = player.market_value_eur ? (gap / player.market_value_eur) * 100 : 0;
     
     let html = `
-        <div class="card mb-4" style="background:var(--hero-grad); border:1px solid var(--border);">
+        <div class="card mb-4" style="border:1px solid var(--color-border);">
             <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:20px;">
                 <div style="display:flex; align-items:center; gap:18px;">
-                    <div style="width:64px; height:64px; border-radius:var(--radius-pill); background:var(--sky-soft); color:var(--sky-600); font-size:24px; font-weight:800; display:flex; align-items:center; justify-content:center;">
+                    <div style="width:64px; height:64px; border-radius:var(--radius-pill); background:var(--color-surface-alt); color:var(--color-ink); font-size:24px; font-weight:800; display:flex; align-items:center; justify-content:center; border:1px solid var(--color-border);">
                         ${getInitials(player.name)}
                     </div>
                     <div>
                         <div style="display:flex; align-items:center; gap:10px; margin-bottom:4px;">
-                            <h1 style="font-size:28px; font-weight:800; margin:0;">${player.name}</h1>
-                            <span class="badge badge-sky">${player.primary_position}</span>
+                            <h1 style="font-size:28px; font-weight:800; margin:0; color:var(--color-ink);">${player.name}</h1>
+                            <span class="${getPositionBadgeClass(player.primary_position)}">${player.primary_position}</span>
                         </div>
-                        <div style="font-size:13.5px; color:var(--text-secondary); display:flex; gap:14px; flex-wrap:wrap;">
-                            <span><strong>Club:</strong> <a href="club.html?id=${player.club_id}">${player.club_name || 'Free Agent'}</a></span>
+                        <div style="font-size:13.5px; color:var(--color-ink-soft); display:flex; gap:14px; flex-wrap:wrap;">
+                            <span><strong>Club:</strong> <a href="club.html?id=${player.club_id}" style="color:var(--color-primary-dark); font-weight:600;">${player.club_name || 'Free Agent'}</a></span>
                             <span><strong>League:</strong> ${player.league_name || '-'}</span>
                             <span><strong>Nationality:</strong> ${player.nationality}</span>
                             <span><strong>Age:</strong> ${player.age || '-'}</span>
@@ -60,21 +60,21 @@ function renderProfile(player, stats, history, transfers, prediction, similar) {
                     </div>
                 </div>
 
-                <div style="display:flex; gap:20px; align-items:center; background:var(--bg-card); padding:16px 20px; border-radius:var(--radius-md); border:1px solid var(--border);">
+                <div style="display:flex; gap:20px; align-items:center; background:var(--color-surface-alt); padding:16px 20px; border-radius:var(--radius-md); border:1px solid var(--color-border);">
                     <div>
                         <div class="kpi-label">Market Value</div>
-                        <div style="font-family:var(--font-heading); font-size:24px; font-weight:800; color:var(--text-primary)">
+                        <div class="tabular-nums" style="font-size:24px; font-weight:800; color:var(--color-ink)">
                             ${formatCurrency(player.market_value_eur)}
                         </div>
                     </div>
-                    <div style="width:1px; height:40px; background:var(--border);"></div>
+                    <div style="width:1px; height:40px; background:var(--color-border);"></div>
                     <div>
                         <div class="kpi-label">Model Implied</div>
-                        <div style="font-family:var(--font-heading); font-size:24px; font-weight:800; color:var(--sky-500)">
+                        <div class="tabular-nums" style="font-size:24px; font-weight:800; color:var(--color-primary-dark)">
                             ${formatCurrency(player.predicted_value_eur)}
                         </div>
                     </div>
-                    <div style="width:1px; height:40px; background:var(--border);"></div>
+                    <div style="width:1px; height:40px; background:var(--color-border);"></div>
                     <div>
                         <div class="kpi-label">Gap</div>
                         ${createValueBadge(gapPercent, true)}
@@ -210,7 +210,7 @@ function renderProfile(player, stats, history, transfers, prediction, similar) {
                                     <td>${t.from_club_name || 'Youth / Free'}</td>
                                     <td>${t.to_club_name || 'Free Agent'}</td>
                                     <td><strong>${t.fee_eur !== null ? formatCurrency(t.fee_eur) : 'Undisclosed'}</strong></td>
-                                    <td><span class="badge badge-sky">${t.transfer_type || 'Transfer'}</span></td>
+                                    <td><span class="badge" style="background:var(--color-surface-alt); border:1px solid var(--color-border); color:var(--color-ink-soft);">${t.transfer_type || 'Transfer'}</span></td>
                                 </tr>
                             `).join('')}
                         </tbody>
@@ -230,16 +230,16 @@ function renderProfile(player, stats, history, transfers, prediction, similar) {
                         <p class="card-subtitle">Cosine similarity based on normalized per-90 statistical vectors</p>
                     </div>
                 </div>
-                <div class="grid-4" id="similar-container">
+                <div class="grid-4" id="similar-container" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:16px;">
                     ${similar.map(s => `
-                        <div class="card" style="cursor: pointer; padding:16px; background:var(--bg-subtle);" onclick="window.location.href='player.html?id=${s.id}'">
-                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                        <div class="card card-interactive" style="cursor: pointer; padding:18px;" onclick="window.location.href='player.html?id=${s.id}'">
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
                                 ${createPlayerAvatar(s.name, s.primary_position)}
-                                <span class="badge badge-sky">${formatPercent(s.similarity_percent, false)} Match</span>
+                                <span class="badge" style="background:var(--color-tertiary-tint); color:var(--color-tertiary-dark); font-weight:700;">${formatPercent(s.similarity_percent, false)} Match</span>
                             </div>
-                            <h4 style="font-size:14px; margin-bottom:2px;">${s.name}</h4>
-                            <div style="font-size:12px; color:var(--text-secondary); margin-bottom:8px;">${s.age || '-'} yrs • ${s.primary_position}</div>
-                            <div style="font-weight:700; color:var(--text-primary); font-size:13px;">${formatCurrency(s.market_value_eur)}</div>
+                            <h4 style="font-size:14px; margin-bottom:3px; color:var(--color-ink); font-weight:700;">${s.name}</h4>
+                            <div style="font-size:12px; color:var(--color-ink-soft); margin-bottom:8px;">${s.age || '-'} yrs • <span class="${getPositionBadgeClass(s.primary_position)}">${s.primary_position}</span></div>
+                            <div class="tabular-nums" style="font-weight:700; color:var(--color-ink); font-size:14px;">${formatCurrency(s.market_value_eur)}</div>
                         </div>
                     `).join('')}
                 </div>

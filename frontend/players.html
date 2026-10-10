@@ -5,78 +5,116 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PlayerValue | Players Database</title>
     <link rel="stylesheet" href="css/styles.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 <body>
     <div class="app-container">
         <main class="main-content">
             <div id="breadcrumbs-container"></div>
             
-            <header class="page-header">
-                <div>
-                    <h1 class="page-title">Players Database</h1>
-                    <p class="page-subtitle">Search, filter, and analyze 10,715 players across top European leagues.</p>
-                </div>
+            <header class="page-header" style="margin-bottom: 24px;">
+                <h1 style="font-size: 32px; font-weight: 800; letter-spacing: -0.02em; color: var(--color-ink); margin-bottom: 6px;">
+                    Players Database
+                </h1>
+                <p style="font-size: 15px; color: var(--color-ink-soft);">
+                    Search, filter, and compare 10,715 verified European players and model-implied values.
+                </p>
             </header>
 
-            <div class="filter-bar" id="filters-container">
-                <div class="filter-group">
-                    <label class="filter-label">Search Name</label>
-                    <input type="text" id="f-name" class="filter-input" placeholder="e.g. Haaland">
-                </div>
-                <div class="filter-group">
-                    <label class="filter-label">Position</label>
-                    <select id="f-position" class="filter-input">
+            <!-- Sticky Filter & Control Bar -->
+            <div class="filter-bar-wrapper">
+                <div class="filter-bar">
+                    <!-- Search with clear button -->
+                    <div class="search-box-wrap">
+                        <span class="search-icon">🔍</span>
+                        <input type="text" id="f-name" class="filter-input" placeholder="Search by player name..." aria-label="Search players by name">
+                        <button id="search-clear-btn" class="search-clear-btn" aria-label="Clear search">✕</button>
+                    </div>
+
+                    <!-- Dropdowns -->
+                    <select id="f-position" class="filter-select" aria-label="Filter by position">
                         <option value="">All Positions</option>
-                        <option value="GK">Goalkeeper (GK)</option>
-                        <option value="CB">Centre-Back (CB)</option>
-                        <option value="LB">Left-Back (LB)</option>
-                        <option value="RB">Right-Back (RB)</option>
+                        <option value="GK">Goalkeepers (GK)</option>
+                        <option value="CB">Centre-Backs (CB)</option>
+                        <option value="LB">Left-Backs (LB)</option>
+                        <option value="RB">Right-Backs (RB)</option>
                         <option value="DM">Defensive Midfield (DM)</option>
                         <option value="CM">Central Midfield (CM)</option>
                         <option value="AM">Attacking Midfield (AM)</option>
-                        <option value="LW">Left Winger (LW)</option>
-                        <option value="RW">Right Winger (RW)</option>
-                        <option value="ST">Striker (ST)</option>
+                        <option value="LW">Left Wingers (LW)</option>
+                        <option value="RW">Right Wingers (RW)</option>
+                        <option value="ST">Strikers (ST)</option>
                     </select>
+
+                    <select id="f-league" class="filter-select" aria-label="Filter by league">
+                        <option value="">All Leagues</option>
+                    </select>
+
+                    <select id="f-club" class="filter-select" aria-label="Filter by club">
+                        <option value="">All Clubs</option>
+                    </select>
+
+                    <select id="f-valuation-status" class="filter-select" aria-label="Filter by valuation status">
+                        <option value="">All Valuations</option>
+                        <option value="undervalued">Undervalued Only</option>
+                        <option value="fair">Fair Value</option>
+                        <option value="overvalued">Overvalued Only</option>
+                    </select>
+
+                    <!-- Sort dropdown -->
+                    <select id="f-sort-by" class="filter-select" aria-label="Sort by field">
+                        <option value="market_value_eur">Sort by: Market Value</option>
+                        <option value="predicted_value_eur">Sort by: Model Implied</option>
+                        <option value="age">Sort by: Age</option>
+                        <option value="minutes">Sort by: Minutes Played</option>
+                        <option value="name">Sort by: Name</option>
+                    </select>
+
+                    <button id="sort-dir-toggle" class="btn btn-secondary btn-sm" aria-label="Toggle sort direction" title="Toggle sort direction">
+                        <span id="sort-dir-icon">▼ Desc</span>
+                    </button>
+
+                    <!-- View Toggle (List vs Grid) -->
+                    <div class="view-toggle" role="radiogroup" aria-label="Select view mode">
+                        <button id="view-list-btn" class="view-toggle-btn active" aria-label="List view">☰ List</button>
+                        <button id="view-grid-btn" class="view-toggle-btn" aria-label="Grid view">⊞ Cards</button>
+                    </div>
                 </div>
-                <div class="filter-group">
-                    <label class="filter-label">League</label>
-                    <select id="f-league" class="filter-input"><option value="">All Leagues</option></select>
-                </div>
-                <div class="filter-group">
-                    <label class="filter-label">Club</label>
-                    <select id="f-club" class="filter-input"><option value="">All Clubs</option></select>
-                </div>
-                <div class="filter-group" style="max-width:110px;">
-                    <label class="filter-label">Min Age</label>
-                    <input type="number" id="f-min-age" class="filter-input" placeholder="16">
-                </div>
-                <div class="filter-group" style="max-width:110px;">
-                    <label class="filter-label">Max Age</label>
-                    <input type="number" id="f-max-age" class="filter-input" placeholder="40">
+
+                <!-- Active Filter Chips & Live Count -->
+                <div class="filter-chips-row">
+                    <div id="active-chips-container" style="display:flex; flex-wrap:wrap; gap:8px;"></div>
+                    <button id="clear-all-filters" class="filter-clear-all" style="display:none;">Clear all filters</button>
+                    <span id="live-player-count" class="filter-live-count">Loading players...</span>
                 </div>
             </div>
 
-            <div class="table-container">
-                <table class="data-table">
+            <!-- List View Container (Table) -->
+            <div id="list-view-container" class="table-container">
+                <table class="data-table" role="table">
                     <thead>
                         <tr>
-                            <th onclick="handleSort('name')">Player</th>
-                            <th onclick="handleSort('age')">Age</th>
-                            <th onclick="handleSort('primary_position')">Pos</th>
+                            <th onclick="toggleSortColumn('name')">Player</th>
+                            <th onclick="toggleSortColumn('age')">Age</th>
+                            <th onclick="toggleSortColumn('primary_position')">Pos</th>
                             <th>League</th>
-                            <th onclick="handleSort('minutes')">Minutes</th>
-                            <th onclick="handleSort('market_value_eur')">Market Value</th>
-                            <th onclick="handleSort('predicted_value_eur')">Model Implied</th>
-                            <th>Valuation Gap</th>
+                            <th onclick="toggleSortColumn('minutes')">Minutes</th>
+                            <th onclick="toggleSortColumn('market_value_eur')">Market Value</th>
+                            <th onclick="toggleSortColumn('predicted_value_eur')">Model Value</th>
+                            <th>Value Gap</th>
                         </tr>
                     </thead>
                     <tbody id="players-tbody"></tbody>
                 </table>
             </div>
 
-            <div id="pagination-container" style="display:flex; justify-content:center; margin-top:24px;"></div>
+            <!-- Card Grid View Container -->
+            <div id="grid-view-container" class="player-cards-grid" style="display:none;"></div>
+
+            <!-- Empty / Error States Container -->
+            <div id="state-container"></div>
+
+            <!-- Pagination -->
+            <div id="pagination-container"></div>
         </main>
     </div>
 
