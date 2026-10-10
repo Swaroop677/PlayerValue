@@ -30,7 +30,7 @@ Football player market value intelligence platform and ML-powered valuation engi
 
 4. **Verify Health**:
    - Test your endpoint in your browser:
-     `https://YOUR-RAILWAY-DOMAIN.up.railway.app/api/health`
+     `https://playervalue.up.railway.app/api/health`
      Should return: `{"status":"ok"}`.
 
 ---
@@ -48,14 +48,14 @@ Football player market value intelligence platform and ML-powered valuation engi
    - **Root Directory**: Select `frontend` (or leave as `./` using the root `vercel.json`).
    - **Framework Preset**: Other / None.
 
-4. **Connect to your Railway Backend**:
-   - Open `vercel.json` (or `frontend/vercel.json`) and replace `https://YOUR-RAILWAY-APP.up.railway.app` with your actual Railway URL from Step 1:
+4. **Connected Railway Backend**:
+   - `vercel.json` is already preconfigured to forward all `/api/*` requests to your Railway backend:
      ```json
      {
        "rewrites": [
          {
            "source": "/api/(.*)",
-           "destination": "https://YOUR-RAILWAY-DOMAIN.up.railway.app/api/$1"
+           "destination": "https://playervalue.up.railway.app/api/$1"
          }
        ]
      }

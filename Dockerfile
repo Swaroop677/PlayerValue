@@ -2,16 +2,18 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-# Install system dependencies for C extensions / PostgreSQL
-RUN apt-get update && apt-get install -y --no-install-recommends gcc libpq-dev && rm -rf /var/lib/apt/lists/*
+ENV PYTHONUNBUFFERED=1
+ENV PORT=8000
+
+# Install system dependencies for C extensions, PostgreSQL, and OpenMP (required by XGBoost)
+RUN apt-get update && apt-get install -y --no-install-recommends gcc libpq-dev libgomp1 && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-# Expose default port
 EXPOSE 8000
 
-# Bind to Railway's dynamic $PORT or default to 8000
+# Bind to Railway's $PORT or fallback to 8000
 CMD ["sh", "-c", "uvicorn backend.main:app --host 0.0.0.0 --port ${PORT:-8000}"]
