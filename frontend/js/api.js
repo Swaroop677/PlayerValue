@@ -2,7 +2,8 @@
  * PlayerValue API Client with Client-Side Caching & Prefetching
  */
 
-const API_BASE = '/api';
+// API Base URL (configurable for cloud deployments, defaults to relative /api)
+const API_BASE = window.__API_BASE__ || localStorage.getItem('playervalue_api_base') || '/api';
 
 // In-memory cache for API requests with 3-minute stale TTL
 const apiCache = new Map();
