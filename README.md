@@ -1,6 +1,6 @@
 # PlayerValue ⚽
 
-*Vibecoded with Gemini*
+*Vibecoded with Gemini Antigravity*
 
 Football player market value intelligence platform and ML-powered valuation engine built on verified Transfermarkt and FBref performance statistics across Europe's top leagues.
 
