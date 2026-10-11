@@ -10,19 +10,77 @@
 <body>
     <div class="app-container">
         <main class="main-content">
-            <!-- Hero Section -->
-            <section class="hero-card">
-                <h1 class="hero-title">Football Market Intelligence</h1>
-                <p class="hero-subtitle">
-                    Model-implied valuations and performance analytics across 10 seasons of verified European football records.
-                </p>
-                <div class="hero-actions">
-                    <a href="players.html" class="btn btn-primary">Explore Players</a>
-                    <a href="predictor.html" class="btn btn-secondary">Open Predictor Tool</a>
+            <!-- Hero Section with High-Aesthetic Atmosphere -->
+            <section class="homepage-hero">
+                <!-- Ambient Floating Mesh Orbs -->
+                <div class="hero-orb-mesh">
+                    <div class="orb orb-primary"></div>
+                    <div class="orb orb-accent"></div>
+                    <div class="orb orb-mint"></div>
+                    <div class="hero-grid-pattern"></div>
                 </div>
-                <div class="search-box-wrap" style="max-width: 480px;">
-                    <span class="search-icon">🔍</span>
-                    <input type="text" id="global-search" class="filter-input" placeholder="Search real players (e.g. Haaland, Saka, Mbappé)...">
+
+                <div class="hero-inner">
+                    <div class="hero-live-badge">
+                        <span class="live-beacon"></span>
+                        <span>Live ML Valuation Engine • 5 European Leagues Tracked</span>
+                    </div>
+
+                    <h1 class="hero-title">
+                        Football Market <span class="hero-gradient-text">Intelligence</span>
+                    </h1>
+
+                    <p class="hero-subtitle">
+                        Model-implied valuations and machine-learning arbitrage across 10 seasons of verified European football records.
+                    </p>
+
+                    <div class="hero-actions">
+                        <a href="players.html" class="btn btn-primary">Explore 10,715 Players</a>
+                        <a href="opportunities.html" class="btn btn-secondary">Market Opportunities</a>
+                        <a href="scouting.html" class="btn btn-secondary">Scouting Network</a>
+                    </div>
+
+                    <div class="hero-search-wrapper">
+                        <div class="search-box-wrap" style="max-width: 100%;">
+                            <span class="search-icon">🔍</span>
+                            <input type="text" id="global-search" class="filter-input" placeholder="Quick search real players (e.g. Haaland, Saka, Bellingham)..." autocomplete="off">
+                        </div>
+                        <div id="hero-search-dropdown" class="search-dropdown"></div>
+                    </div>
+                </div>
+
+                <!-- Floating Interactive Micro-Stats Cards -->
+                <div class="hero-floating-pills">
+                    <a href="player.html?id=1" class="floating-pill pill-1">
+                        <div class="pill-icon" style="background: linear-gradient(135deg, #0EA5E9, #0284C7);">EH</div>
+                        <div class="pill-info">
+                            <div class="pill-title">Erling Haaland</div>
+                            <div class="pill-meta">
+                                <span>€200.0M Value</span>
+                                <span class="badge" style="background:rgba(16,185,129,0.12); color:#10B981; font-size:10px; padding:2px 6px;">+14.2% ML Gap</span>
+                            </div>
+                        </div>
+                    </a>
+
+                    <a href="opportunities.html" class="floating-pill pill-2">
+                        <div class="pill-icon" style="background: linear-gradient(135deg, #10B981, #059669);">⚡</div>
+                        <div class="pill-info">
+                            <div class="pill-title">Arbitrage Opportunities</div>
+                            <div class="pill-meta">
+                                <span>150+ Undervalued Talents</span>
+                            </div>
+                        </div>
+                    </a>
+
+                    <a href="model.html" class="floating-pill pill-3">
+                        <div class="pill-icon" style="background: linear-gradient(135deg, #8B5CF6, #6366F1);">🎯</div>
+                        <div class="pill-info">
+                            <div class="pill-title">XGBoost ML Pipeline</div>
+                            <div class="pill-meta">
+                                <span>R² 0.924 Accuracy</span>
+                            </div>
+                        </div>
+                    </a>
                 </div>
             </section>
 
