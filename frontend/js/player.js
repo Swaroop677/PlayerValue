@@ -41,9 +41,7 @@ function renderProfile(player, stats, history, transfers, prediction, similar) {
         <div class="card mb-4" style="border:1px solid var(--color-border);">
             <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:20px;">
                 <div style="display:flex; align-items:center; gap:18px;">
-                    <div style="width:64px; height:64px; border-radius:var(--radius-pill); background:var(--color-surface-alt); color:var(--color-ink); font-size:24px; font-weight:800; display:flex; align-items:center; justify-content:center; border:1px solid var(--color-border);">
-                        ${getInitials(player.name)}
-                    </div>
+                    ${createPlayerAvatar(player.name, player.primary_position, 'avatar-xl')}
                     <div>
                         <div style="display:flex; align-items:center; gap:10px; margin-bottom:4px;">
                             <h1 style="font-size:28px; font-weight:800; margin:0; color:var(--color-ink);">${player.name}</h1>

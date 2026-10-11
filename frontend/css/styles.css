@@ -796,8 +796,8 @@ input, button, select, textarea {
 
 /* Player Avatar */
 .player-avatar {
-  width: 36px;
-  height: 36px;
+  width: 38px;
+  height: 38px;
   border-radius: var(--radius-pill);
   display: inline-flex;
   align-items: center;
@@ -807,7 +807,42 @@ input, button, select, textarea {
   flex-shrink: 0;
   background-color: var(--color-surface-alt);
   color: var(--color-ink);
-  border: 1px solid var(--color-border);
+  border: 1.5px solid var(--color-border);
+  overflow: hidden;
+  position: relative;
+}
+
+.player-avatar.has-photo {
+  border-color: var(--color-primary);
+  box-shadow: 0 2px 6px rgba(14, 165, 233, 0.14);
+}
+
+.player-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+  display: block;
+}
+
+.player-avatar.avatar-sm {
+  width: 34px;
+  height: 34px;
+  font-size: 11.5px;
+}
+
+.player-avatar.avatar-lg {
+  width: 52px;
+  height: 52px;
+  font-size: 16px;
+}
+
+.player-avatar.avatar-xl {
+  width: 76px;
+  height: 76px;
+  font-size: 24px;
+  font-weight: 800;
+  border-width: 2px;
 }
 
 /* Card Grid View (Alternative to table) */
