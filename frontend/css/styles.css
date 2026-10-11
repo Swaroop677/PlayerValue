@@ -319,21 +319,54 @@ input, button, select, textarea {
   font-size: 18px;
   color: var(--color-ink);
   letter-spacing: -0.02em;
+  transition: transform var(--dur-micro) var(--ease-out);
 }
 
-.nav-brand .brand-dot {
-  width: 10px;
-  height: 10px;
-  border-radius: var(--radius-pill);
-  background-color: var(--color-primary);
-  display: inline-block;
-  box-shadow: 0 0 0 3px var(--color-primary-tint);
-  animation: pulse-coral 2.5s infinite;
+.nav-brand:hover {
+  transform: translateY(-1px);
 }
 
-@keyframes pulse-coral {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.15); }
+.brand-logo-full {
+  height: 36px;
+  width: auto;
+  display: block;
+  object-fit: contain;
+}
+
+.footer-logo-full {
+  height: 38px;
+  width: auto;
+  display: block;
+  object-fit: contain;
+}
+
+.brand-logo-compact {
+  height: 34px;
+  width: 34px;
+  display: none;
+  object-fit: contain;
+}
+
+.logo-dark-only {
+  display: none;
+}
+
+[data-theme="dark"] .logo-light-only {
+  display: none;
+}
+
+[data-theme="dark"] .logo-dark-only {
+  display: block;
+}
+
+@media (max-width: 480px) {
+  .brand-logo-full,
+  [data-theme="dark"] .brand-logo-full {
+    display: none;
+  }
+  .brand-logo-compact {
+    display: block;
+  }
 }
 
 .nav-links {

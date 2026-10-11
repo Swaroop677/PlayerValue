@@ -1,4 +1,8 @@
-# PlayerValue ⚽
+<p align="center">
+  <img src="frontend/assets/logo-full.png" alt="PlayerValue Logo" width="380" />
+</p>
+
+# PlayerValue
 
 *Vibecoded with Gemini Antigravity*
 

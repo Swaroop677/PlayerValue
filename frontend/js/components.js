@@ -46,9 +46,10 @@ function createNavbar(activePage) {
     let navHtml = `
         <nav class="navbar">
             <div class="nav-container">
-                <a href="index.html" class="nav-brand">
-                    <span class="brand-dot"></span>
-                    <span>PlayerValue</span>
+                <a href="index.html" class="nav-brand" aria-label="PlayerValue Home">
+                    <img src="assets/logo-full.png" alt="PlayerValue" class="brand-logo-full logo-light-only">
+                    <img src="assets/logo-full-dark.png" alt="PlayerValue" class="brand-logo-full logo-dark-only">
+                    <img src="assets/logo-icon.png" alt="PlayerValue" class="brand-logo-compact">
                 </a>
 
                 <ul class="nav-links">
@@ -87,8 +88,8 @@ function createFooter() {
                 <div class="footer-top">
                     <div class="footer-brand">
                         <div class="footer-title">
-                            <span class="brand-dot" style="animation:none;"></span>
-                            <span>PlayerValue</span>
+                            <img src="assets/logo-full.png" alt="PlayerValue" class="footer-logo-full logo-light-only">
+                            <img src="assets/logo-full-dark.png" alt="PlayerValue" class="footer-logo-full logo-dark-only">
                         </div>
                         <p class="footer-desc">
                             Real football intelligence and ML-powered player market valuations built on 10 seasons of verified top-5 European league data.
@@ -278,6 +279,13 @@ function createBreadcrumbs(items) {
 
 function initPage(pageId) {
     applyStoredTheme();
+    if (!document.querySelector('link[rel="icon"]')) {
+        const favicon = document.createElement('link');
+        favicon.rel = 'icon';
+        favicon.type = 'image/png';
+        favicon.href = 'assets/logo-icon.png';
+        document.head.appendChild(favicon);
+    }
     document.body.insertAdjacentHTML('afterbegin', createNavbar(pageId));
     document.body.insertAdjacentHTML('beforeend', createFooter());
 }
