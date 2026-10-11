@@ -439,8 +439,42 @@ function createBarChart(canvasId, labels, values, isHorizontal = false, customCo
         if (!canvas) return;
         const ctx = canvas.getContext('2d');
         const t = getThemeTokens();
+        const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-        const color = customColor || t.coral;
+        // Multi-stop vibrant spectrum palette for bars
+        const palette = [
+            { top: '#FF5A5F', bottom: 'rgba(255, 90, 95, 0.28)', border: '#FF5A5F' },
+            { top: '#FF7A45', bottom: 'rgba(255, 122, 69, 0.28)', border: '#FF7A45' },
+            { top: '#FFB400', bottom: 'rgba(255, 180, 0, 0.28)', border: '#FFB400' },
+            { top: '#10B981', bottom: 'rgba(16, 185, 129, 0.28)', border: '#10B981' },
+            { top: '#00D1B2', bottom: 'rgba(0, 209, 178, 0.28)', border: '#00D1B2' },
+            { top: '#06B6D4', bottom: 'rgba(6, 182, 212, 0.28)', border: '#06B6D4' },
+            { top: '#38BDF8', bottom: 'rgba(56, 189, 248, 0.28)', border: '#38BDF8' },
+            { top: '#3B82F6', bottom: 'rgba(59, 130, 246, 0.28)', border: '#3B82F6' },
+            { top: '#6366F1', bottom: 'rgba(99, 102, 241, 0.28)', border: '#6366F1' },
+            { top: '#8B5CF6', bottom: 'rgba(139, 92, 246, 0.28)', border: '#8B5CF6' }
+        ];
+
+        const bgColors = values.map((_, idx) => {
+            if (customColor) return customColor;
+            const p = palette[idx % palette.length];
+            const grad = isHorizontal
+                ? ctx.createLinearGradient(0, 0, 480, 0)
+                : ctx.createLinearGradient(0, 0, 0, 320);
+            grad.addColorStop(0, isHorizontal ? p.bottom : p.top);
+            grad.addColorStop(1, isHorizontal ? p.top : p.bottom);
+            return grad;
+        });
+
+        const borderColors = values.map((_, idx) => {
+            if (customColor) return customColor;
+            return palette[idx % palette.length].border;
+        });
+
+        const hoverColors = values.map((_, idx) => {
+            if (customColor) return customColor;
+            return palette[idx % palette.length].top;
+        });
 
         chartInstances[canvasId] = new Chart(ctx, {
             type: 'bar',
@@ -448,21 +482,37 @@ function createBarChart(canvasId, labels, values, isHorizontal = false, customCo
                 labels: labels,
                 datasets: [{
                     data: values,
-                    backgroundColor: color,
-                    borderRadius: 6,
+                    backgroundColor: bgColors,
+                    borderColor: borderColors,
+                    hoverBackgroundColor: hoverColors,
+                    hoverBorderColor: '#FFFFFF',
+                    borderWidth: 1.5,
+                    hoverBorderWidth: 2,
+                    borderRadius: 8,
                     borderSkipped: false
                 }]
             },
             options: {
                 ...getBaseChartOptions(),
                 indexAxis: isHorizontal ? 'y' : 'x',
+                animation: prefersReducedMotion ? false : {
+                    duration: 850,
+                    easing: 'easeOutQuart',
+                    delay: (context) => {
+                        if (context.type === 'data' && context.mode === 'default') {
+                            return context.dataIndex * 55;
+                        }
+                        return 0;
+                    }
+                },
                 plugins: {
                     ...getBaseChartOptions().plugins,
                     legend: { display: false },
                     tooltip: {
                         ...getBaseChartOptions().plugins.tooltip,
                         callbacks: {
-                            label: (ctx) => typeof ctx.raw === 'number' && ctx.raw > 1000 ? formatCurrency(ctx.raw) : ctx.raw
+                            title: (items) => items.length ? `#${items[0].dataIndex + 1} ${items[0].label}` : '',
+                            label: (ctx) => typeof ctx.raw === 'number' && ctx.raw > 1000 ? `Total Squad Value: ${formatCurrency(ctx.raw)}` : ctx.raw
                         }
                     }
                 },
@@ -471,14 +521,22 @@ function createBarChart(canvasId, labels, values, isHorizontal = false, customCo
                         ...getBaseChartOptions().scales.x,
                         ticks: {
                             color: t.textMuted,
-                            callback: (v) => typeof v === 'number' && v > 1000000 ? formatCurrency(v) : v
+                            font: { size: 11, weight: 600 },
+                            callback: function(v) {
+                                if (typeof v === 'number' && v > 1000000) return formatCurrency(v);
+                                return this.getLabelForValue ? this.getLabelForValue(v) : v;
+                            }
                         }
                     },
                     y: {
                         ...getBaseChartOptions().scales.y,
                         ticks: {
                             color: t.textMuted,
-                            callback: (v) => typeof v === 'number' && v > 1000000 ? formatCurrency(v) : v
+                            font: { size: 11 },
+                            callback: function(v) {
+                                if (typeof v === 'number' && v > 1000000) return formatCurrency(v);
+                                return this.getLabelForValue ? this.getLabelForValue(v) : v;
+                            }
                         }
                     }
                 }
