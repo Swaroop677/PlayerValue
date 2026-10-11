@@ -185,8 +185,8 @@ function createMarketValueChart(canvasId, dates, values) {
     });
 }
 
-// 2. Radar Chart: Player Per-90 vs Positional Average
-function createRadarChart(canvasId, labels, playerVals, benchmarkVals, playerName = 'Player') {
+// 2. Radar Chart: Player Per-90 Percentiles / Positional Benchmark / Multi-Player Comparison
+function createRadarChart(canvasId, labels, playerVals, benchmarkVals, playerName = 'Player', rawPlayerVals = null, rawBenchVals = null) {
     queueChartRender(canvasId, () => {
         destroyChart(canvasId);
         const canvas = document.getElementById(canvasId);
@@ -194,48 +194,122 @@ function createRadarChart(canvasId, labels, playerVals, benchmarkVals, playerNam
         const ctx = canvas.getContext('2d');
         const t = getThemeTokens();
 
+        let chartDatasets = [];
+
+        // Check if playerVals is an array of custom dataset objects (multi-player compare)
+        if (Array.isArray(playerVals) && playerVals.length > 0 && typeof playerVals[0] === 'object' && playerVals[0].data) {
+            const palette = [
+                { border: '#38BDF8', bg: 'rgba(56, 189, 248, 0.22)' },
+                { border: '#FF5A5F', bg: 'rgba(255, 90, 95, 0.22)' },
+                { border: '#00D1B2', bg: 'rgba(0, 209, 178, 0.22)' },
+                { border: '#FFB400', bg: 'rgba(255, 180, 0, 0.22)' },
+                { border: '#8B5CF6', bg: 'rgba(139, 92, 246, 0.22)' }
+            ];
+            chartDatasets = playerVals.map((ds, idx) => {
+                const color = palette[idx % palette.length];
+                return {
+                    label: ds.label,
+                    data: ds.data,
+                    backgroundColor: color.bg,
+                    borderColor: color.border,
+                    pointBackgroundColor: color.border,
+                    pointBorderColor: '#FFFFFF',
+                    pointHoverBackgroundColor: '#FFFFFF',
+                    pointHoverBorderColor: color.border,
+                    pointRadius: 3.5,
+                    borderWidth: 2,
+                    fill: true
+                };
+            });
+        } else {
+            // Standard Player vs Positional Benchmark
+            chartDatasets = [
+                {
+                    label: playerName,
+                    data: playerVals,
+                    backgroundColor: 'rgba(56, 189, 248, 0.25)',
+                    borderColor: '#0284C7',
+                    pointBackgroundColor: '#0284C7',
+                    pointBorderColor: '#FFFFFF',
+                    pointHoverBackgroundColor: '#FFFFFF',
+                    pointHoverBorderColor: '#0284C7',
+                    pointRadius: 4,
+                    pointHoverRadius: 6,
+                    borderWidth: 2.5,
+                    fill: true,
+                    rawVals: rawPlayerVals
+                },
+                {
+                    label: 'Positional Benchmark (Avg = 50)',
+                    data: benchmarkVals || labels.map(() => 50),
+                    backgroundColor: 'rgba(0, 209, 178, 0.08)',
+                    borderColor: '#00D1B2',
+                    borderDash: [5, 4],
+                    pointBackgroundColor: '#00D1B2',
+                    pointBorderColor: '#FFFFFF',
+                    pointRadius: 3,
+                    borderWidth: 2,
+                    fill: true,
+                    rawVals: rawBenchVals
+                }
+            ];
+        }
+
+        const baseOpts = getBaseChartOptions();
+
         chartInstances[canvasId] = new Chart(ctx, {
             type: 'radar',
             data: {
                 labels: labels,
-                datasets: [
-                    {
-                        label: playerName,
-                        data: playerVals,
-                        backgroundColor: 'rgba(255, 90, 95, 0.22)',
-                        borderColor: t.coral,
-                        pointBackgroundColor: t.coral,
-                        pointBorderColor: '#FFFFFF',
-                        borderWidth: 2,
-                        fill: true
-                    },
-                    {
-                        label: 'Position Benchmark',
-                        data: benchmarkVals,
-                        backgroundColor: 'transparent',
-                        borderColor: t.mint,
-                        pointBackgroundColor: t.mint,
-                        pointBorderColor: '#FFFFFF',
-                        borderWidth: 2,
-                        borderDash: [4, 4]
-                    }
-                ]
+                datasets: chartDatasets
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                animation: baseOpts.animation,
                 scales: {
                     r: {
-                        angleLines: { color: t.border },
-                        grid: { color: t.border },
+                        min: 0,
+                        max: 100,
+                        beginAtZero: true,
+                        angleLines: { color: t.border, lineWidth: 1 },
+                        grid: { color: t.border, circular: true },
                         pointLabels: {
-                            color: t.textSecondary,
+                            color: t.textPrimary,
                             font: { family: "'Inter', sans-serif", weight: 600, size: 11 }
                         },
-                        ticks: { display: false }
+                        ticks: {
+                            stepSize: 25,
+                            display: true,
+                            showLabelBackdrop: false,
+                            color: t.textMuted,
+                            font: { size: 9 },
+                            callback: function(val) {
+                                if (val === 50) return 'Avg (50)';
+                                if (val === 100) return '100';
+                                return '';
+                            }
+                        }
                     }
                 },
-                plugins: getBaseChartOptions().plugins
+                plugins: {
+                    ...baseOpts.plugins,
+                    tooltip: {
+                        ...baseOpts.plugins.tooltip,
+                        callbacks: {
+                            label: function(context) {
+                                const ds = context.dataset;
+                                const idx = context.dataIndex;
+                                const score = context.raw;
+                                if (ds.rawVals && ds.rawVals[idx] !== undefined) {
+                                    const raw = ds.rawVals[idx];
+                                    return `${ds.label}: ${raw}/90 (Index: ${score}/100)`;
+                                }
+                                return `${ds.label}: ${score}/100`;
+                            }
+                        }
+                    }
+                }
             }
         });
     });

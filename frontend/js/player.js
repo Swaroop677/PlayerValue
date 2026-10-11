@@ -140,20 +140,47 @@ function renderProfile(player, stats, history, transfers, prediction, similar) {
         fetchAPI(`/players/positional-averages?position=${player.primary_position || 'CM'}`)
             .then(bench => {
                 const labels = ['Goals/90', 'Assists/90', 'xG/90', 'xA/90', 'Prog Passes', 'Prog Carries', 'Tackles', 'Interceptions'];
-                const pVals = [
-                    latestStat.goals_per_90 || 0, latestStat.assists_per_90 || 0,
-                    latestStat.xg_per_90 || 0, latestStat.xa_per_90 || 0,
-                    latestStat.progressive_passes_per_90 || 0, latestStat.progressive_carries_per_90 || 0,
-                    latestStat.tackles_per_90 || 0, latestStat.interceptions_per_90 || 0
+                const rawPlayer = [
+                    Number(latestStat.goals_per_90 || 0).toFixed(2),
+                    Number(latestStat.assists_per_90 || 0).toFixed(2),
+                    Number(latestStat.xg_per_90 || 0).toFixed(2),
+                    Number(latestStat.xa_per_90 || 0).toFixed(2),
+                    Number(latestStat.progressive_passes_per_90 || 0).toFixed(2),
+                    Number(latestStat.progressive_carries_per_90 || 0).toFixed(2),
+                    Number(latestStat.tackles_per_90 || 0).toFixed(2),
+                    Number(latestStat.interceptions_per_90 || 0).toFixed(2)
                 ];
-                const bVals = [
-                    bench.goals_per_90 || 0.1, bench.assists_per_90 || 0.1,
-                    bench.xg_per_90 || 0.1, bench.xa_per_90 || 0.1,
-                    bench.progressive_passes_per_90 || 2.5, bench.progressive_carries_per_90 || 1.8,
-                    bench.tackles_per_90 || 1.2, bench.interceptions_per_90 || 0.8
+                const rawBench = [
+                    Number(bench.goals_per_90 || 0.1).toFixed(2),
+                    Number(bench.assists_per_90 || 0.1).toFixed(2),
+                    Number(bench.xg_per_90 || 0.1).toFixed(2),
+                    Number(bench.xa_per_90 || 0.1).toFixed(2),
+                    Number(bench.progressive_passes_per_90 || 2.5).toFixed(2),
+                    Number(bench.progressive_carries_per_90 || 1.8).toFixed(2),
+                    Number(bench.tackles_per_90 || 1.2).toFixed(2),
+                    Number(bench.interceptions_per_90 || 0.8).toFixed(2)
                 ];
+
+                // Benchmark average benchmark baseline = 50 / 100
+                // Player index: <= bench ratio maps 5->50, > bench ratio maps 50->98
+                function computeScore(pVal, bVal) {
+                    const p = parseFloat(pVal) || 0;
+                    const b = Math.max(parseFloat(bVal) || 0.1, 0.01);
+                    if (p <= 0) return 5;
+                    const ratio = p / b;
+                    if (ratio <= 1.0) {
+                        return Math.round(5 + ratio * 45);
+                    } else {
+                        const extra = Math.min(ratio - 1.0, 1.5) / 1.5;
+                        return Math.round(50 + extra * 48);
+                    }
+                }
+
+                const pVals = rawPlayer.map((val, i) => computeScore(val, rawBench[i]));
+                const bVals = rawBench.map(() => 50);
+
                 setTimeout(() => {
-                    createRadarChart('radar-chart', labels, pVals, bVals, player.name);
+                    createRadarChart('radar-chart', labels, pVals, bVals, player.name, rawPlayer, rawBench);
                 }, 100);
             })
             .catch(e => console.warn('Radar fetch failed', e));
