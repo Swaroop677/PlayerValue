@@ -2,10 +2,77 @@ document.addEventListener('DOMContentLoaded', async () => {
     initPage('dashboard');
 
     const searchInput = document.getElementById('global-search');
+    const searchDropdown = document.getElementById('hero-search-dropdown');
+
+    // Interactive 3D Perspective Tilt on Hero Card
+    const heroEl = document.querySelector('.homepage-hero');
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (heroEl && !prefersReducedMotion) {
+        heroEl.addEventListener('mousemove', (e) => {
+            const rect = heroEl.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+            const rotateX = ((y - centerY) / centerY) * -1.5;
+            const rotateY = ((x - centerX) / centerX) * 1.5;
+            heroEl.style.transform = `perspective(1200px) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg)`;
+        });
+        heroEl.addEventListener('mouseleave', () => {
+            heroEl.style.transform = 'perspective(1200px) rotateX(0deg) rotateY(0deg)';
+        });
+    }
+
     if (searchInput) {
+        let searchTimer = null;
+
         searchInput.addEventListener('keydown', (e) => {
             if (e.key === 'Enter' && searchInput.value.trim()) {
                 window.location.href = `players.html?name=${encodeURIComponent(searchInput.value.trim())}`;
+            } else if (e.key === 'Escape' && searchDropdown) {
+                searchDropdown.classList.remove('active');
+            }
+        });
+
+        searchInput.addEventListener('input', () => {
+            clearTimeout(searchTimer);
+            const q = searchInput.value.trim();
+            if (!q || q.length < 2) {
+                if (searchDropdown) searchDropdown.classList.remove('active');
+                return;
+            }
+            searchTimer = setTimeout(async () => {
+                try {
+                    const res = await getPlayers({ name: q, page: 1, page_size: 6 });
+                    if (searchDropdown && res && res.items && res.items.length > 0) {
+                        searchDropdown.innerHTML = res.items.map(p => `
+                            <a href="player.html?id=${p.id}" class="search-result-item">
+                                <div style="display:flex; align-items:center; gap:10px;">
+                                    ${createPlayerAvatar(p.name, p.primary_position, 'avatar-sm')}
+                                    <div>
+                                        <div style="font-weight:700; font-size:13.5px; color:var(--color-ink);">${p.name}</div>
+                                        <div style="font-size:11.5px; color:var(--color-ink-soft);">${p.club_name || '-'} • ${p.primary_position} • ${p.age || '-'} yrs</div>
+                                    </div>
+                                </div>
+                                <div class="tabular-nums" style="font-weight:700; font-size:13px; color:var(--color-primary-dark);">
+                                    ${formatCurrency(p.market_value_eur)}
+                                </div>
+                            </a>
+                        `).join('');
+                        searchDropdown.classList.add('active');
+                    } else if (searchDropdown) {
+                        searchDropdown.innerHTML = `<div style="padding:14px 16px; font-size:13px; color:var(--color-ink-soft);">No matching players found for "${q}"</div>`;
+                        searchDropdown.classList.add('active');
+                    }
+                } catch (err) {
+                    console.warn('Autocomplete search error:', err);
+                }
+            }, 220);
+        });
+
+        document.addEventListener('click', (e) => {
+            if (searchDropdown && !searchInput.contains(e.target) && !searchDropdown.contains(e.target)) {
+                searchDropdown.classList.remove('active');
             }
         });
     }
@@ -23,7 +90,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         const data = await getDashboard();
 
-        // 1. Render KPIs
+        // 1. Render KPIs with 3D hover class
         if (kpiContainer && data.kpis) {
             kpiContainer.innerHTML = data.kpis.map(kpi => {
                 let displayVal = kpi.value;
@@ -32,7 +99,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 } else {
                     displayVal = formatNumber(kpi.value);
                 }
-                return createStatCard(kpi.label, displayVal);
+                return createStatCard(kpi.label, displayVal).replace('class="card kpi-card"', 'class="card kpi-card card-3d-hover"');
             }).join('');
         }
 
