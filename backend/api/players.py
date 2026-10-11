@@ -53,20 +53,27 @@ def api_get_players(
     }
     return get_players(db, filters, page, page_size, sort_by, sort_dir)
 
+_POS_AVG_CACHE = {}
+
 @router.get("/positional-averages")
 def api_get_positional_averages(position: str = Query("CM"), db: Session = Depends(get_db)):
+    if position in _POS_AVG_CACHE:
+        return _POS_AVG_CACHE[position]
+
     from backend.database.models import SeasonStats, Player
     # Compute average per-90 metrics for the requested position for season 2024-25
     stats = db.query(SeasonStats).join(Player, SeasonStats.player_id == Player.id)\
         .filter(Player.primary_position == position, SeasonStats.season.in_(["2024-25", "2023-24"]), SeasonStats.minutes >= 450).all()
     if not stats:
-        return {
+        result = {
             "goals_per_90": 0.15, "assists_per_90": 0.12, "xg_per_90": 0.14,
             "xa_per_90": 0.10, "progressive_passes_per_90": 3.8, "progressive_carries_per_90": 2.1,
             "tackles_per_90": 1.6, "interceptions_per_90": 1.1
         }
+        _POS_AVG_CACHE[position] = result
+        return result
     n = len(stats)
-    return {
+    result = {
         "goals_per_90": round(sum(s.goals_per_90 for s in stats) / n, 2),
         "assists_per_90": round(sum(s.assists_per_90 for s in stats) / n, 2),
         "xg_per_90": round(sum(s.xg_per_90 for s in stats) / n, 2),
@@ -76,6 +83,8 @@ def api_get_positional_averages(position: str = Query("CM"), db: Session = Depen
         "tackles_per_90": round(sum(s.tackles_per_90 for s in stats) / n, 2),
         "interceptions_per_90": round(sum(s.interceptions_per_90 for s in stats) / n, 2)
     }
+    _POS_AVG_CACHE[position] = result
+    return result
 
 @router.get("/{player_id}")
 def api_get_player_detail(player_id: int, db: Session = Depends(get_db)):
