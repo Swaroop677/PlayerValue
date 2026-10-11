@@ -64,13 +64,13 @@
 }
 
 [data-theme="dark"] {
-  --color-bg: #0F172A;
-  --color-surface: #1E293B;
-  --color-border: #334155;
-  --color-ink: #F1F5F9;
+  --color-bg: #04070F;
+  --color-surface: #0A101E;
+  --color-border: rgba(148, 163, 184, 0.14);
+  --color-ink: #F8FAFC;
   --color-ink-soft: #94A3B8;
   --color-ink-muted: #64748B;
-  --color-surface-alt: #27354A;
+  --color-surface-alt: #111A2E;
 
   --color-primary-tint: rgba(255, 90, 95, 0.18);
   --color-secondary-tint: rgba(255, 180, 0, 0.18);
@@ -79,13 +79,149 @@
   --color-primary-dark: #FF7B80;
   --color-tertiary-dark: #2DE0C4;
 
-  --color-on-secondary: #0F172A;
-  --color-on-tertiary: #0F172A;
+  --color-on-secondary: #04070F;
+  --color-on-tertiary: #04070F;
 
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 6px 20px rgba(0, 0, 0, 0.45);
-  --shadow-lg: 0 10px 28px rgba(0, 0, 0, 0.6);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.55);
+  --shadow-md: 0 10px 30px -5px rgba(0, 0, 0, 0.75);
+  --shadow-lg: 0 20px 44px -10px rgba(0, 0, 0, 0.85);
 }
+
+/* ========================================================
+   AESTHETIC DARK MODE GRADIENTS & GLASSMORPHISM
+   (Applies ONLY to [data-theme="dark"] — Light Mode untouched)
+   ======================================================== */
+[data-theme="dark"] body {
+  background-color: #04070F;
+  background-image:
+    radial-gradient(ellipse 80% 50% at 50% -15%, rgba(56, 189, 248, 0.15), transparent 70%),
+    radial-gradient(ellipse 55% 45% at 88% 18%, rgba(255, 90, 95, 0.11), transparent 65%),
+    radial-gradient(ellipse 60% 50% at 12% 82%, rgba(0, 209, 178, 0.09), transparent 65%),
+    radial-gradient(ellipse 50% 40% at 50% 50%, rgba(99, 102, 241, 0.06), transparent 70%);
+  background-attachment: fixed;
+}
+
+[data-theme="dark"] .navbar {
+  background: linear-gradient(180deg, rgba(4, 7, 15, 0.88) 0%, rgba(8, 13, 26, 0.80) 100%);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border-bottom: 1px solid rgba(56, 189, 248, 0.14);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.6);
+}
+
+[data-theme="dark"] .nav-link.active {
+  background: linear-gradient(135deg, rgba(255, 90, 95, 0.22) 0%, rgba(255, 180, 0, 0.14) 100%);
+  color: #FF8589;
+  border: 1px solid rgba(255, 90, 95, 0.3);
+  box-shadow: 0 0 16px rgba(255, 90, 95, 0.18);
+}
+
+[data-theme="dark"] .card,
+[data-theme="dark"] .kpi-card,
+[data-theme="dark"] .player-grid-card,
+[data-theme="dark"] .hero-card {
+  background: linear-gradient(145deg, rgba(14, 22, 40, 0.90) 0%, rgba(7, 11, 22, 0.96) 100%);
+  border: 1px solid rgba(148, 163, 184, 0.13);
+  box-shadow: 0 12px 32px -8px rgba(0, 0, 0, 0.75), inset 0 1px 0 0 rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(12px);
+}
+
+[data-theme="dark"] .kpi-card {
+  background: linear-gradient(145deg, rgba(16, 25, 46, 0.92) 0%, rgba(8, 13, 25, 0.96) 100%),
+              radial-gradient(circle at top right, rgba(56, 189, 248, 0.12), transparent 60%);
+}
+
+[data-theme="dark"] .card-3d-hover:hover,
+[data-theme="dark"] .player-grid-card:hover {
+  border-color: rgba(56, 189, 248, 0.38);
+  box-shadow: 0 16px 36px -8px rgba(14, 165, 233, 0.22), 0 0 20px rgba(56, 189, 248, 0.10), inset 0 1px 0 0 rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .homepage-hero {
+  background: linear-gradient(135deg, rgba(11, 18, 35, 0.94) 0%, rgba(5, 8, 17, 0.97) 50%, rgba(15, 20, 42, 0.94) 100%);
+  border: 1px solid rgba(56, 189, 248, 0.26);
+  box-shadow: 0 24px 60px -12px rgba(0, 0, 0, 0.9), 0 0 45px -10px rgba(56, 189, 248, 0.18), inset 0 1px 0 0 rgba(255, 255, 255, 0.08);
+}
+
+[data-theme="dark"] .orb {
+  opacity: 0.52;
+  filter: blur(64px);
+}
+
+[data-theme="dark"] .hero-live-badge {
+  background: linear-gradient(90deg, rgba(56, 189, 248, 0.16) 0%, rgba(99, 102, 241, 0.16) 100%);
+  border: 1px solid rgba(56, 189, 248, 0.38);
+  color: #7DD3FC;
+  box-shadow: 0 0 20px rgba(56, 189, 248, 0.18);
+}
+
+[data-theme="dark"] .floating-pill {
+  background: linear-gradient(135deg, rgba(17, 26, 48, 0.90) 0%, rgba(9, 14, 28, 0.95) 100%);
+  border: 1px solid rgba(56, 189, 248, 0.24);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.75), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+[data-theme="dark"] .floating-pill:hover {
+  border-color: #38BDF8;
+  box-shadow: 0 16px 36px rgba(14, 165, 233, 0.28), 0 0 20px rgba(56, 189, 248, 0.2);
+}
+
+[data-theme="dark"] .btn-primary {
+  background: linear-gradient(135deg, #FF5A5F 0%, #F43F5E 55%, #E11D48 100%);
+  box-shadow: 0 6px 20px rgba(255, 90, 95, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+
+[data-theme="dark"] .btn-primary:hover {
+  background: linear-gradient(135deg, #FF7075 0%, #FF5A5F 50%, #FFB400 100%);
+  box-shadow: 0 8px 26px rgba(255, 90, 95, 0.5);
+}
+
+[data-theme="dark"] .btn-secondary {
+  background: linear-gradient(145deg, rgba(20, 30, 54, 0.9) 0%, rgba(12, 19, 36, 0.95) 100%);
+  border: 1px solid rgba(148, 163, 184, 0.24);
+  color: #F1F5F9;
+}
+
+[data-theme="dark"] .btn-secondary:hover {
+  background: linear-gradient(145deg, rgba(28, 42, 74, 0.95) 0%, rgba(17, 27, 50, 0.98) 100%);
+  border-color: rgba(56, 189, 248, 0.45);
+  box-shadow: 0 0 16px rgba(56, 189, 248, 0.15);
+}
+
+[data-theme="dark"] .filter-bar-wrapper {
+  background: linear-gradient(145deg, rgba(13, 20, 38, 0.92) 0%, rgba(8, 13, 25, 0.96) 100%);
+  border-color: rgba(148, 163, 184, 0.16);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.65);
+}
+
+[data-theme="dark"] .filter-input,
+[data-theme="dark"] .filter-select {
+  background: rgba(6, 10, 20, 0.85);
+  border-color: rgba(148, 163, 184, 0.2);
+  color: #F8FAFC;
+}
+
+[data-theme="dark"] .filter-input:focus,
+[data-theme="dark"] .filter-select:focus {
+  border-color: #38BDF8;
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.22);
+}
+
+[data-theme="dark"] .data-table th {
+  background: rgba(8, 13, 26, 0.95);
+  border-bottom: 1px solid rgba(148, 163, 184, 0.18);
+  color: #94A3B8;
+}
+
+[data-theme="dark"] .data-table tbody tr:hover {
+  background: linear-gradient(90deg, rgba(56, 189, 248, 0.09) 0%, rgba(255, 90, 95, 0.05) 100%);
+}
+
+[data-theme="dark"] .player-avatar.has-photo {
+  border-color: #38BDF8;
+  box-shadow: 0 0 12px rgba(56, 189, 248, 0.3);
+}
+
 
 /* ========================================================
    BASE RESETS & DEFAULTS

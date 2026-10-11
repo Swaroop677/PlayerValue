@@ -28,11 +28,11 @@ function getThemeTokens() {
     const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
     return {
         isDark,
-        textPrimary: isDark ? '#F1F5F9' : '#1E293B',
+        textPrimary: isDark ? '#F8FAFC' : '#1E293B',
         textSecondary: isDark ? '#94A3B8' : '#475569',
         textMuted: isDark ? '#64748B' : '#94A3B8',
-        border: isDark ? '#334155' : '#E8EAEE',
-        cardBg: isDark ? '#1E293B' : '#FFFFFF',
+        border: isDark ? 'rgba(148, 163, 184, 0.14)' : '#E8EAEE',
+        cardBg: isDark ? '#0A101E' : '#FFFFFF',
         coral: '#FF5A5F',
         citrus: '#FFB400',
         mint: '#00D1B2',

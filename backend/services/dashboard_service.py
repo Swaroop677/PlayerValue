@@ -129,27 +129,39 @@ def get_dashboard_data(db: Session) -> Dict[str, Any]:
         .filter(prev_vals.c.market_value_eur > 0)  # avoid division by zero
     )
 
-    # Risers — top 10 biggest absolute increase
-    risers_rows = change_query.order_by(desc("change")).limit(10).all()
+    # Risers — top 5 biggest absolute increase (deduplicated by player)
+    risers_rows = change_query.order_by(desc("change")).limit(25).all()
     risers = []
+    seen_riser_ids = set()
     for r in risers_rows:
+        if r.Player.id in seen_riser_ids:
+            continue
+        seen_riser_ids.add(r.Player.id)
         change_pct = ((r.current_value - r.previous_value) / r.previous_value * 100) if r.previous_value else 0
         risers.append({
             **_player_summary(r.Player, r.club_name, r.league_name, r.current_value, prev_mv=r.previous_value),
             "change_eur": r.change,
             "change_percent": round(change_pct, 1),
         })
+        if len(risers) >= 5:
+            break
 
-    # Fallers — top 10 biggest absolute decrease
-    fallers_rows = change_query.order_by(asc("change")).limit(10).all()
+    # Fallers — top 5 biggest absolute decrease (deduplicated by player)
+    fallers_rows = change_query.order_by(asc("change")).limit(25).all()
     fallers = []
+    seen_faller_ids = set()
     for r in fallers_rows:
+        if r.Player.id in seen_faller_ids:
+            continue
+        seen_faller_ids.add(r.Player.id)
         change_pct = ((r.current_value - r.previous_value) / r.previous_value * 100) if r.previous_value else 0
         fallers.append({
             **_player_summary(r.Player, r.club_name, r.league_name, r.current_value, prev_mv=r.previous_value),
             "change_eur": r.change,
             "change_percent": round(change_pct, 1),
         })
+        if len(fallers) >= 5:
+            break
 
     # ── Undervalued (model value > market value) ──────────────────────
     latest_pred_sub = (
@@ -188,11 +200,15 @@ def get_dashboard_data(db: Session) -> Dict[str, Any]:
         .outerjoin(League, Club.league_id == League.id)
         .filter(ModelPrediction.difference_percent > 0)
         .order_by(ModelPrediction.difference_percent.desc())
-        .limit(10)
+        .limit(20)
     )
 
     undervalued = []
+    seen_uv_ids = set()
     for r in undervalued_query.all():
+        if r.Player.id in seen_uv_ids:
+            continue
+        seen_uv_ids.add(r.Player.id)
         undervalued.append(
             _player_summary(
                 r.Player,
@@ -203,6 +219,8 @@ def get_dashboard_data(db: Session) -> Dict[str, Any]:
                 gap=r.difference_percent,
             )
         )
+        if len(undervalued) >= 5:
+            break
 
     # ── Recently updated players ──────────────────────────────────────
     recent_rows = (
