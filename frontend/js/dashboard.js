@@ -90,17 +90,24 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         const data = await getDashboard();
 
-        // 1. Render KPIs with 3D hover class
+        // 1. Render Modern Minimalist Key Metrics
         if (kpiContainer && data.kpis) {
-            kpiContainer.innerHTML = data.kpis.map(kpi => {
-                let displayVal = kpi.value;
-                if (kpi.label === 'Total Market Value') {
-                    displayVal = formatCurrency(kpi.value);
-                } else {
-                    displayVal = formatNumber(kpi.value);
-                }
-                return createStatCard(kpi.label, displayVal).replace('class="card kpi-card"', 'class="card kpi-card card-3d-hover"');
+            kpiContainer.innerHTML = data.kpis.map((kpi, idx) => {
+                const isCurrency = (kpi.label === 'Total Market Value');
+                const initialText = isCurrency ? '€0.0B' : '0';
+                return `
+                    <div class="kpi-metric-card" data-index="${idx}">
+                        <div class="kpi-metric-ambient-glow"></div>
+                        <div class="kpi-metric-value tabular-nums" data-raw-value="${kpi.value}" data-is-currency="${isCurrency}">${initialText}</div>
+                        <span class="kpi-metric-label">
+                            <span class="kpi-metric-dot"></span>
+                            ${kpi.label}
+                        </span>
+                    </div>
+                `;
             }).join('');
+
+            initKpiScrollAnimation(kpiContainer);
         }
 
         // 2. Market Growth Chart
@@ -216,3 +223,83 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (kpiContainer) showError(kpiContainer, 'Failed to connect to backend service.');
     }
 });
+
+// Interactive micro-animation: Smooth animated number counter triggering on scroll into view
+function initKpiScrollAnimation(container) {
+    const cards = container.querySelectorAll('.kpi-metric-card');
+    if (!cards.length) return;
+
+    function animateKpiNumber(el) {
+        const rawVal = parseFloat(el.getAttribute('data-raw-value') || '0');
+        const isCurrency = el.getAttribute('data-is-currency') === 'true';
+        const duration = 1400; // ms
+        const startTime = performance.now();
+
+        function easeOutExpo(x) {
+            return x === 1 ? 1 : 1 - Math.pow(2, -10 * x);
+        }
+
+        function step(now) {
+            const elapsed = now - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+            const ease = easeOutExpo(progress);
+
+            if (isCurrency) {
+                if (rawVal >= 1e9) {
+                    const currentB = ((rawVal / 1e9) * ease).toFixed(1);
+                    el.textContent = `€${currentB}B`;
+                } else if (rawVal >= 1e6) {
+                    const currentM = ((rawVal / 1e6) * ease).toFixed(1);
+                    el.textContent = `€${currentM}M`;
+                } else {
+                    el.textContent = `€${Math.round(rawVal * ease).toLocaleString()}`;
+                }
+            } else {
+                const currentInt = Math.round(rawVal * ease);
+                el.textContent = currentInt.toLocaleString();
+            }
+
+            if (progress < 1) {
+                requestAnimationFrame(step);
+            } else {
+                // Final exact formatting fallback
+                if (isCurrency) {
+                    el.textContent = formatCurrency(rawVal);
+                } else {
+                    el.textContent = formatNumber(rawVal);
+                }
+            }
+        }
+
+        requestAnimationFrame(step);
+    }
+
+    if (!('IntersectionObserver' in window)) {
+        cards.forEach((card, i) => {
+            const valEl = card.querySelector('.kpi-metric-value');
+            if (valEl) setTimeout(() => animateKpiNumber(valEl), i * 80);
+        });
+        return;
+    }
+
+    const observer = new IntersectionObserver((entries, obs) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const card = entry.target;
+                const valEl = card.querySelector('.kpi-metric-value');
+                if (valEl && !valEl.classList.contains('counted')) {
+                    valEl.classList.add('counted');
+                    const idx = parseInt(card.getAttribute('data-index') || '0', 10);
+                    setTimeout(() => animateKpiNumber(valEl), idx * 80);
+                }
+                obs.unobserve(card);
+            }
+        });
+    }, {
+        threshold: 0.15,
+        rootMargin: '0px 0px -20px 0px'
+    });
+
+    cards.forEach(card => observer.observe(card));
+}
+
