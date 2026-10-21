@@ -1,24 +1,29 @@
 /**
- * PlayerValue API Client with Client-Side Caching & Prefetching
+ * PlayerValue API Client with Client-Side Caching, Prefetching & Cloud Failover
  */
 
-// API Base URL (configurable for cloud deployments, defaults to relative /api)
-const API_BASE = window.__API_BASE__ || localStorage.getItem('playervalue_api_base') || '/api';
+// API Base URLs: local relative /api with automatic Railway cloud fallback
+const CLOUD_FALLBACK_API = 'https://playervalue.up.railway.app/api';
+let activeApiBase = window.__API_BASE__ || localStorage.getItem('playervalue_api_base') || '/api';
 
 // In-memory cache for API requests with 3-minute stale TTL
 const apiCache = new Map();
 const CACHE_TTL_MS = 180000;
 
 async function fetchAPI(endpoint, params = {}, options = {}) {
-    const url = new URL(API_BASE + endpoint, window.location.origin);
-    
-    Object.keys(params).forEach(key => {
-        if (params[key] !== null && params[key] !== undefined && params[key] !== '') {
-            url.searchParams.append(key, params[key]);
-        }
-    });
+    const buildRequestUrl = (base) => {
+        const isAbsolute = base.startsWith('http://') || base.startsWith('https://');
+        const url = isAbsolute ? new URL(base + endpoint) : new URL(base + endpoint, window.location.origin);
+        Object.keys(params).forEach(key => {
+            if (params[key] !== null && params[key] !== undefined && params[key] !== '') {
+                url.searchParams.append(key, params[key]);
+            }
+        });
+        return url;
+    };
 
-    const cacheKey = url.toString();
+    const primaryUrl = buildRequestUrl(activeApiBase);
+    const cacheKey = primaryUrl.toString();
     const useCache = options.cache !== false;
 
     if (useCache && apiCache.has(cacheKey)) {
@@ -30,7 +35,7 @@ async function fetchAPI(endpoint, params = {}, options = {}) {
     }
 
     try {
-        const response = await fetch(url);
+        const response = await fetch(primaryUrl);
         if (!response.ok) {
             throw new Error(`API Error: ${response.status} ${response.statusText}`);
         }
@@ -39,9 +44,26 @@ async function fetchAPI(endpoint, params = {}, options = {}) {
             apiCache.set(cacheKey, { timestamp: Date.now(), data });
         }
         return data;
-    } catch (error) {
-        console.error('API Fetch Error:', error);
-        throw error;
+    } catch (primaryError) {
+        // Automatic resilient failover to Railway cloud backend if local or relative /api fails
+        if (activeApiBase !== CLOUD_FALLBACK_API) {
+            try {
+                const fallbackUrl = buildRequestUrl(CLOUD_FALLBACK_API);
+                const fallbackResponse = await fetch(fallbackUrl);
+                if (fallbackResponse.ok) {
+                    const fallbackData = await fallbackResponse.json();
+                    activeApiBase = CLOUD_FALLBACK_API; // Persist working base for remaining requests
+                    if (useCache) {
+                        apiCache.set(cacheKey, { timestamp: Date.now(), data: fallbackData });
+                    }
+                    return fallbackData;
+                }
+            } catch (fallbackErr) {
+                console.warn('Fallback cloud request failed:', fallbackErr);
+            }
+        }
+        console.error('API Fetch Error:', primaryError);
+        throw primaryError;
     }
 }
 

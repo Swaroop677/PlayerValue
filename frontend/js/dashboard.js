@@ -149,10 +149,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     change_eur: 30000000
                 });
             }
-            risersTbody.innerHTML = topRisers.length > 0 ? topRisers.map((p, idx) => {
-                const isPositive = p.change_eur >= 0;
-                const changeStr = formatCurrency(Math.abs(p.change_eur));
-                return `
+            risersTbody.innerHTML = topRisers.length > 0 ? topRisers.map((p, idx) => `
                 <tr style="cursor:pointer" onclick="window.location.href='player.html?id=${p.id}'">
                     <td>
                         <div style="display:flex; align-items:center; gap:10px;">
@@ -168,23 +165,16 @@ document.addEventListener('DOMContentLoaded', async () => {
                         </div>
                     </td>
                     <td class="tabular-nums" style="color:var(--color-ink-soft); white-space:nowrap;">${formatCurrency(p.previous_value_eur)}</td>
-                    <td class="tabular-nums font-mono" style="white-space:nowrap;"><strong>${formatCurrency(p.market_value_eur)}</strong></td>
-                    <td style="width:90px; text-align:center; padding:6px 4px;">
-                        <canvas class="table-sparkline" width="80" height="24" data-type="riser" data-prev="${p.previous_value_eur}" data-curr="${p.market_value_eur}"></canvas>
-                    </td>
-                    <td style="white-space:nowrap;">
-                        <span class="spark-pill spark-pill-up">▲ +${changeStr}</span>
-                    </td>
+                    <td class="tabular-nums" style="white-space:nowrap;"><strong>${formatCurrency(p.market_value_eur)}</strong></td>
+                    <td style="white-space:nowrap;">${createValueBadge(p.change_eur, false)}</td>
                 </tr>
-            `;}).join('') : '<tr><td colspan="5" class="text-center" style="padding:24px">No risers recorded</td></tr>';
+            `).join('') : '<tr><td colspan="4" class="text-center" style="padding:24px">No risers recorded</td></tr>';
         }
 
         // 4. Top 5 Fallers Table
         if (fallersTbody) {
             const topFallers = getUniqueTop5(data.fallers);
-            fallersTbody.innerHTML = topFallers.length > 0 ? topFallers.map((p, idx) => {
-                const changeStr = formatCurrency(Math.abs(p.change_eur));
-                return `
+            fallersTbody.innerHTML = topFallers.length > 0 ? topFallers.map((p, idx) => `
                 <tr style="cursor:pointer" onclick="window.location.href='player.html?id=${p.id}'">
                     <td>
                         <div style="display:flex; align-items:center; gap:10px;">
@@ -200,20 +190,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                         </div>
                     </td>
                     <td class="tabular-nums" style="color:var(--color-ink-soft); white-space:nowrap;">${formatCurrency(p.previous_value_eur)}</td>
-                    <td class="tabular-nums font-mono" style="white-space:nowrap;"><strong>${formatCurrency(p.market_value_eur)}</strong></td>
-                    <td style="width:90px; text-align:center; padding:6px 4px;">
-                        <canvas class="table-sparkline" width="80" height="24" data-type="faller" data-prev="${p.previous_value_eur}" data-curr="${p.market_value_eur}"></canvas>
-                    </td>
-                    <td style="white-space:nowrap;">
-                        <span class="spark-pill spark-pill-down">▼ -${changeStr}</span>
-                    </td>
+                    <td class="tabular-nums" style="white-space:nowrap;"><strong>${formatCurrency(p.market_value_eur)}</strong></td>
+                    <td style="white-space:nowrap;">${createValueBadge(p.change_eur, false)}</td>
                 </tr>
-            `;}).join('') : '<tr><td colspan="5" class="text-center" style="padding:24px">No fallers recorded</td></tr>';
-
-            // Draw sparklines
-            if (typeof renderSparklines === 'function') {
-                renderSparklines();
-            }
+            `).join('') : '<tr><td colspan="4" class="text-center" style="padding:24px">No fallers recorded</td></tr>';
         }
 
         // 6. Fetch Value vs Age Data
