@@ -6,6 +6,14 @@
     <title>PlayerValue | Football Market Intelligence</title>
     <link rel="icon" type="image/png" href="assets/logo-icon.png">
     <link rel="stylesheet" href="css/styles.css">
+    <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+      }
+    }
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 <body>
@@ -19,6 +27,26 @@
                     <div class="orb orb-accent"></div>
                     <div class="orb orb-mint"></div>
                     <div class="hero-grid-pattern"></div>
+                </div>
+
+                <!-- 3D Hero Scene (Three.js with Procedural Football & Orbiting Rings) -->
+                <div id="hero-3d-container" class="hero-3d-container" aria-label="Interactive 3D Football Visualization">
+                    <!-- Static CSS Fallback -->
+                    <div class="hero-3d-fallback" id="hero-3d-fallback">
+                        <div class="fallback-glow-orb"></div>
+                        <div class="fallback-ball-graphic">
+                            <svg viewBox="0 0 100 100" class="fallback-ball-svg" width="120" height="120">
+                                <circle cx="50" cy="50" r="46" fill="#0A1020" stroke="#00FF88" stroke-width="2.5"/>
+                                <polygon points="50,22 68,35 61,56 39,56 32,35" fill="#131E38" stroke="#38BDF8" stroke-width="1.8"/>
+                                <line x1="50" y1="22" x2="50" y2="6" stroke="#00FF88" stroke-width="1.8"/>
+                                <line x1="68" y1="35" x2="84" y2="28" stroke="#00FF88" stroke-width="1.8"/>
+                                <line x1="61" y1="56" x2="72" y2="72" stroke="#00FF88" stroke-width="1.8"/>
+                                <line x1="39" y1="56" x2="28" y2="72" stroke="#00FF88" stroke-width="1.8"/>
+                                <line x1="32" y1="35" x2="16" y2="28" stroke="#00FF88" stroke-width="1.8"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <canvas id="hero-3d-canvas" class="hero-3d-canvas"></canvas>
                 </div>
 
                 <div class="hero-inner">
@@ -188,5 +216,34 @@
     <script src="js/charts.js"></script>
     <script src="js/components.js"></script>
     <script src="js/dashboard.js"></script>
+
+    <!-- Lazy-load 3D Hero Scene after first paint -->
+    <script type="module">
+        window.addEventListener('load', () => {
+            if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.getElementById('hero-3d-container')?.classList.add('fallback-active');
+                return;
+            }
+
+            const loadHero = () => {
+                import('./js/hero-scene.js')
+                    .then(module => {
+                        if (module.initHeroScene) {
+                            module.initHeroScene();
+                        }
+                    })
+                    .catch(err => {
+                        console.warn('3D Hero Scene fallback activated:', err);
+                        document.getElementById('hero-3d-container')?.classList.add('fallback-active');
+                    });
+            };
+
+            if ('requestIdleCallback' in window) {
+                requestIdleCallback(loadHero, { timeout: 1200 });
+            } else {
+                setTimeout(loadHero, 150);
+            }
+        });
+    </script>
 </body>
 </html>
