@@ -1855,3 +1855,307 @@ input, button, select, textarea {
   box-shadow: 0 14px 28px rgba(14, 165, 233, 0.1), 0 2px 4px rgba(11, 31, 51, 0.04);
 }
 
+/* ========================================================
+   PREMIUM DATA VISUALIZATION DESIGN TOKENS & CHARTS
+   ======================================================== */
+.font-mono {
+  font-family: 'JetBrains Mono', 'SF Mono', monospace !important;
+}
+
+.chart-glass-card {
+  background: rgba(255, 255, 255, 0.04) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 20px !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  box-shadow: 0 16px 36px -8px rgba(0, 0, 0, 0.65), inset 0 1px 0 0 rgba(255, 255, 255, 0.06) !important;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+[data-theme="light"] .chart-glass-card {
+  background: rgba(255, 255, 255, 0.9) !important;
+  border: 1px solid rgba(15, 23, 42, 0.08) !important;
+  box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.05), 0 1px 3px rgba(15, 23, 42, 0.03) !important;
+}
+
+.chart-glass-card:hover {
+  border-color: rgba(0, 255, 136, 0.25) !important;
+  box-shadow: 0 20px 42px -10px rgba(0, 0, 0, 0.75), 0 0 20px rgba(0, 255, 136, 0.06) !important;
+}
+
+/* Header Tags & Subtitles */
+.chart-header-tag {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  color: #00FF88;
+  margin-bottom: 4px;
+}
+
+.prime-badge-inline {
+  display: inline-block;
+  font-size: 10.5px;
+  font-weight: 700;
+  color: #00D4FF;
+  background: rgba(0, 212, 255, 0.12);
+  border: 1px solid rgba(0, 212, 255, 0.25);
+  border-radius: 999px;
+  padding: 1px 7px;
+}
+
+/* Chart Header Metrics Callout */
+.chart-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.chart-metric-callout {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.chart-metric-value {
+  font-family: 'JetBrains Mono', 'SF Mono', monospace;
+  font-size: 22px;
+  font-weight: 800;
+  color: #F5F7FA;
+  letter-spacing: -0.02em;
+}
+
+[data-theme="light"] .chart-metric-value {
+  color: #0F172A;
+}
+
+.chart-growth-badge {
+  display: inline-flex;
+  align-items: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 6px;
+}
+
+.chart-growth-badge.positive {
+  background: rgba(0, 255, 136, 0.14);
+  color: #00FF88;
+  border: 1px solid rgba(0, 255, 136, 0.3);
+}
+
+.chart-growth-badge.negative {
+  background: rgba(255, 77, 109, 0.14);
+  color: #FF4D6D;
+  border: 1px solid rgba(255, 77, 109, 0.3);
+}
+
+/* Time Range Selector (5Y | 10Y | All) */
+.range-toggle-group {
+  display: inline-flex;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+  padding: 2px;
+}
+
+[data-theme="light"] .range-toggle-group {
+  background: rgba(15, 23, 42, 0.05);
+  border-color: rgba(15, 23, 42, 0.1);
+}
+
+.range-btn {
+  background: transparent;
+  border: none;
+  color: #8A94A6;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.range-btn:hover {
+  color: #F5F7FA;
+}
+
+.range-btn.active {
+  background: #00FF88;
+  color: #0A101E;
+  box-shadow: 0 2px 8px rgba(0, 255, 136, 0.35);
+}
+
+/* Positional Tier Legend Toggles */
+.tier-legend-group {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.tier-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #8A94A6;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 9px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tier-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.tier-btn.fwd .tier-dot { background: #00FF88; }
+.tier-btn.mid .tier-dot { background: #00D4FF; }
+.tier-btn.def .tier-dot { background: #8B5CF6; }
+.tier-btn.gk .tier-dot { background: #FFC94D; }
+
+.tier-btn.active.fwd { color: #00FF88; border-color: rgba(0, 255, 136, 0.4); background: rgba(0, 255, 136, 0.1); }
+.tier-btn.active.mid { color: #00D4FF; border-color: rgba(0, 212, 255, 0.4); background: rgba(0, 212, 255, 0.1); }
+.tier-btn.active.def { color: #8B5CF6; border-color: rgba(139, 92, 246, 0.4); background: rgba(139, 92, 246, 0.1); }
+.tier-btn.active.gk { color: #FFC94D; border-color: rgba(255, 201, 77, 0.4); background: rgba(255, 201, 77, 0.1); }
+
+.tier-btn:not(.active) {
+  opacity: 0.4;
+  text-decoration: line-through;
+}
+
+/* Club Squad Total Badge */
+.squad-total-badge {
+  background: rgba(0, 255, 136, 0.12) !important;
+  color: #00FF88 !important;
+  font-weight: 700 !important;
+  border: 1px solid rgba(0, 255, 136, 0.28) !important;
+  padding: 5px 12px !important;
+  border-radius: 999px !important;
+  font-size: 12px !important;
+}
+
+/* Custom Dark Glass Tooltip */
+.chartjs-glass-tooltip {
+  position: absolute;
+  pointer-events: none;
+  background: rgba(10, 16, 30, 0.94);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  padding: 10px 14px;
+  color: #F5F7FA;
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.7), 0 0 16px rgba(0, 255, 136, 0.1);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  font-family: 'Inter', -apple-system, sans-serif;
+  z-index: 100;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+  min-width: 140px;
+}
+
+.chartjs-glass-tooltip .tooltip-title {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #8A94A6;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.chartjs-glass-tooltip .tooltip-metric {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 18px;
+  font-weight: 800;
+  color: #F5F7FA;
+  margin-bottom: 4px;
+}
+
+.chartjs-glass-tooltip .tooltip-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.chartjs-glass-tooltip .tooltip-pill {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10.5px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.chartjs-glass-tooltip .pill-up {
+  background: rgba(0, 255, 136, 0.15);
+  color: #00FF88;
+  border: 1px solid rgba(0, 255, 136, 0.3);
+}
+
+.chartjs-glass-tooltip .pill-down {
+  background: rgba(255, 77, 109, 0.15);
+  color: #FF4D6D;
+  border: 1px solid rgba(255, 77, 109, 0.3);
+}
+
+.chartjs-glass-tooltip .pill-prime {
+  background: rgba(0, 212, 255, 0.15);
+  color: #00D4FF;
+  border: 1px solid rgba(0, 212, 255, 0.3);
+}
+
+/* Table Sparklines & Change Pills */
+.table-sparkline {
+  display: block;
+  margin: 0 auto;
+  border-radius: 4px;
+}
+
+.spark-pill {
+  display: inline-flex;
+  align-items: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11.5px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+
+.spark-pill-up {
+  background: rgba(0, 255, 136, 0.12);
+  color: #00FF88;
+  border: 1px solid rgba(0, 255, 136, 0.28);
+}
+
+.spark-pill-down {
+  background: rgba(255, 77, 109, 0.12);
+  color: #FF4D6D;
+  border: 1px solid rgba(255, 77, 109, 0.28);
+}
+
+/* Mobile Chart Optimizations */
+@media (max-width: 768px) {
+  .chart-metric-value {
+    font-size: 18px;
+  }
+  .range-btn {
+    padding: 3px 8px;
+    font-size: 10.5px;
+  }
+  .tier-btn {
+    font-size: 10px;
+    padding: 3px 7px;
+  }
+  .chart-header-actions {
+    gap: 8px;
+  }
+}
+
+

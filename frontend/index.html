@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PlayerValue | Football Market Intelligence</title>
     <link rel="icon" type="image/png" href="assets/logo-icon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/styles.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
@@ -92,36 +95,57 @@
 
             <!-- Charts Grid -->
             <div class="grid-2 mb-4">
-                <div class="card">
-                    <div class="card-header">
+                <!-- Market Growth History Card -->
+                <div class="card chart-glass-card" id="market-growth-card">
+                    <div class="card-header flex-between flex-wrap gap-2">
                         <div>
+                            <div class="chart-header-tag">MARKET MOMENTUM</div>
                             <h3 class="card-title">Market Growth History</h3>
                             <p class="card-subtitle">Aggregated valuation trend across top European leagues</p>
                         </div>
-                        <span class="badge" style="background:var(--color-primary-tint); color:var(--color-primary-dark); font-weight:700;">2015–2026</span>
+                        <div class="chart-header-actions">
+                            <div class="chart-metric-callout">
+                                <span class="chart-metric-value tabular-nums" id="market-latest-value">--</span>
+                                <span class="chart-growth-badge positive" id="market-growth-badge">--</span>
+                            </div>
+                            <div class="range-toggle-group" id="market-range-toggles" role="group" aria-label="Time range selector">
+                                <button type="button" class="range-btn" data-range="5y">5Y</button>
+                                <button type="button" class="range-btn" data-range="10y">10Y</button>
+                                <button type="button" class="range-btn active" data-range="all">All</button>
+                            </div>
+                        </div>
                     </div>
-                    <div class="chart-container">
-                        <canvas id="market-overview-chart"></canvas>
+                    <div class="chart-container" style="position:relative; height:320px;">
+                        <canvas id="market-overview-chart" aria-label="Market Growth History area chart"></canvas>
+                        <span class="sr-only">Market value grew consistently across verified European football records.</span>
                     </div>
                 </div>
 
-                <div class="card">
-                    <div class="card-header">
+                <!-- Valuation by Player Age Card -->
+                <div class="card chart-glass-card" id="value-age-card">
+                    <div class="card-header flex-between flex-wrap gap-2">
                         <div>
+                            <div class="chart-header-tag">LIFECYCLE TRAJECTORY</div>
                             <h3 class="card-title">Valuation by Player Age</h3>
-                            <p class="card-subtitle">Market distribution curve across position tiers</p>
+                            <p class="card-subtitle">Distribution curve across positional tiers • <span class="prime-badge-inline">Prime 24–29y</span></p>
                         </div>
-                        <span class="badge" style="background:var(--color-secondary-tint); color:var(--color-on-secondary); font-weight:700;">Distribution</span>
+                        <div class="tier-legend-group" id="age-tier-legend" role="group" aria-label="Position tier filter">
+                            <button type="button" class="tier-btn active fwd" data-tier="FWD"><span class="tier-dot"></span>FWD</button>
+                            <button type="button" class="tier-btn active mid" data-tier="MID"><span class="tier-dot"></span>MID</button>
+                            <button type="button" class="tier-btn active def" data-tier="DEF"><span class="tier-dot"></span>DEF</button>
+                            <button type="button" class="tier-btn active gk" data-tier="GK"><span class="tier-dot"></span>GK</button>
+                        </div>
                     </div>
-                    <div class="chart-container">
-                        <canvas id="value-age-chart"></canvas>
+                    <div class="chart-container" style="position:relative; height:320px;">
+                        <canvas id="value-age-chart" aria-label="Valuation by Player Age distribution curve"></canvas>
+                        <span class="sr-only">Player market valuations peak between ages 24 and 29 across forwards and midfielders.</span>
                     </div>
                 </div>
             </div>
 
             <!-- Risers & Fallers Grid (Top 5 Each) -->
             <div class="grid-2 mb-4">
-                <div class="card">
+                <div class="card chart-glass-card">
                     <div class="card-header">
                         <div>
                             <h3 class="card-title">Top 5 Value Risers</h3>
@@ -136,6 +160,7 @@
                                     <th>Player</th>
                                     <th>Previous</th>
                                     <th>Current</th>
+                                    <th style="width:90px; text-align:center;">Trend</th>
                                     <th>Change</th>
                                 </tr>
                             </thead>
@@ -144,7 +169,7 @@
                     </div>
                 </div>
 
-                <div class="card">
+                <div class="card chart-glass-card">
                     <div class="card-header">
                         <div>
                             <h3 class="card-title">Top 5 Value Fallers</h3>
@@ -159,6 +184,7 @@
                                     <th>Player</th>
                                     <th>Previous</th>
                                     <th>Current</th>
+                                    <th style="width:90px; text-align:center;">Trend</th>
                                     <th>Change</th>
                                 </tr>
                             </thead>
@@ -169,15 +195,22 @@
             </div>
 
             <!-- Club Squad Valuation Rankings -->
-            <div class="card mb-4">
-                <div class="card-header">
+            <div class="card chart-glass-card mb-4" id="club-squad-card">
+                <div class="card-header flex-between flex-wrap gap-2">
                     <div>
+                        <div class="chart-header-tag">SQUAD BALANCE SHEET</div>
                         <h3 class="card-title">Club Squad Valuation Rankings</h3>
                         <p class="card-subtitle">Top 15 squads by aggregate market value</p>
                     </div>
+                    <div class="club-chart-stats">
+                        <span class="badge squad-total-badge">
+                            Total Top 15: <span id="club-total-squad-value" class="tabular-nums font-mono">--</span>
+                        </span>
+                    </div>
                 </div>
-                <div class="chart-container" style="height:320px;">
-                    <canvas id="club-squad-chart"></canvas>
+                <div class="chart-container" style="min-height:430px; height:auto; position:relative;">
+                    <canvas id="club-squad-chart" aria-label="Club Squad Valuation Rankings horizontal bar chart"></canvas>
+                    <span class="sr-only">Top 15 club squads ranked by total squad valuation.</span>
                 </div>
             </div>
         </main>
