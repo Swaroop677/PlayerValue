@@ -152,21 +152,23 @@ document.addEventListener('DOMContentLoaded', async () => {
             risersTbody.innerHTML = topRisers.length > 0 ? topRisers.map((p, idx) => `
                 <tr style="cursor:pointer" onclick="window.location.href='player.html?id=${p.id}'">
                     <td>
-                        <div style="display:flex; align-items:center; gap:10px;">
-                            <span style="font-size:11.5px; font-weight:800; color:var(--color-ink-muted); width:16px; flex-shrink:0;">#${idx + 1}</span>
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <span style="font-size:11px; font-weight:800; color:var(--color-ink-muted); width:16px; flex-shrink:0;">#${idx + 1}</span>
                             ${createPlayerAvatar(p.name, p.primary_position)}
-                            <div style="min-width:0;">
-                                <div style="display:flex; align-items:center; gap:6px; flex-wrap:nowrap;">
-                                    <span style="font-weight:700; font-size:13.5px; color:var(--color-ink); white-space:nowrap;">${p.name}</span>
-                                    <span class="${getPositionBadgeClass(p.primary_position)}" style="font-size:10px; padding:1px 6px; flex-shrink:0;">${p.primary_position || ''}</span>
+                            <div style="min-width:0; overflow:hidden;">
+                                <div style="display:flex; align-items:center; gap:5px; flex-wrap:nowrap;">
+                                    <span style="font-weight:700; font-size:13px; color:var(--color-ink); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${p.name}</span>
+                                    <span class="${getPositionBadgeClass(p.primary_position)}" style="font-size:9.5px; padding:1px 5px; flex-shrink:0;">${p.primary_position || ''}</span>
                                 </div>
-                                <div style="font-size:11.5px; color:var(--color-ink-soft); margin-top:2px; white-space:nowrap;">${p.club_name || ''}</div>
+                                <div style="font-size:11px; color:var(--color-ink-soft); margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${p.club_name || ''}</div>
                             </div>
                         </div>
                     </td>
-                    <td class="tabular-nums" style="color:var(--color-ink-soft); white-space:nowrap;">${formatCurrency(p.previous_value_eur)}</td>
-                    <td class="tabular-nums" style="white-space:nowrap;"><strong>${formatCurrency(p.market_value_eur)}</strong></td>
-                    <td style="white-space:nowrap;">${createValueBadge(p.change_eur, false)}</td>
+                    <td class="tabular-nums" style="color:var(--color-ink-soft); white-space:nowrap; text-align:right;">${formatCurrency(p.previous_value_eur)}</td>
+                    <td class="tabular-nums" style="white-space:nowrap; text-align:right;"><strong>${formatCurrency(p.market_value_eur)}</strong></td>
+                    <td style="white-space:nowrap; text-align:right;">
+                        <span class="badge badge-positive" style="font-weight:700; font-size:11.5px; padding:3px 8px; display:inline-block;">+${formatCurrency(Math.abs(p.change_eur))}</span>
+                    </td>
                 </tr>
             `).join('') : '<tr><td colspan="4" class="text-center" style="padding:24px">No risers recorded</td></tr>';
         }
@@ -177,21 +179,23 @@ document.addEventListener('DOMContentLoaded', async () => {
             fallersTbody.innerHTML = topFallers.length > 0 ? topFallers.map((p, idx) => `
                 <tr style="cursor:pointer" onclick="window.location.href='player.html?id=${p.id}'">
                     <td>
-                        <div style="display:flex; align-items:center; gap:10px;">
-                            <span style="font-size:11.5px; font-weight:800; color:var(--color-ink-muted); width:16px; flex-shrink:0;">#${idx + 1}</span>
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <span style="font-size:11px; font-weight:800; color:var(--color-ink-muted); width:16px; flex-shrink:0;">#${idx + 1}</span>
                             ${createPlayerAvatar(p.name, p.primary_position)}
-                            <div style="min-width:0;">
-                                <div style="display:flex; align-items:center; gap:6px; flex-wrap:nowrap;">
-                                    <span style="font-weight:700; font-size:13.5px; color:var(--color-ink); white-space:nowrap;">${p.name}</span>
-                                    <span class="${getPositionBadgeClass(p.primary_position)}" style="font-size:10px; padding:1px 6px; flex-shrink:0;">${p.primary_position || ''}</span>
+                            <div style="min-width:0; overflow:hidden;">
+                                <div style="display:flex; align-items:center; gap:5px; flex-wrap:nowrap;">
+                                    <span style="font-weight:700; font-size:13px; color:var(--color-ink); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${p.name}</span>
+                                    <span class="${getPositionBadgeClass(p.primary_position)}" style="font-size:9.5px; padding:1px 5px; flex-shrink:0;">${p.primary_position || ''}</span>
                                 </div>
-                                <div style="font-size:11.5px; color:var(--color-ink-soft); margin-top:2px; white-space:nowrap;">${p.club_name || ''}</div>
+                                <div style="font-size:11px; color:var(--color-ink-soft); margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${p.club_name || ''}</div>
                             </div>
                         </div>
                     </td>
-                    <td class="tabular-nums" style="color:var(--color-ink-soft); white-space:nowrap;">${formatCurrency(p.previous_value_eur)}</td>
-                    <td class="tabular-nums" style="white-space:nowrap;"><strong>${formatCurrency(p.market_value_eur)}</strong></td>
-                    <td style="white-space:nowrap;">${createValueBadge(p.change_eur, false)}</td>
+                    <td class="tabular-nums" style="color:var(--color-ink-soft); white-space:nowrap; text-align:right;">${formatCurrency(p.previous_value_eur)}</td>
+                    <td class="tabular-nums" style="white-space:nowrap; text-align:right;"><strong>${formatCurrency(p.market_value_eur)}</strong></td>
+                    <td style="white-space:nowrap; text-align:right;">
+                        <span class="badge badge-negative" style="font-weight:700; font-size:11.5px; padding:3px 8px; display:inline-block;">-${formatCurrency(Math.abs(p.change_eur))}</span>
+                    </td>
                 </tr>
             `).join('') : '<tr><td colspan="4" class="text-center" style="padding:24px">No fallers recorded</td></tr>';
         }

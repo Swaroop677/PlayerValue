@@ -127,7 +127,7 @@ function queueChartRender(canvasId, renderFn) {
     chartObserver.observe(canvas);
 }
 
-// 1. Line / Area Chart: Historical Market Value
+// 1. Line / Area Chart: Historical Market Value (Smooth Area Chart)
 function createMarketValueChart(canvasId, dates, values) {
     queueChartRender(canvasId, () => {
         destroyChart(canvasId);
@@ -136,46 +136,106 @@ function createMarketValueChart(canvasId, dates, values) {
         const ctx = canvas.getContext('2d');
         const t = getThemeTokens();
 
-        const gradient = ctx.createLinearGradient(0, 0, 0, 320);
-        gradient.addColorStop(0, 'rgba(255, 90, 95, 0.30)');
-        gradient.addColorStop(1, 'rgba(255, 90, 95, 0.00)');
+        // Check if dates are granular and aggregate by year for a smooth macroeconomic growth curve
+        let plotLabels = dates;
+        let plotValues = values;
+
+        if (dates && dates.length > 15) {
+            const yearMap = new Map();
+            dates.forEach((d, idx) => {
+                const yrMatch = String(d).match(/20\d{2}/);
+                const yr = yrMatch ? yrMatch[0] : String(d);
+                const val = Number(values[idx]) || 0;
+                yearMap.set(yr, (yearMap.get(yr) || 0) + val);
+            });
+
+            if (yearMap.size >= 5 && yearMap.size < dates.length) {
+                plotLabels = Array.from(yearMap.keys());
+                plotValues = Array.from(yearMap.values());
+            }
+        }
+
+        // Dynamic emerald-to-transparent area gradient based on canvas height
+        function getAreaGradient(context) {
+            const chart = context.chart;
+            const { ctx, chartArea } = chart;
+            if (!chartArea) {
+                const fallbackGrad = ctx.createLinearGradient(0, 0, 0, 300);
+                fallbackGrad.addColorStop(0, 'rgba(16, 185, 129, 0.35)');
+                fallbackGrad.addColorStop(1, 'rgba(16, 185, 129, 0.00)');
+                return fallbackGrad;
+            }
+            const gradient = ctx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
+            gradient.addColorStop(0, 'rgba(16, 185, 129, 0.38)');
+            gradient.addColorStop(0.6, 'rgba(16, 185, 129, 0.10)');
+            gradient.addColorStop(1, 'rgba(16, 185, 129, 0.00)');
+            return gradient;
+        }
 
         chartInstances[canvasId] = new Chart(ctx, {
             type: 'line',
             data: {
-                labels: dates,
+                labels: plotLabels,
                 datasets: [{
                     label: 'Market Valuation (€)',
-                    data: values,
-                    borderColor: t.coral,
-                    backgroundColor: gradient,
-                    borderWidth: 2.5,
+                    data: plotValues,
+                    borderColor: '#10B981',
+                    borderWidth: 3,
+                    borderCapStyle: 'round',
+                    borderJoinStyle: 'round',
+                    backgroundColor: getAreaGradient,
                     fill: true,
-                    tension: 0.35,
-                    pointBackgroundColor: '#FFFFFF',
-                    pointBorderColor: t.coral,
-                    pointBorderWidth: 2,
-                    pointRadius: 4,
-                    pointHoverRadius: 7
+                    tension: 0.38,
+                    cubicInterpolationMode: 'monotone',
+                    pointRadius: 0,
+                    pointHoverRadius: 6,
+                    pointHoverBackgroundColor: '#10B981',
+                    pointHoverBorderColor: '#FFFFFF',
+                    pointHoverBorderWidth: 2.5
                 }]
             },
             options: {
                 ...getBaseChartOptions(),
+                interaction: {
+                    mode: 'index',
+                    intersect: false
+                },
                 plugins: {
                     ...getBaseChartOptions().plugins,
+                    legend: { display: false },
                     tooltip: {
                         ...getBaseChartOptions().plugins.tooltip,
                         callbacks: {
-                            label: (ctx) => `Valuation: ${formatCurrency(ctx.raw)}`
+                            title: (items) => items.length ? `Season ${items[0].label}` : '',
+                            label: (ctx) => ` Market Valuation: ${formatCurrency(ctx.raw)}`
                         }
                     }
                 },
                 scales: {
                     ...getBaseChartOptions().scales,
-                    y: {
-                        ...getBaseChartOptions().scales.y,
+                    x: {
+                        ...getBaseChartOptions().scales.x,
+                        grid: { display: false },
+                        border: { display: false },
                         ticks: {
                             color: t.textMuted,
+                            font: { size: 11, weight: 600 },
+                            maxRotation: 0,
+                            autoSkip: true,
+                            maxTicksLimit: 7
+                        }
+                    },
+                    y: {
+                        ...getBaseChartOptions().scales.y,
+                        grid: {
+                            color: t.border,
+                            borderDash: [4, 4],
+                            drawBorder: false
+                        },
+                        border: { display: false },
+                        ticks: {
+                            color: t.textMuted,
+                            font: { size: 11 },
                             callback: (v) => formatCurrency(v)
                         }
                     }
