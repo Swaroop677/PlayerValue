@@ -27,7 +27,21 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Load filter options (Leagues and Clubs)
     try {
         const [leagues, clubs] = await Promise.all([getLeagues(), getClubs()]);
-        leaguesList = leagues || [];
+        
+        function getLeagueRank(name) {
+            const n = (name || '').toLowerCase().replace(/[\s\-_]/g, '');
+            if (n.includes('premier') || n === 'pl') return 0;
+            if (n === 'laliga' || n === 'liga' || n.includes('laliga')) return 1;
+            if (n.includes('bundesliga')) return 2;
+            if (n.includes('seriea') || n.includes('serie')) return 3;
+            if (n.includes('ligue1') || n.includes('ligue')) return 4;
+            return 999;
+        }
+
+        leaguesList = (leagues || []).sort((a, b) => {
+            const diff = getLeagueRank(a.name) - getLeagueRank(b.name);
+            return diff !== 0 ? diff : (a.name || '').localeCompare(b.name || '');
+        });
         clubsList = clubs || [];
 
         const leagueSelect = document.getElementById('f-league');
