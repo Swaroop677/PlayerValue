@@ -85,13 +85,21 @@ async function loadData() {
                         ${createPlayerAvatar(p.name, p.primary_position)}
                         <div>
                             <div style="font-weight:600; color:var(--color-ink);">${p.name}</div>
-                            <div style="font-size:12px; color:var(--color-ink-muted);">${p.club_name || 'Free Agent'}</div>
+                            <div style="font-size:12px; color:var(--color-ink-muted); display:flex; align-items:center; gap:5px;">
+                                ${createClubLogo(p.club_id, p.club_name, 15)}
+                                <span>${p.club_name || 'Free Agent'}</span>
+                            </div>
                         </div>
                     </div>
                 </td>
                 <td class="tabular-nums">${p.age || '-'}</td>
                 <td><span class="${getPositionBadgeClass(p.primary_position)}">${p.primary_position}</span></td>
-                <td>${p.club_name || '-'}</td>
+                <td>
+                    <div style="display:inline-flex; align-items:center; gap:6px;">
+                        ${createClubLogo(p.club_id, p.club_name, 16)}
+                        <span>${p.club_name || '-'}</span>
+                    </div>
+                </td>
                 <td>${p.league_name || '-'}</td>
                 <td class="tabular-nums"><strong>${formatCurrency(p.market_value_eur)}</strong></td>
                 <td class="tabular-nums" style="color:var(--color-primary-dark); font-weight:600">${formatCurrency(p.predicted_value_eur)}</td>

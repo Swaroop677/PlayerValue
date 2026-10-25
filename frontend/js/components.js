@@ -168,7 +168,10 @@ function createPlayerCard(player) {
                     ${createPlayerAvatar(player.name, player.primary_position)}
                     <div>
                         <h4 style="font-size:15px; font-weight:700; color:var(--color-ink); margin-bottom:2px;">${player.name}</h4>
-                        <div style="font-size:12px; color:var(--color-ink-soft);">${player.club_name || 'Free Agent'}</div>
+                        <div style="font-size:12px; color:var(--color-ink-soft); display:flex; align-items:center; gap:5px;">
+                            ${createClubLogo(player.club_id, player.club_name, 16)}
+                            <span>${player.club_name || 'Free Agent'}</span>
+                        </div>
                     </div>
                 </div>
                 <span class="${posClass}">${player.primary_position}</span>
@@ -207,7 +210,10 @@ function createPlayerRow(player) {
                     ${createPlayerAvatar(player.name, player.primary_position)}
                     <div>
                         <div style="font-weight:600; color:var(--color-ink);">${player.name}</div>
-                        <div style="font-size:12px; color:var(--color-ink-muted);">${player.club_name || 'Free Agent'} · ${player.nationality || ''}</div>
+                        <div style="font-size:12px; color:var(--color-ink-muted); display:flex; align-items:center; gap:5px;">
+                            ${createClubLogo(player.club_id, player.club_name, 16)}
+                            <span>${player.club_name || 'Free Agent'}</span> · ${player.nationality || ''}
+                        </div>
                     </div>
                 </div>
             </td>

@@ -47,8 +47,12 @@ function renderProfile(player, stats, history, transfers, prediction, similar) {
                             <h1 style="font-size:28px; font-weight:800; margin:0; color:var(--color-ink);">${player.name}</h1>
                             <span class="${getPositionBadgeClass(player.primary_position)}">${player.primary_position}</span>
                         </div>
-                        <div style="font-size:13.5px; color:var(--color-ink-soft); display:flex; gap:14px; flex-wrap:wrap;">
-                            <span><strong>Club:</strong> <a href="club.html?id=${player.club_id}" style="color:var(--color-primary-dark); font-weight:600;">${player.club_name || 'Free Agent'}</a></span>
+                        <div style="font-size:13.5px; color:var(--color-ink-soft); display:flex; gap:14px; flex-wrap:wrap; align-items:center;">
+                            <span style="display:inline-flex; align-items:center; gap:6px;">
+                                <strong>Club:</strong> 
+                                ${createClubLogo(player.club_id, player.club_name, 22)}
+                                <a href="club.html?id=${player.club_id}" style="color:var(--color-primary-dark); font-weight:600;">${player.club_name || 'Free Agent'}</a>
+                            </span>
                             <span><strong>League:</strong> ${player.league_name || '-'}</span>
                             <span><strong>Nationality:</strong> ${player.nationality}</span>
                             <span><strong>Age:</strong> ${player.age || '-'}</span>
@@ -84,17 +88,105 @@ function renderProfile(player, stats, history, transfers, prediction, similar) {
 
     // History Line Chart
     if (history && history.length > 0) {
-        html += `
-            <div class="card mb-4">
-                <div class="card-header">
-                    <div>
-                        <h3 class="card-title">Market Valuation History</h3>
-                        <p class="card-subtitle">Transfermarkt historical value changes over seasons</p>
+        const top100 = typeof getTop100Data === 'function' ? getTop100Data(player.id) : null;
+        let ribbonHtml = '';
+        let analysisHtml = '';
+
+        if (top100) {
+            ribbonHtml = `
+                <div class="mb-3">
+                    <div style="font-size:11.5px; font-weight:700; color:var(--color-ink-muted); text-transform:uppercase; letter-spacing:0.04em; margin-bottom:8px; display:flex; align-items:center; gap:6px;">
+                        <span>Career Club Path</span>
+                        <span style="color:var(--color-ink-soft); font-weight:400; text-transform:none;">(Chronological progression & kit colors)</span>
+                    </div>
+                    <div class="club-tenure-ribbon" style="display:flex; align-items:center; gap:8px; overflow-x:auto; padding-bottom:8px;">
+                        ${top100.timeline.map((club, idx) => `
+                            <div style="display:inline-flex; align-items:center; gap:8px; background:var(--color-surface-alt); border:1px solid var(--color-border); border-left:4px solid ${club.color}; border-radius:var(--radius-md); padding:8px 12px; white-space:nowrap; flex-shrink:0; box-shadow:var(--shadow-sm);">
+                                ${createClubLogo(null, club.club_name, 22)}
+                                <div>
+                                    <div style="font-size:12.5px; font-weight:700; color:var(--color-ink);">${club.club_name}</div>
+                                    <div style="font-size:11px; color:var(--color-ink-muted); font-family:var(--font-mono);">${club.start_date.substring(0,4)} – ${club.end_date.substring(0,4)}</div>
+                                </div>
+                            </div>
+                            ${idx < top100.timeline.length - 1 ? '<span style="color:var(--color-ink-muted); font-size:13px; flex-shrink:0;">➔</span>' : ''}
+                        `).join('')}
                     </div>
                 </div>
-                <div class="chart-container" style="height:320px;">
+            `;
+
+            if (top100.transfers && top100.transfers.length > 0) {
+                analysisHtml = `
+                    <div class="mt-4" style="background:var(--color-surface-alt); border:1px solid var(--color-border); border-radius:var(--radius-lg); padding:16px 18px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
+                            <div>
+                                <h4 style="font-size:14px; font-weight:800; color:var(--color-ink); margin:0; display:flex; align-items:center; gap:8px;">
+                                    <span>Transfer Fee vs. Model Valuation Analysis</span>
+                                    <span class="badge" style="background:rgba(255, 180, 0, 0.15); color:#F59E0B; border:1px solid rgba(255, 180, 0, 0.3); font-size:10px; font-weight:800;">Top 100 Exclusive</span>
+                                </h4>
+                                <p style="font-size:12px; color:var(--color-ink-soft); margin:2px 0 0 0;">Historical transaction benchmark comparing actual transfer fees paid against PlayerValue market valuation at move dates</p>
+                            </div>
+                        </div>
+                        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:12px;">
+                            ${top100.transfers.map(tr => {
+                                const fee = tr.fee_eur !== null ? formatCurrency(tr.fee_eur) : 'Free / Undisclosed';
+                                const val = formatCurrency(tr.valuation_at_transfer);
+                                const diff = tr.val_vs_fee_diff;
+                                let badgeHtml = '';
+                                if (tr.fee_eur === 0) {
+                                    badgeHtml = `<span class="badge badge-positive" style="font-size:10.5px; padding:2px 8px;">Free Agent Bargain</span>`;
+                                } else if (diff !== null && tr.fee_eur > 0) {
+                                    if (diff > 0) {
+                                        badgeHtml = `<span class="badge badge-positive" style="font-size:10.5px; padding:2px 8px;">+${formatCurrency(diff)} Value Surplus (+${tr.val_vs_fee_percent.toFixed(0)}%)</span>`;
+                                    } else {
+                                        badgeHtml = `<span class="badge badge-negative" style="font-size:10.5px; padding:2px 8px;">-${formatCurrency(Math.abs(diff))} Fee Premium</span>`;
+                                    }
+                                }
+                                return `
+                                    <div style="background:var(--color-surface); border:1px solid var(--color-border); border-radius:var(--radius-md); padding:12px 14px;">
+                                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                                            <span style="font-size:11px; font-weight:700; color:var(--color-ink-muted); font-family:var(--font-mono);">${formatDate(tr.date)}</span>
+                                            ${badgeHtml}
+                                        </div>
+                                        <div style="display:flex; align-items:center; gap:6px; margin-bottom:10px; flex-wrap:nowrap; overflow:hidden;">
+                                            ${createClubLogo(null, tr.from_club, 18)}
+                                            <span style="font-size:12px; font-weight:600; color:var(--color-ink); white-space:nowrap; text-overflow:ellipsis; overflow:hidden;">${tr.from_club}</span>
+                                            <span style="color:var(--color-ink-muted); font-size:11px; flex-shrink:0;">➔</span>
+                                            ${createClubLogo(null, tr.to_club, 18)}
+                                            <span style="font-size:12px; font-weight:600; color:var(--color-ink); white-space:nowrap; text-overflow:ellipsis; overflow:hidden;">${tr.to_club}</span>
+                                        </div>
+                                        <div style="display:flex; justify-content:space-between; font-size:12px; border-top:1px dashed var(--color-border); padding-top:8px;">
+                                            <div>
+                                                <span style="color:var(--color-ink-soft); font-size:11px;">Transfer Fee:</span>
+                                                <div class="tabular-nums" style="font-weight:700; color:var(--color-ink);">${fee}</div>
+                                            </div>
+                                            <div style="text-align:right;">
+                                                <span style="color:var(--color-ink-soft); font-size:11px;">Valuation at Move:</span>
+                                                <div class="tabular-nums" style="font-weight:700; color:var(--color-primary-dark);">${val}</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        html += `
+            <div class="card mb-4">
+                <div class="card-header" style="flex-wrap:wrap; gap:10px;">
+                    <div>
+                        <h3 class="card-title">Market Valuation History</h3>
+                        <p class="card-subtitle">${top100 ? 'Interactive career club tenure progression, kit colors & historical transfer events' : 'Transfermarkt historical value changes over seasons'}</p>
+                    </div>
+                    ${top100 ? `<span class="badge" style="background:rgba(255, 180, 0, 0.12); color:#F59E0B; border:1px solid rgba(255, 180, 0, 0.28); font-weight:700;">Top 100 • Club Timeline & Transfers</span>` : ''}
+                </div>
+                ${ribbonHtml}
+                <div class="chart-container" style="height:330px;">
                     <canvas id="mv-chart"></canvas>
                 </div>
+                ${analysisHtml}
             </div>
         `;
     }
@@ -232,8 +324,18 @@ function renderProfile(player, stats, history, transfers, prediction, similar) {
                             ${transfers.map(t => `
                                 <tr>
                                     <td>${formatDate(t.transfer_date)}</td>
-                                    <td>${t.from_club_name || 'Youth / Free'}</td>
-                                    <td>${t.to_club_name || 'Free Agent'}</td>
+                                    <td>
+                                        <div style="display:inline-flex; align-items:center; gap:6px;">
+                                            ${createClubLogo(null, t.from_club_name, 20)}
+                                            <span>${t.from_club_name || 'Youth / Free'}</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div style="display:inline-flex; align-items:center; gap:6px;">
+                                            ${createClubLogo(null, t.to_club_name, 20)}
+                                            <span>${t.to_club_name || 'Free Agent'}</span>
+                                        </div>
+                                    </td>
                                     <td><strong>${t.fee_eur !== null ? formatCurrency(t.fee_eur) : 'Undisclosed'}</strong></td>
                                     <td><span class="badge" style="background:var(--color-surface-alt); border:1px solid var(--color-border); color:var(--color-ink-soft);">${t.transfer_type || 'Transfer'}</span></td>
                                 </tr>
@@ -276,7 +378,13 @@ function renderProfile(player, stats, history, transfers, prediction, similar) {
 
     if (history && history.length > 0) {
         setTimeout(() => {
-            createMarketValueChart('mv-chart', history.map(h => formatDate(h.valuation_date)), history.map(h => h.market_value_eur));
+            const top100Data = typeof getTop100Data === 'function' ? getTop100Data(player.id) : null;
+            createPlayerValuationHistoryChart(
+                'mv-chart', 
+                history.map(h => h.valuation_date), 
+                history.map(h => h.market_value_eur), 
+                top100Data
+            );
         }, 100);
     }
 }

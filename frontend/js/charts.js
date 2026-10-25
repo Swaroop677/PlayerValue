@@ -245,6 +245,249 @@ function createMarketValueChart(canvasId, dates, values) {
     });
 }
 
+// 1b. Player Valuation History with Club Colors & Transfer Milestones (Top 100 Exclusive)
+function createPlayerValuationHistoryChart(canvasId, dates, values, top100Data = null) {
+    queueChartRender(canvasId, () => {
+        destroyChart(canvasId);
+        const canvas = document.getElementById(canvasId);
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        const t = getThemeTokens();
+
+        function getClubAtDate(dStr) {
+            if (!top100Data || !top100Data.timeline || !top100Data.timeline.length) return null;
+            const cleanD = String(dStr || '').substring(0, 10);
+            const matched = top100Data.timeline.find(p => cleanD >= p.start_date && cleanD <= p.end_date);
+            return matched || top100Data.timeline[top100Data.timeline.length - 1];
+        }
+
+        function getTransferNearDate(dStr) {
+            if (!top100Data || !top100Data.transfers) return null;
+            const cleanD = String(dStr || '').substring(0, 10);
+            return top100Data.transfers.find(tr => {
+                if (!tr.date) return false;
+                if (tr.date.substring(0, 7) === cleanD.substring(0, 7)) return true;
+                const diffDays = Math.abs(new Date(tr.date) - new Date(cleanD)) / (1000 * 3600 * 24);
+                return diffDays <= 45;
+            });
+        }
+
+        const isTop100 = Boolean(top100Data && top100Data.timeline && top100Data.timeline.length > 0);
+
+        // Dynamic area gradient
+        function getAreaGradient(context) {
+            const chart = context.chart;
+            const { ctx, chartArea } = chart;
+            const primaryColor = isTop100 && top100Data.current_club_color ? top100Data.current_club_color : '#10B981';
+            
+            let c = primaryColor.replace('#', '');
+            if (c.length === 3) c = c.split('').map(x => x + x).join('');
+            const num = parseInt(c, 16);
+            const r = (num >> 16) & 255;
+            const g = (num >> 8) & 255;
+            const b = num & 255;
+
+            if (!chartArea) {
+                const fallbackGrad = ctx.createLinearGradient(0, 0, 0, 300);
+                fallbackGrad.addColorStop(0, `rgba(${r}, ${g}, ${b}, 0.28)`);
+                fallbackGrad.addColorStop(1, `rgba(${r}, ${g}, ${b}, 0.00)`);
+                return fallbackGrad;
+            }
+            const gradient = ctx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
+            gradient.addColorStop(0, `rgba(${r}, ${g}, ${b}, 0.32)`);
+            gradient.addColorStop(0.65, `rgba(${r}, ${g}, ${b}, 0.08)`);
+            gradient.addColorStop(1, `rgba(${r}, ${g}, ${b}, 0.00)`);
+            return gradient;
+        }
+
+        // Custom canvas plugin for Club Background Bands
+        const clubBandsPlugin = {
+            id: 'clubBandsPlugin',
+            beforeDraw: (chart) => {
+                if (!isTop100 || !top100Data.timeline || top100Data.timeline.length <= 1) return;
+                const { ctx, chartArea, scales: { x } } = chart;
+                if (!chartArea || !x) return;
+
+                ctx.save();
+                top100Data.timeline.forEach((period, idx) => {
+                    let startIdx = dates.findIndex(d => String(d).substring(0, 10) >= period.start_date);
+                    if (startIdx === -1) startIdx = 0;
+                    
+                    let endIdx = -1;
+                    for (let i = dates.length - 1; i >= 0; i--) {
+                        if (String(dates[i]).substring(0, 10) <= period.end_date) {
+                            endIdx = i;
+                            break;
+                        }
+                    }
+                    if (endIdx === -1) endIdx = dates.length - 1;
+                    if (endIdx < startIdx) endIdx = startIdx;
+
+                    const xStart = idx === 0 ? chartArea.left : x.getPixelForValue(startIdx);
+                    const xEnd = idx === top100Data.timeline.length - 1 ? chartArea.right : x.getPixelForValue(endIdx);
+                    const width = Math.max(2, xEnd - xStart);
+
+                    let c = (period.color || '#10B981').replace('#', '');
+                    if (c.length === 3) c = c.split('').map(x => x + x).join('');
+                    const num = parseInt(c, 16);
+                    const r = (num >> 16) & 255;
+                    const g = (num >> 8) & 255;
+                    const b = num & 255;
+
+                    ctx.fillStyle = `rgba(${r}, ${g}, ${b}, 0.07)`;
+                    ctx.fillRect(xStart, chartArea.top, width, chartArea.bottom - chartArea.top);
+
+                    ctx.fillStyle = `rgba(${r}, ${g}, ${b}, 0.8)`;
+                    ctx.fillRect(xStart, chartArea.top, width, 3);
+
+                    if (width > 68) {
+                        ctx.fillStyle = period.color || '#F8FAFC';
+                        ctx.font = '700 10.5px Inter, sans-serif';
+                        ctx.textAlign = 'center';
+                        const textX = xStart + width / 2;
+                        const label = period.club_name.length > 15 ? period.club_name.substring(0, 13) + '..' : period.club_name;
+                        ctx.fillText(label, textX, chartArea.top + 16);
+                    }
+                });
+                ctx.restore();
+            }
+        };
+
+        const datasetConfig = {
+            label: 'Market Valuation (€)',
+            data: values,
+            borderColor: isTop100 && top100Data.current_club_color ? top100Data.current_club_color : '#10B981',
+            borderWidth: 3.2,
+            borderCapStyle: 'round',
+            borderJoinStyle: 'round',
+            backgroundColor: getAreaGradient,
+            fill: true,
+            tension: 0.38,
+            cubicInterpolationMode: 'monotone',
+            pointBackgroundColor: '#10B981',
+            pointBorderColor: '#FFFFFF',
+            pointBorderWidth: 2,
+            pointRadius: 4,
+            pointHoverRadius: 7,
+            pointHoverBorderColor: '#FFFFFF',
+            pointHoverBorderWidth: 2.5
+        };
+
+        if (isTop100) {
+            datasetConfig.segment = {
+                borderColor: (ctx) => {
+                    const d = dates[ctx.p0DataIndex];
+                    const club = getClubAtDate(d);
+                    return club ? club.color : (top100Data.current_club_color || '#10B981');
+                }
+            };
+            datasetConfig.pointBackgroundColor = (ctx) => {
+                const d = dates[ctx.dataIndex];
+                const club = getClubAtDate(d);
+                return club ? club.color : '#10B981';
+            };
+            datasetConfig.pointRadius = (ctx) => {
+                const d = dates[ctx.dataIndex];
+                const tr = getTransferNearDate(d);
+                return tr ? 8 : 4;
+            };
+            datasetConfig.pointHoverRadius = (ctx) => {
+                const d = dates[ctx.dataIndex];
+                const tr = getTransferNearDate(d);
+                return tr ? 11 : 7;
+            };
+            datasetConfig.pointStyle = (ctx) => {
+                const d = dates[ctx.dataIndex];
+                const tr = getTransferNearDate(d);
+                return tr ? 'rectRot' : 'circle';
+            };
+        }
+
+        chartInstances[canvasId] = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: dates.map(d => formatDate(d)),
+                datasets: [datasetConfig]
+            },
+            plugins: [clubBandsPlugin],
+            options: {
+                ...getBaseChartOptions(),
+                interaction: {
+                    mode: 'index',
+                    intersect: false
+                },
+                plugins: {
+                    ...getBaseChartOptions().plugins,
+                    legend: { display: false },
+                    tooltip: {
+                        ...getBaseChartOptions().plugins.tooltip,
+                        padding: 12,
+                        callbacks: {
+                            title: (items) => items.length ? `Valuation Date: ${items[0].label}` : '',
+                            label: (ctx) => ` Market Valuation: ${formatCurrency(ctx.raw)}`,
+                            afterLabel: (ctx) => {
+                                if (!isTop100) return '';
+                                const d = dates[ctx.dataIndex];
+                                const club = getClubAtDate(d);
+                                const tr = getTransferNearDate(d);
+                                const lines = [];
+                                if (club) {
+                                    lines.push(` 🏟️ Club: ${club.club_name}`);
+                                }
+                                if (tr) {
+                                    lines.push(`─────────────────────────────`);
+                                    lines.push(` 🔄 TRANSFER: ${tr.date}`);
+                                    lines.push(`   ${tr.from_club} ➔ ${tr.to_club}`);
+                                    lines.push(`   Transfer Fee: ${tr.fee_eur !== null ? formatCurrency(tr.fee_eur) : 'Free / Undisclosed'}`);
+                                    if (tr.fee_eur !== null && tr.fee_eur > 0) {
+                                        if (tr.val_vs_fee_diff > 0) {
+                                            lines.push(`   Surplus: +${formatCurrency(tr.val_vs_fee_diff)} (+${tr.val_vs_fee_percent.toFixed(0)}% Bargain)`);
+                                        } else {
+                                            lines.push(`   Premium: ${formatCurrency(Math.abs(tr.val_vs_fee_diff))} fee above valuation`);
+                                        }
+                                    } else if (tr.fee_eur === 0) {
+                                        lines.push(`   Free Transfer (+${formatCurrency(tr.valuation_at_transfer)} Market Asset)`);
+                                    }
+                                }
+                                return lines.join('\n');
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    ...getBaseChartOptions().scales,
+                    x: {
+                        ...getBaseChartOptions().scales.x,
+                        grid: { display: false },
+                        border: { display: false },
+                        ticks: {
+                            color: t.textMuted,
+                            font: { size: 11, weight: 600 },
+                            maxRotation: 0,
+                            autoSkip: true,
+                            maxTicksLimit: 7
+                        }
+                    },
+                    y: {
+                        ...getBaseChartOptions().scales.y,
+                        grid: {
+                            color: t.border,
+                            borderDash: [4, 4],
+                            drawBorder: false
+                        },
+                        border: { display: false },
+                        ticks: {
+                            color: t.textMuted,
+                            font: { size: 11 },
+                            callback: (v) => formatCurrency(v)
+                        }
+                    }
+                }
+            }
+        });
+    });
+}
+
 // 2. Radar Chart: Player Per-90 Percentiles / Positional Benchmark / Multi-Player Comparison
 function createRadarChart(canvasId, labels, playerVals, benchmarkVals, playerName = 'Player', rawPlayerVals = null, rawBenchVals = null) {
     queueChartRender(canvasId, () => {

@@ -51,7 +51,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                                     ${createPlayerAvatar(p.name, p.primary_position, 'avatar-sm')}
                                     <div>
                                         <div style="font-weight:700; font-size:13.5px; color:var(--color-ink);">${p.name}</div>
-                                        <div style="font-size:11.5px; color:var(--color-ink-soft);">${p.club_name || '-'} • ${p.primary_position} • ${p.age || '-'} yrs</div>
+                                        <div style="font-size:11.5px; color:var(--color-ink-soft); display:flex; align-items:center; gap:4px;">
+                                            ${createClubLogo(p.club_id, p.club_name, 14)}
+                                            <span>${p.club_name || '-'}</span> • ${p.primary_position} • ${p.age || '-'} yrs
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="tabular-nums" style="font-weight:700; font-size:13px; color:var(--color-primary-dark);">
@@ -160,7 +163,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                                     <span style="font-weight:700; font-size:13px; color:var(--color-ink); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${p.name}</span>
                                     <span class="${getPositionBadgeClass(p.primary_position)}" style="font-size:9.5px; padding:1px 5px; flex-shrink:0;">${p.primary_position || ''}</span>
                                 </div>
-                                <div style="font-size:11px; color:var(--color-ink-soft); margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${p.club_name || ''}</div>
+                                <div style="font-size:11px; color:var(--color-ink-soft); margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; display:flex; align-items:center; gap:4px;">
+                                    ${createClubLogo(null, p.club_name, 13)}
+                                    <span>${p.club_name || ''}</span>
+                                </div>
                             </div>
                         </div>
                     </td>
@@ -187,7 +193,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                                     <span style="font-weight:700; font-size:13px; color:var(--color-ink); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${p.name}</span>
                                     <span class="${getPositionBadgeClass(p.primary_position)}" style="font-size:9.5px; padding:1px 5px; flex-shrink:0;">${p.primary_position || ''}</span>
                                 </div>
-                                <div style="font-size:11px; color:var(--color-ink-soft); margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${p.club_name || ''}</div>
+                                <div style="font-size:11px; color:var(--color-ink-soft); margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; display:flex; align-items:center; gap:4px;">
+                                    ${createClubLogo(null, p.club_name, 13)}
+                                    <span>${p.club_name || ''}</span>
+                                </div>
                             </div>
                         </div>
                     </td>

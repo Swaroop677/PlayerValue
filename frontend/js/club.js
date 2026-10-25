@@ -28,7 +28,7 @@ function renderClub(club) {
     
     let html = `
         <div class="card mb-4" style="padding: 28px; display:flex; align-items:center; gap:20px;">
-            <div class="player-avatar" style="width: 56px; height: 56px; font-size: 20px; font-weight:800;">${getInitials(club.name)}</div>
+            ${createClubLogo(club.id, club.name, 56)}
             <div>
                 <h2 style="font-size: 28px; font-weight:800; color:var(--color-ink); margin-bottom: 4px;">${club.name}</h2>
                 <div style="font-size: 14px; color: var(--color-ink-soft)">

@@ -46,7 +46,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 html += `
                     <div class="card card-interactive" style="cursor:pointer; padding:20px;" onclick="window.location.href='club.html?id=${c.id}'">
                         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-                            <div class="player-avatar" style="width:34px; height:34px; font-size:12px;">${getInitials(c.name)}</div>
+                            ${createClubLogo(c.id, c.name, 36)}
                             <span class="badge" style="background:var(--color-surface-alt); border:1px solid var(--color-border); color:var(--color-ink-soft);">${c.country}</span>
                         </div>
                         <h4 style="font-size:15px; font-weight:700; color:var(--color-ink); margin-bottom:4px;">${c.name}</h4>

@@ -484,6 +484,37 @@ function createPlayerAvatar(name, position, sizeClass = '') {
     return `<div class="player-avatar ${sizeClass}">${initials}</div>`;
 }
 
+function getClubLogoUrl(clubId, clubName) {
+    if (typeof CLUB_LOGOS_BY_ID !== 'undefined') {
+        if (clubId && CLUB_LOGOS_BY_ID[clubId]) return CLUB_LOGOS_BY_ID[clubId];
+        if (clubName && CLUB_LOGOS_BY_ID[clubName]) return CLUB_LOGOS_BY_ID[clubName];
+        if (clubName) {
+            const lower = clubName.toLowerCase();
+            for (const [key, url] of Object.entries(CLUB_LOGOS_BY_ID)) {
+                if (typeof key === 'string' && (lower.includes(key.toLowerCase()) || key.toLowerCase().includes(lower))) {
+                    return url;
+                }
+            }
+        }
+    }
+    return null;
+}
+
+function createClubLogo(clubId, clubName, size = 22, extraClass = '') {
+    const safeName = (clubName || 'Club').replace(/"/g, '&quot;');
+    const logoUrl = getClubLogoUrl(clubId, clubName);
+    const initials = (clubName || 'FC').split(' ').filter(Boolean).map(w => w[0]).slice(0, 2).join('').toUpperCase();
+    
+    if (logoUrl) {
+        return `<span class="club-logo-wrap ${extraClass}" style="display:inline-flex; align-items:center; justify-content:center; width:${size}px; height:${size}px; flex-shrink:0;">
+            <img src="${logoUrl}" alt="${safeName}" title="${safeName}" loading="lazy" decoding="async"
+                 style="width:100%; height:100%; object-fit:contain; filter:drop-shadow(0 1px 2px rgba(0,0,0,0.25)); vertical-align:middle;"
+                 onerror="this.parentElement.innerHTML='<span style=\\'display:inline-flex;align-items:center;justify-content:center;width:${size}px;height:${size}px;border-radius:50%;background:rgba(255,255,255,0.08);font-size:${Math.max(9, Math.round(size * 0.36))}px;font-weight:700;color:var(--color-ink);\\'>${initials}</span>';">
+        </span>`;
+    }
+    return `<span class="club-logo-wrap ${extraClass}" style="display:inline-flex; align-items:center; justify-content:center; width:${size}px; height:${size}px; border-radius:50%; background:rgba(255,255,255,0.08); font-size:${Math.max(9, Math.round(size * 0.36))}px; font-weight:700; color:var(--color-ink); flex-shrink:0;">${initials}</span>`;
+}
+
 function getUrlParam(name) {
     const params = new URLSearchParams(window.location.search);
     return params.get(name);
