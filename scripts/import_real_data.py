@@ -81,10 +81,13 @@ def main():
     db.commit()
     print(f"   Created {len(league_map)} leagues.")
 
-    # 2. Clubs
-    print("\n3. Loading and filtering clubs...")
+    # 2. Clubs (filter to current season clubs only: last_season == 2025)
+    print("\n3. Loading and filtering current season clubs...")
     clubs_df = pd.read_csv(os.path.join(tm_dir, "clubs.csv"))
-    top_clubs = clubs_df[clubs_df['domestic_competition_id'].isin(league_configs.keys())]
+    top_clubs = clubs_df[
+        clubs_df['domestic_competition_id'].isin(league_configs.keys()) &
+        (clubs_df['last_season'] == 2025)
+    ]
 
     club_map = {}
     tm_clubs_dict = {}
@@ -107,9 +110,11 @@ def main():
     print("\n4. Loading real players...")
     players_df = pd.read_csv(os.path.join(tm_dir, "players.csv"))
     
-    # Filter for players associated with our top leagues and having a market value or recorded minutes
+    # Filter for active current playing players associated with current season clubs in our top leagues
     top_players = players_df[
         (players_df['current_club_domestic_competition_id'].isin(league_configs.keys())) &
+        (players_df['current_club_id'].isin(top_clubs['club_id'])) &
+        (players_df['last_season'] == 2025) &
         (players_df['market_value_in_eur'].fillna(0) > 0)
     ].copy()
 

@@ -249,7 +249,7 @@ const TOP_100_PLAYERS_DATA = {
         "start_date": "2019-10-17",
         "end_date": "2021-07-08",
         "color": "#002D62",
-        "logo_url": "https://tmssl.akamaized.net/images/wappen/head/1032.png"
+        "logo_url": null
       },
       {
         "club_name": "Crystal Palace",
@@ -276,7 +276,7 @@ const TOP_100_PLAYERS_DATA = {
         "val_vs_fee_diff": 5700000.0,
         "val_vs_fee_percent": 61.29032258064516,
         "is_bargain": true,
-        "from_logo": "https://tmssl.akamaized.net/images/wappen/head/1032.png",
+        "from_logo": null,
         "to_logo": "https://tmssl.akamaized.net/images/wappen/head/873.png",
         "from_color": "#002D62",
         "to_color": "#1B458F"
@@ -313,7 +313,7 @@ const TOP_100_PLAYERS_DATA = {
         "start_date": "2019-09-10",
         "end_date": "2019-09-02",
         "color": "#FFDE00",
-        "logo_url": "https://tmssl.akamaized.net/images/wappen/head/472.png"
+        "logo_url": null
       },
       {
         "club_name": "FC Barcelona",
@@ -327,7 +327,7 @@ const TOP_100_PLAYERS_DATA = {
         "start_date": "2019-09-03",
         "end_date": "2020-07-31",
         "color": "#FFDE00",
-        "logo_url": "https://tmssl.akamaized.net/images/wappen/head/472.png"
+        "logo_url": null
       },
       {
         "club_name": "FC Barcelona",
@@ -347,7 +347,7 @@ const TOP_100_PLAYERS_DATA = {
         "val_vs_fee_diff": -18000000.0,
         "val_vs_fee_percent": -78.26086956521739,
         "is_bargain": false,
-        "from_logo": "https://tmssl.akamaized.net/images/wappen/head/472.png",
+        "from_logo": null,
         "to_logo": "https://tmssl.akamaized.net/images/wappen/head/131.png",
         "from_color": "#FFDE00",
         "to_color": "#A50044"
@@ -362,7 +362,7 @@ const TOP_100_PLAYERS_DATA = {
         "val_vs_fee_percent": 100.0,
         "is_bargain": true,
         "from_logo": "https://tmssl.akamaized.net/images/wappen/head/131.png",
-        "to_logo": "https://tmssl.akamaized.net/images/wappen/head/472.png",
+        "to_logo": null,
         "from_color": "#A50044",
         "to_color": "#FFDE00"
       },
@@ -375,7 +375,7 @@ const TOP_100_PLAYERS_DATA = {
         "val_vs_fee_diff": 15000000.0,
         "val_vs_fee_percent": 100.0,
         "is_bargain": true,
-        "from_logo": "https://tmssl.akamaized.net/images/wappen/head/472.png",
+        "from_logo": null,
         "to_logo": "https://tmssl.akamaized.net/images/wappen/head/131.png",
         "from_color": "#FFDE00",
         "to_color": "#A50044"
@@ -1317,7 +1317,7 @@ const TOP_100_PLAYERS_DATA = {
         "start_date": "2018-07-01",
         "end_date": "2019-07-25",
         "color": "#007A33",
-        "logo_url": "https://tmssl.akamaized.net/images/wappen/head/618.png"
+        "logo_url": null
       },
       {
         "club_name": "Arsenal FC",
@@ -1331,7 +1331,7 @@ const TOP_100_PLAYERS_DATA = {
         "start_date": "2019-07-26",
         "end_date": "2020-06-30",
         "color": "#007A33",
-        "logo_url": "https://tmssl.akamaized.net/images/wappen/head/618.png"
+        "logo_url": null
       },
       {
         "club_name": "Arsenal FC",
@@ -1380,7 +1380,7 @@ const TOP_100_PLAYERS_DATA = {
         "val_vs_fee_percent": null,
         "is_bargain": null,
         "from_logo": null,
-        "to_logo": "https://tmssl.akamaized.net/images/wappen/head/618.png",
+        "to_logo": null,
         "from_color": "#007A33",
         "to_color": "#007A33"
       },
@@ -1393,7 +1393,7 @@ const TOP_100_PLAYERS_DATA = {
         "val_vs_fee_diff": -5000000.0,
         "val_vs_fee_percent": -16.666666666666664,
         "is_bargain": false,
-        "from_logo": "https://tmssl.akamaized.net/images/wappen/head/618.png",
+        "from_logo": null,
         "to_logo": "https://tmssl.akamaized.net/images/wappen/head/11.png",
         "from_color": "#007A33",
         "to_color": "#EF0107"
@@ -1408,7 +1408,7 @@ const TOP_100_PLAYERS_DATA = {
         "val_vs_fee_percent": 100.0,
         "is_bargain": true,
         "from_logo": "https://tmssl.akamaized.net/images/wappen/head/11.png",
-        "to_logo": "https://tmssl.akamaized.net/images/wappen/head/618.png",
+        "to_logo": null,
         "from_color": "#EF0107",
         "to_color": "#007A33"
       },
@@ -1421,7 +1421,7 @@ const TOP_100_PLAYERS_DATA = {
         "val_vs_fee_diff": 22500000.0,
         "val_vs_fee_percent": 100.0,
         "is_bargain": true,
-        "from_logo": "https://tmssl.akamaized.net/images/wappen/head/618.png",
+        "from_logo": null,
         "to_logo": "https://tmssl.akamaized.net/images/wappen/head/11.png",
         "from_color": "#007A33",
         "to_color": "#EF0107"
@@ -2081,7 +2081,7 @@ const TOP_100_PLAYERS_DATA = {
         "start_date": "2023-07-07",
         "end_date": "2024-02-01",
         "color": "#10B981",
-        "logo_url": "https://tmssl.akamaized.net/images/wappen/head/641.png"
+        "logo_url": null
       },
       {
         "club_name": "Aston Villa",
@@ -2116,7 +2116,7 @@ const TOP_100_PLAYERS_DATA = {
         "val_vs_fee_percent": 50.0,
         "is_bargain": true,
         "from_logo": null,
-        "to_logo": "https://tmssl.akamaized.net/images/wappen/head/641.png",
+        "to_logo": null,
         "from_color": "#6CABDD",
         "to_color": "#10B981"
       },
@@ -2129,7 +2129,7 @@ const TOP_100_PLAYERS_DATA = {
         "val_vs_fee_diff": -6600000.0,
         "val_vs_fee_percent": -70.2127659574468,
         "is_bargain": false,
-        "from_logo": "https://tmssl.akamaized.net/images/wappen/head/641.png",
+        "from_logo": null,
         "to_logo": "https://tmssl.akamaized.net/images/wappen/head/405.png",
         "from_color": "#10B981",
         "to_color": "#670E36"
@@ -2457,7 +2457,7 @@ const TOP_100_PLAYERS_DATA = {
         "start_date": "2025-01-01",
         "end_date": "2025-07-16",
         "color": "#005BA9",
-        "logo_url": "https://tmssl.akamaized.net/images/wappen/head/1244.png"
+        "logo_url": null
       },
       {
         "club_name": "RB Leipzig",
@@ -2492,7 +2492,7 @@ const TOP_100_PLAYERS_DATA = {
         "val_vs_fee_percent": 100.0,
         "is_bargain": true,
         "from_logo": null,
-        "to_logo": "https://tmssl.akamaized.net/images/wappen/head/1244.png",
+        "to_logo": null,
         "from_color": "#10B981",
         "to_color": "#005BA9"
       },
@@ -2505,7 +2505,7 @@ const TOP_100_PLAYERS_DATA = {
         "val_vs_fee_diff": -18500000.0,
         "val_vs_fee_percent": -92.5,
         "is_bargain": false,
-        "from_logo": "https://tmssl.akamaized.net/images/wappen/head/1244.png",
+        "from_logo": null,
         "to_logo": "https://tmssl.akamaized.net/images/wappen/head/23826.png",
         "from_color": "#005BA9",
         "to_color": "#DD0741"
@@ -2719,7 +2719,7 @@ const TOP_100_PLAYERS_DATA = {
         "start_date": "2018-02-01",
         "end_date": "2020-09-09",
         "color": "#10B981",
-        "logo_url": "https://tmssl.akamaized.net/images/wappen/head/19.png"
+        "logo_url": null
       },
       {
         "club_name": "AC Milan",
@@ -2733,7 +2733,7 @@ const TOP_100_PLAYERS_DATA = {
         "start_date": "2021-06-30",
         "end_date": "2021-07-08",
         "color": "#10B981",
-        "logo_url": "https://tmssl.akamaized.net/images/wappen/head/19.png"
+        "logo_url": null
       },
       {
         "club_name": "AC Milan",
@@ -2760,7 +2760,7 @@ const TOP_100_PLAYERS_DATA = {
         "val_vs_fee_diff": 32000000.0,
         "val_vs_fee_percent": 100.0,
         "is_bargain": true,
-        "from_logo": "https://tmssl.akamaized.net/images/wappen/head/19.png",
+        "from_logo": null,
         "to_logo": "https://tmssl.akamaized.net/images/wappen/head/5.png",
         "from_color": "#10B981",
         "to_color": "#FB090B"
@@ -2775,7 +2775,7 @@ const TOP_100_PLAYERS_DATA = {
         "val_vs_fee_percent": 100.0,
         "is_bargain": true,
         "from_logo": "https://tmssl.akamaized.net/images/wappen/head/5.png",
-        "to_logo": "https://tmssl.akamaized.net/images/wappen/head/19.png",
+        "to_logo": null,
         "from_color": "#FB090B",
         "to_color": "#10B981"
       },
@@ -2788,7 +2788,7 @@ const TOP_100_PLAYERS_DATA = {
         "val_vs_fee_diff": 12720000.0,
         "val_vs_fee_percent": 89.07563025210085,
         "is_bargain": true,
-        "from_logo": "https://tmssl.akamaized.net/images/wappen/head/19.png",
+        "from_logo": null,
         "to_logo": "https://tmssl.akamaized.net/images/wappen/head/5.png",
         "from_color": "#10B981",
         "to_color": "#FB090B"
@@ -3459,7 +3459,7 @@ const TOP_100_PLAYERS_DATA = {
         "start_date": "2020-01-01",
         "end_date": "2020-01-10",
         "color": "#10B981",
-        "logo_url": "https://tmssl.akamaized.net/images/wappen/head/1010.png"
+        "logo_url": null
       },
       {
         "club_name": "Tondela",
@@ -3662,7 +3662,7 @@ const TOP_100_PLAYERS_DATA = {
         "start_date": "2024-09-26",
         "end_date": "2024-12-31",
         "color": "#10B981",
-        "logo_url": "https://tmssl.akamaized.net/images/wappen/head/3008.png"
+        "logo_url": null
       },
       {
         "club_name": "EC Vit\u00f3ria",
@@ -4166,7 +4166,7 @@ const TOP_100_PLAYERS_DATA = {
         "val_vs_fee_percent": 73.91304347826086,
         "is_bargain": true,
         "from_logo": null,
-        "to_logo": "https://tmssl.akamaized.net/images/wappen/head/1010.png",
+        "to_logo": null,
         "from_color": "#10B981",
         "to_color": "#10B981"
       },
@@ -4431,7 +4431,7 @@ const TOP_100_PLAYERS_DATA = {
         "val_vs_fee_diff": -2200000.0,
         "val_vs_fee_percent": -6.432748538011696,
         "is_bargain": false,
-        "from_logo": "https://tmssl.akamaized.net/images/wappen/head/1010.png",
+        "from_logo": null,
         "to_logo": "https://tmssl.akamaized.net/images/wappen/head/1237.png",
         "from_color": "#10B981",
         "to_color": "#0057B8"
@@ -4572,7 +4572,7 @@ const TOP_100_PLAYERS_DATA = {
         "val_vs_fee_percent": null,
         "is_bargain": null,
         "from_logo": null,
-        "to_logo": "https://tmssl.akamaized.net/images/wappen/head/3008.png",
+        "to_logo": null,
         "from_color": "#10B981",
         "to_color": "#10B981"
       },
@@ -4641,7 +4641,7 @@ const TOP_100_PLAYERS_DATA = {
         "val_vs_fee_diff": 50000000.0,
         "val_vs_fee_percent": 100.0,
         "is_bargain": true,
-        "from_logo": "https://tmssl.akamaized.net/images/wappen/head/3008.png",
+        "from_logo": null,
         "to_logo": null,
         "from_color": "#10B981",
         "to_color": "#10B981"
@@ -4854,7 +4854,7 @@ const TOP_100_PLAYERS_DATA = {
         "start_date": "2021-01-07",
         "end_date": "2021-01-29",
         "color": "#E20613",
-        "logo_url": "https://tmssl.akamaized.net/images/wappen/head/1421.png"
+        "logo_url": null
       },
       {
         "club_name": "Vejle BK",
@@ -4868,14 +4868,14 @@ const TOP_100_PLAYERS_DATA = {
         "start_date": "2021-06-30",
         "end_date": "2021-07-01",
         "color": "#E20613",
-        "logo_url": "https://tmssl.akamaized.net/images/wappen/head/1421.png"
+        "logo_url": null
       },
       {
         "club_name": "Stade Reims",
         "start_date": "2021-07-01",
         "end_date": "2022-07-16",
         "color": "#E20613",
-        "logo_url": "https://tmssl.akamaized.net/images/wappen/head/1421.png"
+        "logo_url": null
       },
       {
         "club_name": "Paris Saint-Germain",
@@ -4889,7 +4889,7 @@ const TOP_100_PLAYERS_DATA = {
         "start_date": "2023-06-30",
         "end_date": "2023-07-01",
         "color": "#E20613",
-        "logo_url": "https://tmssl.akamaized.net/images/wappen/head/1421.png"
+        "logo_url": null
       },
       {
         "club_name": "Paris Saint-Germain",
@@ -4937,7 +4937,7 @@ const TOP_100_PLAYERS_DATA = {
         "val_vs_fee_diff": 400000.0,
         "val_vs_fee_percent": 100.0,
         "is_bargain": true,
-        "from_logo": "https://tmssl.akamaized.net/images/wappen/head/1421.png",
+        "from_logo": null,
         "to_logo": null,
         "from_color": "#E20613",
         "to_color": "#10B981"
@@ -4952,7 +4952,7 @@ const TOP_100_PLAYERS_DATA = {
         "val_vs_fee_percent": 100.0,
         "is_bargain": true,
         "from_logo": null,
-        "to_logo": "https://tmssl.akamaized.net/images/wappen/head/1421.png",
+        "to_logo": null,
         "from_color": "#10B981",
         "to_color": "#E20613"
       },
@@ -4965,8 +4965,8 @@ const TOP_100_PLAYERS_DATA = {
         "val_vs_fee_diff": null,
         "val_vs_fee_percent": null,
         "is_bargain": null,
-        "from_logo": "https://tmssl.akamaized.net/images/wappen/head/1421.png",
-        "to_logo": "https://tmssl.akamaized.net/images/wappen/head/1421.png",
+        "from_logo": null,
+        "to_logo": null,
         "from_color": "#E20613",
         "to_color": "#E20613"
       },
@@ -4979,7 +4979,7 @@ const TOP_100_PLAYERS_DATA = {
         "val_vs_fee_diff": 28000000.0,
         "val_vs_fee_percent": 100.0,
         "is_bargain": true,
-        "from_logo": "https://tmssl.akamaized.net/images/wappen/head/1421.png",
+        "from_logo": null,
         "to_logo": "https://tmssl.akamaized.net/images/wappen/head/583.png",
         "from_color": "#E20613",
         "to_color": "#004170"
@@ -4994,7 +4994,7 @@ const TOP_100_PLAYERS_DATA = {
         "val_vs_fee_percent": 100.0,
         "is_bargain": true,
         "from_logo": "https://tmssl.akamaized.net/images/wappen/head/583.png",
-        "to_logo": "https://tmssl.akamaized.net/images/wappen/head/1421.png",
+        "to_logo": null,
         "from_color": "#004170",
         "to_color": "#E20613"
       },
@@ -5007,7 +5007,7 @@ const TOP_100_PLAYERS_DATA = {
         "val_vs_fee_diff": -8500000.0,
         "val_vs_fee_percent": -29.82456140350877,
         "is_bargain": false,
-        "from_logo": "https://tmssl.akamaized.net/images/wappen/head/1421.png",
+        "from_logo": null,
         "to_logo": "https://tmssl.akamaized.net/images/wappen/head/583.png",
         "from_color": "#E20613",
         "to_color": "#004170"
@@ -5236,14 +5236,14 @@ const TOP_100_PLAYERS_DATA = {
         "start_date": "2018-03-20",
         "end_date": "2018-07-01",
         "color": "#10B981",
-        "logo_url": "https://tmssl.akamaized.net/images/wappen/head/1095.png"
+        "logo_url": null
       },
       {
         "club_name": "Troyes",
         "start_date": "2018-07-01",
         "end_date": "2019-08-05",
         "color": "#10B981",
-        "logo_url": "https://tmssl.akamaized.net/images/wappen/head/1095.png"
+        "logo_url": null
       },
       {
         "club_name": "Brentford FC",
@@ -5270,8 +5270,8 @@ const TOP_100_PLAYERS_DATA = {
         "val_vs_fee_diff": null,
         "val_vs_fee_percent": null,
         "is_bargain": null,
-        "from_logo": "https://tmssl.akamaized.net/images/wappen/head/1095.png",
-        "to_logo": "https://tmssl.akamaized.net/images/wappen/head/1095.png",
+        "from_logo": null,
+        "to_logo": null,
         "from_color": "#10B981",
         "to_color": "#10B981"
       },
@@ -5284,7 +5284,7 @@ const TOP_100_PLAYERS_DATA = {
         "val_vs_fee_diff": -3000000.0,
         "val_vs_fee_percent": -46.15384615384615,
         "is_bargain": false,
-        "from_logo": "https://tmssl.akamaized.net/images/wappen/head/1095.png",
+        "from_logo": null,
         "to_logo": "https://tmssl.akamaized.net/images/wappen/head/1148.png",
         "from_color": "#10B981",
         "to_color": "#E30613"
@@ -5420,7 +5420,7 @@ const TOP_100_PLAYERS_DATA = {
         "start_date": "2014-09-01",
         "end_date": "2014-12-31",
         "color": "#10B981",
-        "logo_url": "https://tmssl.akamaized.net/images/wappen/head/4102.png"
+        "logo_url": null
       },
       {
         "club_name": "Monte Azul",
@@ -5497,14 +5497,14 @@ const TOP_100_PLAYERS_DATA = {
         "start_date": "2017-07-01",
         "end_date": "2018-01-31",
         "color": "#10B981",
-        "logo_url": "https://tmssl.akamaized.net/images/wappen/head/1095.png"
+        "logo_url": null
       },
       {
         "club_name": "FC Empoli",
         "start_date": "2018-01-31",
         "end_date": "2018-02-14",
         "color": "#005BAC",
-        "logo_url": "https://tmssl.akamaized.net/images/wappen/head/749.png"
+        "logo_url": null
       },
       {
         "club_name": "LOSC Lille",
@@ -5658,7 +5658,7 @@ const TOP_100_PLAYERS_DATA = {
         "val_vs_fee_percent": 100.0,
         "is_bargain": true,
         "from_logo": "https://tmssl.akamaized.net/images/wappen/head/5.png",
-        "to_logo": "https://tmssl.akamaized.net/images/wappen/head/4102.png",
+        "to_logo": null,
         "from_color": "#FB090B",
         "to_color": "#10B981"
       },
@@ -5699,7 +5699,7 @@ const TOP_100_PLAYERS_DATA = {
         "val_vs_fee_diff": 125000.0,
         "val_vs_fee_percent": 100.0,
         "is_bargain": true,
-        "from_logo": "https://tmssl.akamaized.net/images/wappen/head/4102.png",
+        "from_logo": null,
         "to_logo": "https://tmssl.akamaized.net/images/wappen/head/5.png",
         "from_color": "#10B981",
         "to_color": "#FB090B"
@@ -5812,7 +5812,7 @@ const TOP_100_PLAYERS_DATA = {
         "val_vs_fee_percent": 100.0,
         "is_bargain": true,
         "from_logo": "https://tmssl.akamaized.net/images/wappen/head/1082.png",
-        "to_logo": "https://tmssl.akamaized.net/images/wappen/head/1095.png",
+        "to_logo": null,
         "from_color": "#E01E26",
         "to_color": "#10B981"
       },
@@ -5826,7 +5826,7 @@ const TOP_100_PLAYERS_DATA = {
         "val_vs_fee_percent": 100.0,
         "is_bargain": true,
         "from_logo": "https://tmssl.akamaized.net/images/wappen/head/5.png",
-        "to_logo": "https://tmssl.akamaized.net/images/wappen/head/749.png",
+        "to_logo": null,
         "from_color": "#FB090B",
         "to_color": "#005BAC"
       },
@@ -5839,7 +5839,7 @@ const TOP_100_PLAYERS_DATA = {
         "val_vs_fee_diff": 600000.0,
         "val_vs_fee_percent": 100.0,
         "is_bargain": true,
-        "from_logo": "https://tmssl.akamaized.net/images/wappen/head/1095.png",
+        "from_logo": null,
         "to_logo": "https://tmssl.akamaized.net/images/wappen/head/1082.png",
         "from_color": "#10B981",
         "to_color": "#E01E26"
@@ -5867,7 +5867,7 @@ const TOP_100_PLAYERS_DATA = {
         "val_vs_fee_diff": 600000.0,
         "val_vs_fee_percent": 100.0,
         "is_bargain": true,
-        "from_logo": "https://tmssl.akamaized.net/images/wappen/head/749.png",
+        "from_logo": null,
         "to_logo": "https://tmssl.akamaized.net/images/wappen/head/5.png",
         "from_color": "#005BAC",
         "to_color": "#FB090B"
@@ -6164,7 +6164,7 @@ const TOP_100_PLAYERS_DATA = {
         "start_date": "2020-01-31",
         "end_date": "2021-08-25",
         "color": "#10B981",
-        "logo_url": "https://tmssl.akamaized.net/images/wappen/head/44.png"
+        "logo_url": null
       },
       {
         "club_name": "Atl\u00e9tico",
@@ -6241,7 +6241,7 @@ const TOP_100_PLAYERS_DATA = {
         "val_vs_fee_percent": -16.666666666666664,
         "is_bargain": false,
         "from_logo": "https://tmssl.akamaized.net/images/wappen/head/23826.png",
-        "to_logo": "https://tmssl.akamaized.net/images/wappen/head/44.png",
+        "to_logo": null,
         "from_color": "#DD0741",
         "to_color": "#10B981"
       },
@@ -6254,7 +6254,7 @@ const TOP_100_PLAYERS_DATA = {
         "val_vs_fee_diff": -5000000.0,
         "val_vs_fee_percent": -14.285714285714285,
         "is_bargain": false,
-        "from_logo": "https://tmssl.akamaized.net/images/wappen/head/44.png",
+        "from_logo": null,
         "to_logo": "https://tmssl.akamaized.net/images/wappen/head/13.png",
         "from_color": "#10B981",
         "to_color": "#CB3524"
@@ -6645,7 +6645,7 @@ const TOP_100_PLAYERS_DATA = {
         "start_date": "2020-01-10",
         "end_date": "2020-07-31",
         "color": "#10B981",
-        "logo_url": "https://tmssl.akamaized.net/images/wappen/head/2288.png"
+        "logo_url": null
       },
       {
         "club_name": "Chelsea FC",
@@ -6659,7 +6659,7 @@ const TOP_100_PLAYERS_DATA = {
         "start_date": "2020-08-26",
         "end_date": "2021-05-31",
         "color": "#10B981",
-        "logo_url": "https://tmssl.akamaized.net/images/wappen/head/2288.png"
+        "logo_url": null
       },
       {
         "club_name": "Chelsea FC",
@@ -6694,7 +6694,7 @@ const TOP_100_PLAYERS_DATA = {
         "val_vs_fee_percent": 100.0,
         "is_bargain": true,
         "from_logo": "https://tmssl.akamaized.net/images/wappen/head/631.png",
-        "to_logo": "https://tmssl.akamaized.net/images/wappen/head/2288.png",
+        "to_logo": null,
         "from_color": "#034694",
         "to_color": "#10B981"
       },
@@ -6707,7 +6707,7 @@ const TOP_100_PLAYERS_DATA = {
         "val_vs_fee_diff": 2700000.0,
         "val_vs_fee_percent": 100.0,
         "is_bargain": true,
-        "from_logo": "https://tmssl.akamaized.net/images/wappen/head/2288.png",
+        "from_logo": null,
         "to_logo": "https://tmssl.akamaized.net/images/wappen/head/631.png",
         "from_color": "#10B981",
         "to_color": "#034694"
@@ -6722,7 +6722,7 @@ const TOP_100_PLAYERS_DATA = {
         "val_vs_fee_percent": 100.0,
         "is_bargain": true,
         "from_logo": "https://tmssl.akamaized.net/images/wappen/head/631.png",
-        "to_logo": "https://tmssl.akamaized.net/images/wappen/head/2288.png",
+        "to_logo": null,
         "from_color": "#034694",
         "to_color": "#10B981"
       },
@@ -6735,7 +6735,7 @@ const TOP_100_PLAYERS_DATA = {
         "val_vs_fee_diff": 10000000.0,
         "val_vs_fee_percent": 100.0,
         "is_bargain": true,
-        "from_logo": "https://tmssl.akamaized.net/images/wappen/head/2288.png",
+        "from_logo": null,
         "to_logo": "https://tmssl.akamaized.net/images/wappen/head/631.png",
         "from_color": "#10B981",
         "to_color": "#034694"
@@ -7083,7 +7083,7 @@ const TOP_100_PLAYERS_DATA = {
         "start_date": "2020-08-25",
         "end_date": "2021-01-06",
         "color": "#10B981",
-        "logo_url": "https://tmssl.akamaized.net/images/wappen/head/2288.png"
+        "logo_url": null
       },
       {
         "club_name": "Wolverhampton Wanderers",
@@ -7132,7 +7132,7 @@ const TOP_100_PLAYERS_DATA = {
         "val_vs_fee_percent": 100.0,
         "is_bargain": true,
         "from_logo": "https://tmssl.akamaized.net/images/wappen/head/543.png",
-        "to_logo": "https://tmssl.akamaized.net/images/wappen/head/2288.png",
+        "to_logo": null,
         "from_color": "#FDB913",
         "to_color": "#10B981"
       },
@@ -7145,7 +7145,7 @@ const TOP_100_PLAYERS_DATA = {
         "val_vs_fee_diff": 6000000.0,
         "val_vs_fee_percent": 100.0,
         "is_bargain": true,
-        "from_logo": "https://tmssl.akamaized.net/images/wappen/head/2288.png",
+        "from_logo": null,
         "to_logo": "https://tmssl.akamaized.net/images/wappen/head/543.png",
         "from_color": "#10B981",
         "to_color": "#FDB913"
@@ -8318,7 +8318,7 @@ const TOP_100_PLAYERS_DATA = {
         "start_date": "2020-10-02",
         "end_date": "2021-01-14",
         "color": "#10B981",
-        "logo_url": "https://tmssl.akamaized.net/images/wappen/head/2288.png"
+        "logo_url": null
       },
       {
         "club_name": "Brighton",
@@ -8416,7 +8416,7 @@ const TOP_100_PLAYERS_DATA = {
         "val_vs_fee_percent": 100.0,
         "is_bargain": true,
         "from_logo": "https://tmssl.akamaized.net/images/wappen/head/1237.png",
-        "to_logo": "https://tmssl.akamaized.net/images/wappen/head/2288.png",
+        "to_logo": null,
         "from_color": "#0057B8",
         "to_color": "#10B981"
       },
@@ -8429,7 +8429,7 @@ const TOP_100_PLAYERS_DATA = {
         "val_vs_fee_diff": 800000.0,
         "val_vs_fee_percent": 100.0,
         "is_bargain": true,
-        "from_logo": "https://tmssl.akamaized.net/images/wappen/head/2288.png",
+        "from_logo": null,
         "to_logo": "https://tmssl.akamaized.net/images/wappen/head/1237.png",
         "from_color": "#10B981",
         "to_color": "#0057B8"
@@ -8861,7 +8861,7 @@ const TOP_100_PLAYERS_DATA = {
         "start_date": "2012-08-31",
         "end_date": "2013-02-01",
         "color": "#10B981",
-        "logo_url": "https://tmssl.akamaized.net/images/wappen/head/1123.png"
+        "logo_url": null
       },
       {
         "club_name": "Tottenham Hotspur",
@@ -8875,7 +8875,7 @@ const TOP_100_PLAYERS_DATA = {
         "start_date": "2013-02-21",
         "end_date": "2013-05-14",
         "color": "#003090",
-        "logo_url": "https://tmssl.akamaized.net/images/wappen/head/1003.png"
+        "logo_url": null
       },
       {
         "club_name": "Tottenham Hotspur",
@@ -8959,7 +8959,7 @@ const TOP_100_PLAYERS_DATA = {
         "val_vs_fee_percent": 100.0,
         "is_bargain": true,
         "from_logo": "https://tmssl.akamaized.net/images/wappen/head/148.png",
-        "to_logo": "https://tmssl.akamaized.net/images/wappen/head/1123.png",
+        "to_logo": null,
         "from_color": "#132257",
         "to_color": "#10B981"
       },
@@ -8972,7 +8972,7 @@ const TOP_100_PLAYERS_DATA = {
         "val_vs_fee_diff": 15000000.0,
         "val_vs_fee_percent": 100.0,
         "is_bargain": true,
-        "from_logo": "https://tmssl.akamaized.net/images/wappen/head/1123.png",
+        "from_logo": null,
         "to_logo": "https://tmssl.akamaized.net/images/wappen/head/148.png",
         "from_color": "#10B981",
         "to_color": "#132257"
@@ -8987,7 +8987,7 @@ const TOP_100_PLAYERS_DATA = {
         "val_vs_fee_percent": 100.0,
         "is_bargain": true,
         "from_logo": "https://tmssl.akamaized.net/images/wappen/head/148.png",
-        "to_logo": "https://tmssl.akamaized.net/images/wappen/head/1003.png",
+        "to_logo": null,
         "from_color": "#132257",
         "to_color": "#003090"
       },
@@ -9000,7 +9000,7 @@ const TOP_100_PLAYERS_DATA = {
         "val_vs_fee_diff": 15000000.0,
         "val_vs_fee_percent": 100.0,
         "is_bargain": true,
-        "from_logo": "https://tmssl.akamaized.net/images/wappen/head/1003.png",
+        "from_logo": null,
         "to_logo": "https://tmssl.akamaized.net/images/wappen/head/148.png",
         "from_color": "#003090",
         "to_color": "#132257"
@@ -9700,7 +9700,7 @@ const TOP_100_PLAYERS_DATA = {
         "val_vs_fee_diff": -70000.0,
         "val_vs_fee_percent": -14.893617021276595,
         "is_bargain": false,
-        "from_logo": "https://tmssl.akamaized.net/images/wappen/head/1084.png",
+        "from_logo": null,
         "to_logo": null,
         "from_color": "#10B981",
         "to_color": "#1A1A1A"
@@ -10805,7 +10805,7 @@ const TOP_100_PLAYERS_DATA = {
         "start_date": "2024-01-29",
         "end_date": "2025-02-03",
         "color": "#10B981",
-        "logo_url": "https://tmssl.akamaized.net/images/wappen/head/3524.png"
+        "logo_url": null
       },
       {
         "club_name": "Stade Rennais FC",
@@ -10854,7 +10854,7 @@ const TOP_100_PLAYERS_DATA = {
         "val_vs_fee_percent": 100.0,
         "is_bargain": true,
         "from_logo": "https://tmssl.akamaized.net/images/wappen/head/273.png",
-        "to_logo": "https://tmssl.akamaized.net/images/wappen/head/3524.png",
+        "to_logo": null,
         "from_color": "#E2001A",
         "to_color": "#10B981"
       },
@@ -10867,7 +10867,7 @@ const TOP_100_PLAYERS_DATA = {
         "val_vs_fee_diff": 5000000.0,
         "val_vs_fee_percent": 100.0,
         "is_bargain": true,
-        "from_logo": "https://tmssl.akamaized.net/images/wappen/head/3524.png",
+        "from_logo": null,
         "to_logo": "https://tmssl.akamaized.net/images/wappen/head/273.png",
         "from_color": "#10B981",
         "to_color": "#E2001A"
@@ -10925,7 +10925,7 @@ const TOP_100_PLAYERS_DATA = {
         "start_date": "2016-07-01",
         "end_date": "2017-06-30",
         "color": "#005BAC",
-        "logo_url": "https://tmssl.akamaized.net/images/wappen/head/749.png"
+        "logo_url": null
       },
       {
         "club_name": "Inter Milan",
@@ -11016,7 +11016,7 @@ const TOP_100_PLAYERS_DATA = {
         "val_vs_fee_percent": 100.0,
         "is_bargain": true,
         "from_logo": "https://tmssl.akamaized.net/images/wappen/head/46.png",
-        "to_logo": "https://tmssl.akamaized.net/images/wappen/head/749.png",
+        "to_logo": null,
         "from_color": "#010E80",
         "to_color": "#005BAC"
       },
@@ -11029,7 +11029,7 @@ const TOP_100_PLAYERS_DATA = {
         "val_vs_fee_diff": 2000000.0,
         "val_vs_fee_percent": 100.0,
         "is_bargain": true,
-        "from_logo": "https://tmssl.akamaized.net/images/wappen/head/749.png",
+        "from_logo": null,
         "to_logo": "https://tmssl.akamaized.net/images/wappen/head/46.png",
         "from_color": "#005BAC",
         "to_color": "#010E80"
@@ -11277,7 +11277,7 @@ const TOP_100_PLAYERS_DATA = {
         "start_date": "2018-08-31",
         "end_date": "2019-06-30",
         "color": "#10B981",
-        "logo_url": "https://tmssl.akamaized.net/images/wappen/head/1533.png"
+        "logo_url": null
       },
       {
         "club_name": "FC Barcelona",
@@ -11291,7 +11291,7 @@ const TOP_100_PLAYERS_DATA = {
         "start_date": "2019-07-01",
         "end_date": "2019-07-16",
         "color": "#10B981",
-        "logo_url": "https://tmssl.akamaized.net/images/wappen/head/1533.png"
+        "logo_url": null
       },
       {
         "club_name": "FC Barcelona",
@@ -11361,7 +11361,7 @@ const TOP_100_PLAYERS_DATA = {
         "val_vs_fee_percent": 100.0,
         "is_bargain": true,
         "from_logo": "https://tmssl.akamaized.net/images/wappen/head/131.png",
-        "to_logo": "https://tmssl.akamaized.net/images/wappen/head/1533.png",
+        "to_logo": null,
         "from_color": "#A50044",
         "to_color": "#10B981"
       },
@@ -11374,7 +11374,7 @@ const TOP_100_PLAYERS_DATA = {
         "val_vs_fee_diff": 10000000.0,
         "val_vs_fee_percent": 100.0,
         "is_bargain": true,
-        "from_logo": "https://tmssl.akamaized.net/images/wappen/head/1533.png",
+        "from_logo": null,
         "to_logo": "https://tmssl.akamaized.net/images/wappen/head/131.png",
         "from_color": "#10B981",
         "to_color": "#A50044"
@@ -11389,7 +11389,7 @@ const TOP_100_PLAYERS_DATA = {
         "val_vs_fee_percent": 400.0,
         "is_bargain": true,
         "from_logo": "https://tmssl.akamaized.net/images/wappen/head/131.png",
-        "to_logo": "https://tmssl.akamaized.net/images/wappen/head/1533.png",
+        "to_logo": null,
         "from_color": "#A50044",
         "to_color": "#10B981"
       },
@@ -11402,7 +11402,7 @@ const TOP_100_PLAYERS_DATA = {
         "val_vs_fee_diff": 6000000.0,
         "val_vs_fee_percent": 150.0,
         "is_bargain": true,
-        "from_logo": "https://tmssl.akamaized.net/images/wappen/head/1533.png",
+        "from_logo": null,
         "to_logo": "https://tmssl.akamaized.net/images/wappen/head/131.png",
         "from_color": "#10B981",
         "to_color": "#A50044"
@@ -11502,14 +11502,14 @@ const TOP_100_PLAYERS_DATA = {
         "start_date": "2015-03-15",
         "end_date": "2017-07-05",
         "color": "#10B981",
-        "logo_url": "https://tmssl.akamaized.net/images/wappen/head/750.png"
+        "logo_url": null
       },
       {
         "club_name": "Guingamp",
         "start_date": "2017-07-05",
         "end_date": "2019-07-22",
         "color": "#10B981",
-        "logo_url": "https://tmssl.akamaized.net/images/wappen/head/855.png"
+        "logo_url": null
       },
       {
         "club_name": "M\u00f6nchengladbach",
@@ -11537,7 +11537,7 @@ const TOP_100_PLAYERS_DATA = {
         "val_vs_fee_percent": null,
         "is_bargain": null,
         "from_logo": null,
-        "to_logo": "https://tmssl.akamaized.net/images/wappen/head/750.png",
+        "to_logo": null,
         "from_color": "#10B981",
         "to_color": "#10B981"
       },
@@ -11550,8 +11550,8 @@ const TOP_100_PLAYERS_DATA = {
         "val_vs_fee_diff": 0.0,
         "val_vs_fee_percent": 0.0,
         "is_bargain": false,
-        "from_logo": "https://tmssl.akamaized.net/images/wappen/head/750.png",
-        "to_logo": "https://tmssl.akamaized.net/images/wappen/head/855.png",
+        "from_logo": null,
+        "to_logo": null,
         "from_color": "#10B981",
         "to_color": "#10B981"
       },
@@ -11564,7 +11564,7 @@ const TOP_100_PLAYERS_DATA = {
         "val_vs_fee_diff": 0.0,
         "val_vs_fee_percent": 0.0,
         "is_bargain": false,
-        "from_logo": "https://tmssl.akamaized.net/images/wappen/head/855.png",
+        "from_logo": null,
         "to_logo": "https://tmssl.akamaized.net/images/wappen/head/18.png",
         "from_color": "#10B981",
         "to_color": "#009933"

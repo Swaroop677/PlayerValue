@@ -358,19 +358,22 @@ def main():
 
     # 1. Build Club Logos dataset
     print("Building club logos mapping...")
+    csv_club_map = {}
     with open('data/archive (2)/clubs.csv', mode='r', encoding='utf-8') as f:
         reader = csv.DictReader(f)
-        csv_top = [row for row in reader if row.get('domestic_competition_id') in ['GB1', 'ES1', 'L1', 'IT1', 'FR1']]
+        for row in reader:
+            if row.get('domestic_competition_id') in ['GB1', 'ES1', 'L1', 'IT1', 'FR1']:
+                csv_club_map[row['name']] = int(row['club_id'])
 
     c.execute('SELECT id, name, country, league_id FROM clubs ORDER BY id')
     db_clubs = c.fetchall()
 
     club_logos = {}
     club_meta = {}
-    for db_c, csv_c in zip(db_clubs, csv_top):
-        tm_id = int(csv_c['club_id'])
+    for db_c in db_clubs:
         db_id = db_c[0]
         cname = db_c[1]
+        tm_id = csv_club_map.get(cname, db_id)
         logo_url = f"https://tmssl.akamaized.net/images/wappen/head/{tm_id}.png"
         colors = get_club_color(cname)
         
