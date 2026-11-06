@@ -685,48 +685,206 @@ function createScatterChart(canvasId, points) {
     });
 }
 
-// 4. Value vs Age Curve Chart
-function createValueAgeChart(canvasId, points) {
+// 4. Value vs Age Curve Chart (Aesthetic Spline Area or Rounded Bar representation)
+function createValueAgeChart(canvasId, points, chartType = 'area') {
     queueChartRender(canvasId, () => {
         destroyChart(canvasId);
         const canvas = document.getElementById(canvasId);
         if (!canvas) return;
         const ctx = canvas.getContext('2d');
         const t = getThemeTokens();
+        const isDark = t.isDark;
+
+        if (!points || !points.length) return;
+
+        // Group & aggregate by age (ages 17 to 37)
+        const ageMap = {};
+        for (let a = 17; a <= 37; a++) {
+            ageMap[a] = {
+                age: a,
+                total: 0,
+                count: 0,
+                values: [],
+                topVal: 0,
+                topPlayer: ''
+            };
+        }
+
+        points.forEach(p => {
+            const age = Math.round(Number(p.age));
+            const val = Number(p.market_value_eur || p.actual || 0);
+            if (age >= 17 && age <= 37 && val > 0) {
+                const b = ageMap[age];
+                b.total += val;
+                b.count += 1;
+                b.values.push(val);
+                if (val > b.topVal) {
+                    b.topVal = val;
+                    b.topPlayer = p.name ? `${p.name} (${p.position || 'Player'})` : '';
+                }
+            }
+        });
+
+        // Map aggregated buckets
+        const aggregated = Object.keys(ageMap).map(k => {
+            const b = ageMap[k];
+            const avg = b.count > 0 ? Math.round(b.total / b.count) : 0;
+            let phase = 'Prime Asset';
+            if (b.age <= 20) phase = 'Rising Talent';
+            else if (b.age <= 23) phase = 'Emerging Prime';
+            else if (b.age <= 27) phase = 'Peak Prime';
+            else if (b.age <= 31) phase = 'Elite Experience';
+            else phase = 'Veteran Era';
+
+            return {
+                age: b.age,
+                label: `${b.age}y`,
+                avg: avg,
+                count: b.count,
+                topVal: b.topVal,
+                topPlayer: b.topPlayer,
+                phase: phase
+            };
+        }).filter(d => d.count > 0);
+
+        const labels = aggregated.map(d => d.label);
+        const avgValues = aggregated.map(d => d.avg);
+
+        const chartAreaHeight = 320;
+        let datasetConfig;
+
+        if (chartType === 'bar') {
+            // High-aesthetic modern bar columns
+            const barGradients = aggregated.map(d => {
+                const grad = ctx.createLinearGradient(0, 0, 0, chartAreaHeight);
+                if (d.age >= 24 && d.age <= 27) {
+                    grad.addColorStop(0, '#818CF8'); // Radiant Indigo
+                    grad.addColorStop(1, isDark ? 'rgba(99, 102, 241, 0.28)' : 'rgba(99, 102, 241, 0.45)');
+                } else if (d.age <= 21) {
+                    grad.addColorStop(0, '#38BDF8'); // Sky Cyan
+                    grad.addColorStop(1, isDark ? 'rgba(56, 189, 248, 0.25)' : 'rgba(56, 189, 248, 0.40)');
+                } else {
+                    grad.addColorStop(0, '#6366F1');
+                    grad.addColorStop(1, isDark ? 'rgba(99, 102, 241, 0.20)' : 'rgba(99, 102, 241, 0.35)');
+                }
+                return grad;
+            });
+
+            const barBorders = aggregated.map(d => {
+                if (d.age >= 24 && d.age <= 27) return '#A5B4FC';
+                if (d.age <= 21) return '#7DD3FC';
+                return '#818CF8';
+            });
+
+            datasetConfig = {
+                type: 'bar',
+                label: 'Average Market Value (€)',
+                data: avgValues,
+                backgroundColor: barGradients,
+                borderColor: barBorders,
+                borderWidth: 1.5,
+                borderRadius: 6,
+                borderSkipped: false,
+                hoverBackgroundColor: '#818CF8',
+                hoverBorderColor: '#FFFFFF',
+                hoverBorderWidth: 2,
+                barPercentage: 0.76,
+                categoryPercentage: 0.88
+            };
+        } else {
+            // High-aesthetic smooth Spline Area Chart (Default)
+            const areaGradient = ctx.createLinearGradient(0, 0, 0, chartAreaHeight);
+            areaGradient.addColorStop(0, isDark ? 'rgba(99, 102, 241, 0.44)' : 'rgba(99, 102, 241, 0.32)');
+            areaGradient.addColorStop(0.55, isDark ? 'rgba(99, 102, 241, 0.15)' : 'rgba(99, 102, 241, 0.10)');
+            areaGradient.addColorStop(1, 'rgba(99, 102, 241, 0.0)');
+
+            datasetConfig = {
+                type: 'line',
+                label: 'Average Market Value (€)',
+                data: avgValues,
+                borderColor: '#6366F1',
+                borderWidth: 3.2,
+                backgroundColor: areaGradient,
+                fill: true,
+                tension: 0.38,
+                cubicInterpolationMode: 'monotone',
+                pointBackgroundColor: '#6366F1',
+                pointBorderColor: '#FFFFFF',
+                pointBorderWidth: 2,
+                pointRadius: 4,
+                pointHoverRadius: 7.5,
+                pointHoverBackgroundColor: '#FFFFFF',
+                pointHoverBorderColor: '#6366F1',
+                pointHoverBorderWidth: 3
+            };
+        }
 
         chartInstances[canvasId] = new Chart(ctx, {
-            type: 'scatter',
+            type: chartType === 'bar' ? 'bar' : 'line',
             data: {
-                datasets: [{
-                    label: 'Player Valuations by Age',
-                    data: points.map(p => ({ x: p.age, y: p.market_value_eur, name: p.name, pos: p.position })),
-                    backgroundColor: 'rgba(255, 180, 0, 0.65)',
-                    pointRadius: 4,
-                    pointHoverRadius: 7
-                }]
+                labels: labels,
+                datasets: [datasetConfig]
             },
             options: {
                 ...getBaseChartOptions(),
+                interaction: {
+                    mode: 'index',
+                    intersect: false
+                },
                 plugins: {
                     ...getBaseChartOptions().plugins,
+                    legend: { display: false },
                     tooltip: {
                         ...getBaseChartOptions().plugins.tooltip,
+                        padding: 12,
                         callbacks: {
-                            label: (ctx) => `${ctx.raw.name} (${ctx.raw.pos}, ${ctx.raw.x}y): ${formatCurrency(ctx.raw.y)}`
+                            title: (items) => {
+                                if (!items.length) return '';
+                                const d = aggregated[items[0].dataIndex];
+                                return `Age ${d.age} • ${d.phase}`;
+                            },
+                            label: (ctx) => ` Avg Valuation: ${formatCurrency(ctx.raw)}`,
+                            afterLabel: (ctx) => {
+                                const d = aggregated[ctx.dataIndex];
+                                const lines = [];
+                                if (d.topPlayer && d.topVal) {
+                                    lines.push(` ⭐️ Peak Asset: ${d.topPlayer}`);
+                                    lines.push(`    Valuation: ${formatCurrency(d.topVal)}`);
+                                }
+                                if (d.count) {
+                                    lines.push(` 👥 Sample: ${d.count} players`);
+                                }
+                                return lines.join('\n');
+                            }
                         }
                     }
                 },
                 scales: {
                     x: {
                         ...getBaseChartOptions().scales.x,
-                        title: { display: true, text: 'Player Age', color: t.textMuted },
-                        min: 16,
-                        max: 40
+                        grid: { display: false },
+                        border: { display: false },
+                        ticks: {
+                            color: t.textMuted,
+                            font: { size: 11, weight: 600 },
+                            maxRotation: 0,
+                            autoSkip: true,
+                            maxTicksLimit: 11
+                        }
                     },
                     y: {
                         ...getBaseChartOptions().scales.y,
-                        title: { display: true, text: 'Market Value (€)', color: t.textMuted },
-                        ticks: { callback: (v) => formatCurrency(v), color: t.textMuted }
+                        grid: {
+                            color: t.border,
+                            borderDash: [4, 4],
+                            drawBorder: false
+                        },
+                        border: { display: false },
+                        ticks: {
+                            color: t.textMuted,
+                            font: { size: 11 },
+                            callback: (v) => formatCurrency(v)
+                        }
                     }
                 }
             }

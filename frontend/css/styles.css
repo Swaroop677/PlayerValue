@@ -1948,4 +1948,47 @@ input, button, select, textarea {
   box-shadow: 0 14px 28px -6px rgba(14, 165, 233, 0.09), 0 2px 6px rgba(11, 31, 51, 0.04);
 }
 
+/* Valuation by Age Chart Mode Toggle */
+.chart-mode-pill {
+  display: inline-flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 3px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  gap: 2px;
+}
+
+[data-theme="light"] .chart-mode-pill {
+  background: #EEF2F6;
+  border-color: #E2E8F0;
+}
+
+.chart-mode-btn {
+  background: transparent;
+  border: none;
+  color: var(--color-ink-muted, #94A3B8);
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.chart-mode-btn:hover {
+  color: var(--color-ink, #F8FAFC);
+}
+
+[data-theme="light"] .chart-mode-btn:hover {
+  color: #1E293B;
+}
+
+.chart-mode-btn.active {
+  background: #6366F1;
+  color: #FFFFFF !important;
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.35);
+}
+
 

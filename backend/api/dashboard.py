@@ -58,7 +58,7 @@ def api_get_value_vs_age(position: str = Query("ALL"), db: Session = Depends(get
 
     results = []
     current_year = 2026
-    for pid, name, pos, dob, mv in q.limit(400).all():
+    for pid, name, pos, dob, mv in q.all():
         age = (current_year - dob.year) if dob else 25
         results.append({
             "id": pid,

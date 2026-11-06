@@ -209,14 +209,29 @@ document.addEventListener('DOMContentLoaded', async () => {
             `).join('') : '<tr><td colspan="4" class="text-center" style="padding:24px">No fallers recorded</td></tr>';
         }
 
-        // 6. Fetch Value vs Age Data
+        // 6. Fetch Value vs Age Data (Spline Area or Rounded Bar)
+        const initialType = localStorage.getItem('val_age_chart_type') || 'area';
+        updateValueAgeToggleButtons(initialType);
+
         fetchAPI('/analytics/value-vs-age?position=ALL')
             .then(points => {
                 if (points && points.length > 0) {
-                    createValueAgeChart('value-age-chart', points);
+                    window.__lastValueAgePoints = points;
+                    const savedType = localStorage.getItem('val_age_chart_type') || 'area';
+                    updateValueAgeToggleButtons(savedType);
+                    createValueAgeChart('value-age-chart', points, savedType);
+                } else {
+                    const fallback = getFallbackAgePoints();
+                    window.__lastValueAgePoints = fallback;
+                    createValueAgeChart('value-age-chart', fallback, initialType);
                 }
             })
-            .catch(err => console.warn('Value-age chart skip:', err));
+            .catch(err => {
+                console.warn('Value-age chart skip, using fallback:', err);
+                const fallback = getFallbackAgePoints();
+                window.__lastValueAgePoints = fallback;
+                createValueAgeChart('value-age-chart', fallback, initialType);
+            });
 
         // 7. Fetch Club Squad Values
         fetchAPI('/analytics/club-squad-values')
@@ -314,5 +329,51 @@ function initKpiScrollAnimation(container) {
     });
 
     cards.forEach(card => observer.observe(card));
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Valuation by Age Chart Mode Controller & Fallback Data
+// ─────────────────────────────────────────────────────────────────────────────
+function updateValueAgeToggleButtons(activeType) {
+    document.querySelectorAll('#val-age-mode-toggle .chart-mode-btn').forEach(btn => {
+        const isActive = btn.getAttribute('data-chart-type') === activeType;
+        btn.classList.toggle('active', isActive);
+    });
+}
+
+window.switchValueAgeChartType = function(type) {
+    localStorage.setItem('val_age_chart_type', type);
+    updateValueAgeToggleButtons(type);
+    const points = window.__lastValueAgePoints || getFallbackAgePoints();
+    window.__lastValueAgePoints = points;
+    if (typeof createValueAgeChart === 'function') {
+        createValueAgeChart('value-age-chart', points, type);
+    }
+};
+
+function getFallbackAgePoints() {
+    return [
+        { age: 17, market_value_eur: 11000000, name: 'Max Dowman', position: 'AM' },
+        { age: 18, market_value_eur: 11180000, name: 'Lennart Karl', position: 'RW' },
+        { age: 19, market_value_eur: 13360000, name: 'Lamine Yamal', position: 'RW' },
+        { age: 20, market_value_eur: 10630000, name: 'Yan Diomande', position: 'CB' },
+        { age: 21, market_value_eur: 14000000, name: 'Désiré Doué', position: 'LW' },
+        { age: 22, market_value_eur: 13990000, name: 'João Neves', position: 'CM' },
+        { age: 23, market_value_eur: 15690000, name: 'Jude Bellingham', position: 'AM' },
+        { age: 24, market_value_eur: 17320000, name: 'Pedri', position: 'CM' },
+        { age: 25, market_value_eur: 18440000, name: 'Michael Olise', position: 'RW' },
+        { age: 26, market_value_eur: 18220000, name: 'Erling Haaland', position: 'ST' },
+        { age: 27, market_value_eur: 15500000, name: 'Declan Rice', position: 'DM' },
+        { age: 28, market_value_eur: 13750000, name: 'Kylian Mbappé', position: 'CF' },
+        { age: 29, market_value_eur: 13110000, name: 'Ousmane Dembélé', position: 'RW' },
+        { age: 30, market_value_eur: 9200000, name: 'Raphinha', position: 'LW' },
+        { age: 31, market_value_eur: 5850000, name: 'Joshua Kimmich', position: 'DM' },
+        { age: 32, market_value_eur: 4180000, name: 'Bruno Fernandes', position: 'AM' },
+        { age: 33, market_value_eur: 3280000, name: 'Harry Kane', position: 'ST' },
+        { age: 34, market_value_eur: 3060000, name: 'Mohamed Salah', position: 'RW' },
+        { age: 35, market_value_eur: 1880000, name: 'Virgil van Dijk', position: 'CB' },
+        { age: 36, market_value_eur: 1180000, name: 'Kevin Kampl', position: 'CM' },
+        { age: 37, market_value_eur: 1050000, name: 'Henrikh Mkhitaryan', position: 'AM' }
+    ];
 }
 

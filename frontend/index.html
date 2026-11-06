@@ -106,12 +106,18 @@
                 </div>
 
                 <div class="card">
-                    <div class="card-header">
+                    <div class="card-header" style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:10px;">
                         <div>
                             <h3 class="card-title">Valuation by Player Age</h3>
-                            <p class="card-subtitle">Market distribution curve across position tiers</p>
+                            <p class="card-subtitle">Average market valuation curve across career age brackets</p>
                         </div>
-                        <span class="badge" style="background:var(--color-secondary-tint); color:var(--color-on-secondary); font-weight:700;">Distribution</span>
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <div class="chart-mode-pill" id="val-age-mode-toggle">
+                                <button type="button" class="chart-mode-btn active" data-chart-type="area" onclick="switchValueAgeChartType('area')">Area</button>
+                                <button type="button" class="chart-mode-btn" data-chart-type="bar" onclick="switchValueAgeChartType('bar')">Bar</button>
+                            </div>
+                            <span class="badge" style="background:rgba(99, 102, 241, 0.14); color:#818CF8; font-weight:700; border:1px solid rgba(99, 102, 241, 0.28);">Age Curve</span>
+                        </div>
                     </div>
                     <div class="chart-container">
                         <canvas id="value-age-chart"></canvas>
