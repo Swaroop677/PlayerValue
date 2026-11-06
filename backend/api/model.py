@@ -49,6 +49,94 @@ _model_q90 = None
 _features = None
 
 
+_candidate_players = None
+
+
+def _get_candidate_players():
+    global _candidate_players
+    if _candidate_players is not None:
+        return _candidate_players
+
+    import sqlite3
+    db_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "playervalue.db")
+    if not os.path.exists(db_path):
+        return []
+
+    try:
+        conn = sqlite3.connect(db_path)
+        cur = conn.cursor()
+        cur.execute("""
+            SELECT p.id, p.name, p.primary_position, p.date_of_birth, c.name, mv.market_value_eur,
+                   ss.minutes, ss.goals, ss.assists, ss.xg, ss.xa
+            FROM players p
+            JOIN season_stats ss ON p.id = ss.player_id AND ss.season = '2024-25'
+            LEFT JOIN clubs c ON ss.club_id = c.id
+            LEFT JOIN (
+                SELECT player_id, MAX(market_value_eur) as market_value_eur 
+                FROM market_values GROUP BY player_id
+            ) mv ON p.id = mv.player_id
+            WHERE ss.minutes >= 450
+        """)
+        rows = cur.fetchall()
+        conn.close()
+
+        candidates = []
+        for r in rows:
+            dob = str(r[3] or '1999-01-01')
+            birth_yr = int(dob[:4]) if len(dob) >= 4 and dob[:4].isdigit() else 1999
+            age = max(16, min(42, 2025 - birth_yr))
+            candidates.append({
+                "id": r[0],
+                "name": r[1],
+                "position": r[2] or "MID",
+                "age": age,
+                "club": r[4] or "Top Flight",
+                "market_value_eur": float(r[5] or 0),
+                "minutes": float(r[6] or 0),
+                "goals": float(r[7] or 0),
+                "assists": float(r[8] or 0),
+                "xg": float(r[9] or 0),
+                "xa": float(r[10] or 0)
+            })
+        _candidate_players = candidates
+        return candidates
+    except Exception as e:
+        print(f"Error loading candidates: {e}")
+        return []
+
+
+def _compute_percentiles(stats: CustomPlayerStats, nineties: float, is_fwd: float, is_mid: float, is_def: float) -> Dict[str, int]:
+    g90 = stats.goals / nineties
+    a90 = stats.assists / nineties
+    xg90 = stats.xg / nineties
+    xa90 = stats.xa / nineties
+    prg90 = (stats.progressive_carries + stats.progressive_passes) / nineties
+    def90 = (stats.tackles + stats.interceptions + stats.aerial_wins) / nineties
+
+    if is_fwd:
+        finish_raw = (g90 * 0.6 + xg90 * 0.4) / 0.85
+        create_raw = (a90 * 0.5 + xa90 * 0.5) / 0.35
+        prog_raw = prg90 / 6.0
+        def_raw = def90 / 3.0
+    elif is_mid:
+        finish_raw = (g90 * 0.5 + xg90 * 0.5) / 0.35
+        create_raw = (a90 * 0.5 + xa90 * 0.5) / 0.45
+        prog_raw = prg90 / 9.0
+        def_raw = def90 / 5.0
+    else:  # defender or GK
+        finish_raw = (g90 * 0.5 + xg90 * 0.5) / 0.10
+        create_raw = (a90 * 0.5 + xa90 * 0.5) / 0.20
+        prog_raw = prg90 / 6.0
+        def_raw = def90 / 5.5
+
+    return {
+        "finishing": int(np.clip(finish_raw * 70.0 + 15.0, 5, 99)),
+        "creation": int(np.clip(create_raw * 70.0 + 15.0, 5, 99)),
+        "progression": int(np.clip(prog_raw * 70.0 + 15.0, 5, 99)),
+        "defending": int(np.clip(def_raw * 70.0 + 15.0, 5, 99))
+    }
+
+
 def get_artifacts():
     global _model_main, _model_q10, _model_q90, _features
     if _model_main is None:
@@ -242,6 +330,75 @@ def predict_custom_valuation(stats: CustomPlayerStats):
         "Standard top-5 European league sample")
     )
 
+    # 1. Projected Value vs Age Curve (ages 18 to 36)
+    age_idx = feature_cols.index("age")
+    ages_range = list(range(18, 37))
+    batch_vecs = []
+    for a in ages_range:
+        v = list(vec)
+        v[age_idx] = float(a)
+        batch_vecs.append(v)
+    batch_preds_eur = np.expm1(model.predict(batch_vecs))
+    max_idx = int(np.argmax(batch_preds_eur))
+    peak_age = ages_range[max_idx]
+
+    age_curve = [
+        {
+            "age": a,
+            "value_eur": round(float(val), -4),
+            "is_current": (a == int(stats.age)),
+            "is_peak": (a == peak_age)
+        }
+        for a, val in zip(ages_range, batch_preds_eur)
+    ]
+
+    # 2. Positional Percentiles (0-100)
+    percentiles = _compute_percentiles(stats, nineties, is_fwd, is_mid, is_def)
+
+    # 3. Top 3 Closest Comparable Players
+    candidates = _get_candidate_players()
+    comparables = []
+    if candidates:
+        pos_family = (
+            ['ST', 'CF', 'LW', 'RW'] if is_fwd else
+            (['AM', 'CM', 'DM', 'LM', 'RM'] if is_mid else
+            (['CB', 'LB', 'RB'] if is_def else ['GK']))
+        )
+        sim_scored = []
+        target_g90 = goals / nineties
+        target_a90 = assists / nineties
+        target_xg90 = xg / nineties
+        target_xa90 = xa / nineties
+        for cand in candidates:
+            if cand["position"] in pos_family:
+                c_n90 = max(cand["minutes"] / 90.0, 0.1)
+                cg90 = cand["goals"] / c_n90
+                ca90 = cand["assists"] / c_n90
+                cxg90 = cand["xg"] / c_n90
+                cxa90 = cand["xa"] / c_n90
+
+                dist = (
+                    ((target_g90 - cg90) / 0.5) ** 2 +
+                    ((target_a90 - ca90) / 0.3) ** 2 +
+                    ((target_xg90 - cxg90) / 0.5) ** 2 +
+                    ((target_xa90 - cxa90) / 0.3) ** 2 +
+                    ((stats.age - cand["age"]) / 8.0) ** 2
+                ) ** 0.5
+                sim_pct = max(50, min(99, int(100 - dist * 12)))
+                sim_scored.append((dist, sim_pct, cand))
+
+        sim_scored.sort(key=lambda x: x[0])
+        for _, sim_pct, cand in sim_scored[:3]:
+            comparables.append({
+                "id": cand["id"],
+                "name": cand["name"],
+                "club": cand["club"],
+                "position": cand["position"],
+                "age": cand["age"],
+                "market_value_eur": cand["market_value_eur"],
+                "similarity_percent": sim_pct
+            })
+
     return {
         "predicted_value_eur": round(pred_val, -4),
         "baseline_value_eur": round(base_val, -4),
@@ -255,6 +412,9 @@ def predict_custom_valuation(stats: CustomPlayerStats):
         "target_currency": "EUR",
         "top_factors": top_factors[:6],
         "all_shap_contributions": top_factors[:12],
+        "age_curve": age_curve,
+        "percentiles": percentiles,
+        "comparable_players": comparables,
         "model_metadata": {
             "version": "v2.0-xgboost-quantile",
             "algorithm": "XGBoost + Quantile Regression",
