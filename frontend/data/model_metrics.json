@@ -1,0 +1,1513 @@
+{
+  "model_version": "v2.0-xgboost-quantile",
+  "last_updated": "2026-11-06",
+  "trained_at": "2026-11-06T18:03:42.859457Z",
+  "model_type": "XGBoost Regressor + Quantile Regression (10/50/90)",
+  "train_seasons": "2015-16 to 2023-24",
+  "held_out_test_season": "2024-25",
+  "n_train_samples": 7604,
+  "n_test_samples": 1886,
+  "n_features": 43,
+  "feature_names": [
+    "age",
+    "league_strength",
+    "club_tier",
+    "is_tier1_nation",
+    "minutes",
+    "minutes_share",
+    "goals",
+    "assists",
+    "goal_contributions",
+    "xg",
+    "xa",
+    "xg_xa_total",
+    "goals_per_90",
+    "assists_per_90",
+    "xg_per_90",
+    "xa_per_90",
+    "shots_per_90",
+    "key_passes_per_90",
+    "progressive_passes_per_90",
+    "progressive_carries_per_90",
+    "tackles_per_90",
+    "interceptions_per_90",
+    "aerial_wins_per_90",
+    "recoveries_per_90",
+    "goal_contribs_per_90",
+    "xg_xa_per_90",
+    "clean_sheets_per_90",
+    "is_forward",
+    "is_midfielder",
+    "is_defender",
+    "is_gk",
+    "pos_CB",
+    "pos_LB",
+    "pos_RB",
+    "pos_DM",
+    "pos_CM",
+    "pos_AM",
+    "pos_LM",
+    "pos_RM",
+    "pos_LW",
+    "pos_RW",
+    "pos_ST",
+    "pos_CF"
+  ],
+  "metrics_held_out": {
+    "r2_log": 0.2488,
+    "r2_eur": 0.078,
+    "mae_eur": 10373897.39,
+    "mape_percent": 98.5,
+    "median_absolute_error_percent": 64.1,
+    "quantile_80_ci_coverage_percent": 73.4
+  },
+  "metrics_baseline": {
+    "description": "Historical Median by Tactical Position + Age Bracket + League",
+    "r2_log": 0.1751,
+    "r2_eur": 0.0364,
+    "mae_eur": 10895453.34,
+    "median_absolute_error_percent": 66.7
+  },
+  "metrics_before_vs_after": {
+    "old_model": {
+      "r2_log": 0.0789,
+      "r2_eur": -0.1108,
+      "mae_eur": 11080000.0,
+      "median_pct_err": 66.0,
+      "haaland_pred_eur": 10140000.0
+    },
+    "new_model": {
+      "r2_log": 0.2488,
+      "r2_eur": 0.078,
+      "mae_eur": 10373897.39,
+      "median_pct_err": 64.1,
+      "haaland_preset_eur": 25330000.0
+    }
+  },
+  "error_by_tier": {
+    "<5M": {
+      "count": 674,
+      "mae_eur": 1370393.9886869437,
+      "median_pct_err": 54.669442708333335,
+      "r2_eur": -1.189168582430837
+    },
+    "5-20M": {
+      "count": 697,
+      "mae_eur": 5783508.136029412,
+      "median_pct_err": 59.888525,
+      "r2_eur": -2.1377763343822935
+    },
+    "20-50M": {
+      "count": 391,
+      "mae_eur": 19328217.967870843,
+      "median_pct_err": 70.60071607142856,
+      "r2_eur": -6.4337220033294775
+    },
+    "50M+": {
+      "count": 124,
+      "mae_eur": 56879730.12096774,
+      "median_pct_err": 77.02409036363636,
+      "r2_eur": -2.9768058448409507
+    }
+  },
+  "error_by_position": {
+    "AM": {
+      "count": 111,
+      "mae_eur": 17358018.662865993,
+      "median_pct_err": 66.29148571428571,
+      "r2_eur": 0.014713244116132507
+    },
+    "CB": {
+      "count": 366,
+      "mae_eur": 9950793.74824966,
+      "median_pct_err": 68.16180625,
+      "r2_eur": -0.07928437309561964
+    },
+    "CF": {
+      "count": 16,
+      "mae_eur": 7449716.390625,
+      "median_pct_err": 42.56602698863637,
+      "r2_eur": 0.0926592755746467
+    },
+    "CM": {
+      "count": 261,
+      "mae_eur": 9846402.010416666,
+      "median_pct_err": 59.527565625,
+      "r2_eur": 0.09574020837781394
+    },
+    "DM": {
+      "count": 146,
+      "mae_eur": 11187599.502996575,
+      "median_pct_err": 63.43102388888889,
+      "r2_eur": -0.03207241192775401
+    },
+    "GK": {
+      "count": 175,
+      "mae_eur": 6525844.521875,
+      "median_pct_err": 79.850515,
+      "r2_eur": -0.25216283990471045
+    },
+    "LB": {
+      "count": 141,
+      "mae_eur": 7797490.802969858,
+      "median_pct_err": 60.233242857142855,
+      "r2_eur": 0.044060517292393575
+    },
+    "LM": {
+      "count": 11,
+      "mae_eur": 5851195.5227272725,
+      "median_pct_err": 57.458079166666664,
+      "r2_eur": -0.9234658387843171
+    },
+    "LW": {
+      "count": 123,
+      "mae_eur": 13801903.360264227,
+      "median_pct_err": 58.82627857142857,
+      "r2_eur": 0.07767925220778749
+    },
+    "RB": {
+      "count": 173,
+      "mae_eur": 7148569.1950867055,
+      "median_pct_err": 57.88251785714286,
+      "r2_eur": 0.12609524699589647
+    },
+    "RM": {
+      "count": 14,
+      "mae_eur": 4481771.410714285,
+      "median_pct_err": 49.19562500000001,
+      "r2_eur": -0.3891988776718929
+    },
+    "RW": {
+      "count": 127,
+      "mae_eur": 12451278.31828248,
+      "median_pct_err": 55.98799166666667,
+      "r2_eur": 0.017977657382284407
+    },
+    "ST": {
+      "count": 222,
+      "mae_eur": 12566297.7759009,
+      "median_pct_err": 63.14713625,
+      "r2_eur": 0.10312529988768848
+    }
+  },
+  "error_by_age_band": {
+    "Under 21": {
+      "count": 241,
+      "mae_eur": 8938426.348482884,
+      "median_pct_err": 77.0038375,
+      "r2_eur": -0.04086387840312078
+    },
+    "21\u201324": {
+      "count": 620,
+      "mae_eur": 12481328.997429436,
+      "median_pct_err": 64.13400714285714,
+      "r2_eur": 0.037422529854010844
+    },
+    "25\u201328": {
+      "count": 577,
+      "mae_eur": 12447028.499268847,
+      "median_pct_err": 63.03892857142858,
+      "r2_eur": 0.01857867494915355
+    },
+    "29\u201332": {
+      "count": 335,
+      "mae_eur": 6688208.788922574,
+      "median_pct_err": 56.222675,
+      "r2_eur": 0.12774832826932914
+    },
+    "33+": {
+      "count": 113,
+      "mae_eur": 2213277.5474972343,
+      "median_pct_err": 61.31196249999999,
+      "r2_eur": 0.30379560343865974
+    }
+  },
+  "error_by_league": {
+    "Bundesliga": {
+      "count": 341,
+      "mae_eur": 7710176.414177053,
+      "median_pct_err": 62.7325675,
+      "r2_eur": 0.08365752135454807
+    },
+    "La Liga": {
+      "count": 402,
+      "mae_eur": 9875780.546875,
+      "median_pct_err": 67.10796666666667,
+      "r2_eur": 0.10310759371780398
+    },
+    "Ligue 1": {
+      "count": 294,
+      "mae_eur": 7224965.448926446,
+      "median_pct_err": 65.64214196428571,
+      "r2_eur": 0.05149225257576662
+    },
+    "Premier League": {
+      "count": 426,
+      "mae_eur": 17309182.972344484,
+      "median_pct_err": 63.28071848484849,
+      "r2_eur": -0.1807699806399965
+    },
+    "Serie A": {
+      "count": 423,
+      "mae_eur": 8198781.92516253,
+      "median_pct_err": 62.02744285714286,
+      "r2_eur": 0.03103635192589438
+    }
+  },
+  "top_feature_importances": [
+    {
+      "feature": "club_tier",
+      "importance_percent": 26.07,
+      "display_name": "Club Tier"
+    },
+    {
+      "feature": "xg_xa_total",
+      "importance_percent": 10.42,
+      "display_name": "Xg Xa Total"
+    },
+    {
+      "feature": "minutes_share",
+      "importance_percent": 4.01,
+      "display_name": "Minutes Share"
+    },
+    {
+      "feature": "is_gk",
+      "importance_percent": 3.6,
+      "display_name": "Is Gk"
+    },
+    {
+      "feature": "pos_RB",
+      "importance_percent": 3.13,
+      "display_name": "Position: Rb"
+    },
+    {
+      "feature": "xg",
+      "importance_percent": 3.07,
+      "display_name": "Xg"
+    },
+    {
+      "feature": "league_strength",
+      "importance_percent": 2.18,
+      "display_name": "League Strength"
+    },
+    {
+      "feature": "minutes",
+      "importance_percent": 2.02,
+      "display_name": "Minutes"
+    },
+    {
+      "feature": "goal_contributions",
+      "importance_percent": 1.93,
+      "display_name": "Goal Contributions"
+    },
+    {
+      "feature": "xa",
+      "importance_percent": 1.9,
+      "display_name": "Xa"
+    },
+    {
+      "feature": "pos_AM",
+      "importance_percent": 1.74,
+      "display_name": "Position: Am"
+    },
+    {
+      "feature": "pos_LM",
+      "importance_percent": 1.68,
+      "display_name": "Position: Lm"
+    },
+    {
+      "feature": "pos_CB",
+      "importance_percent": 1.66,
+      "display_name": "Position: Cb"
+    },
+    {
+      "feature": "pos_LB",
+      "importance_percent": 1.61,
+      "display_name": "Position: Lb"
+    },
+    {
+      "feature": "age",
+      "importance_percent": 1.57,
+      "display_name": "Age"
+    }
+  ],
+  "known_players_test_results": [
+    {
+      "name": "Erling Haaland",
+      "season": "2024-25",
+      "position": "ST",
+      "actual_market_value_eur": 200000000.0,
+      "predicted_value_eur": 25330000.0,
+      "ci_80_low_eur": 10920000.0,
+      "ci_80_high_eur": 79250000.0,
+      "diff_percent": -87.3,
+      "is_flagged_over_35_pct": true
+    },
+    {
+      "name": "Kylian Mbapp\u00e9",
+      "season": "2024-25",
+      "position": "ST",
+      "actual_market_value_eur": 180000000.0,
+      "predicted_value_eur": 32330000.0,
+      "ci_80_low_eur": 10660000.0,
+      "ci_80_high_eur": 83380000.0,
+      "diff_percent": -82.0,
+      "is_flagged_over_35_pct": true
+    },
+    {
+      "name": "Vinicius Junior",
+      "season": "2024-25",
+      "position": "LW",
+      "actual_market_value_eur": 200000000.0,
+      "predicted_value_eur": 25680000.0,
+      "ci_80_low_eur": 7720000.0,
+      "ci_80_high_eur": 64500000.0,
+      "diff_percent": -87.2,
+      "is_flagged_over_35_pct": true
+    },
+    {
+      "name": "Lamine Yamal",
+      "season": "2024-25",
+      "position": "RW",
+      "actual_market_value_eur": 180000000.0,
+      "predicted_value_eur": 10340000.0,
+      "ci_80_low_eur": 3490000.0,
+      "ci_80_high_eur": 68940000.0,
+      "diff_percent": -94.3,
+      "is_flagged_over_35_pct": true
+    },
+    {
+      "name": "Jude Bellingham",
+      "season": "2024-25",
+      "position": "AM",
+      "actual_market_value_eur": 180000000.0,
+      "predicted_value_eur": 17090000.0,
+      "ci_80_low_eur": 4140000.0,
+      "ci_80_high_eur": 60810000.0,
+      "diff_percent": -90.5,
+      "is_flagged_over_35_pct": true
+    },
+    {
+      "name": "Phil Foden",
+      "season": "2024-25",
+      "position": "AM",
+      "actual_market_value_eur": 150000000.0,
+      "predicted_value_eur": 28340000.0,
+      "ci_80_low_eur": 10290000.0,
+      "ci_80_high_eur": 70010000.0,
+      "diff_percent": -81.1,
+      "is_flagged_over_35_pct": true
+    },
+    {
+      "name": "Bukayo Saka",
+      "season": "2024-25",
+      "position": "RW",
+      "actual_market_value_eur": 150000000.0,
+      "predicted_value_eur": 24570000.0,
+      "ci_80_low_eur": 14150000.0,
+      "ci_80_high_eur": 67110000.0,
+      "diff_percent": -83.6,
+      "is_flagged_over_35_pct": true
+    },
+    {
+      "name": "Pedri",
+      "season": "2024-25",
+      "position": "CM",
+      "actual_market_value_eur": 100000000.0,
+      "predicted_value_eur": 17690000.0,
+      "ci_80_low_eur": 8370000.0,
+      "ci_80_high_eur": 69400000.0,
+      "diff_percent": -82.3,
+      "is_flagged_over_35_pct": true
+    },
+    {
+      "name": "Mohamed Salah",
+      "season": "2024-25",
+      "position": "RW",
+      "actual_market_value_eur": 55000000.0,
+      "predicted_value_eur": 20210000.0,
+      "ci_80_low_eur": 23470000.0,
+      "ci_80_high_eur": 56050000.0,
+      "diff_percent": -63.2,
+      "is_flagged_over_35_pct": true
+    },
+    {
+      "name": "Harry Kane",
+      "season": "2024-25",
+      "position": "ST",
+      "actual_market_value_eur": 100000000.0,
+      "predicted_value_eur": 17040000.0,
+      "ci_80_low_eur": 7560000.0,
+      "ci_80_high_eur": 56810000.0,
+      "diff_percent": -83.0,
+      "is_flagged_over_35_pct": true
+    },
+    {
+      "name": "Declan Rice",
+      "season": "2024-25",
+      "position": "CM",
+      "actual_market_value_eur": 120000000.0,
+      "predicted_value_eur": 25670000.0,
+      "ci_80_low_eur": 9180000.0,
+      "ci_80_high_eur": 61590000.0,
+      "diff_percent": -78.6,
+      "is_flagged_over_35_pct": true
+    },
+    {
+      "name": "Bruno Fernandes",
+      "season": "2024-25",
+      "position": "AM",
+      "actual_market_value_eur": 65000000.0,
+      "predicted_value_eur": 16710000.0,
+      "ci_80_low_eur": 9730000.0,
+      "ci_80_high_eur": 56730000.0,
+      "diff_percent": -74.3,
+      "is_flagged_over_35_pct": true
+    },
+    {
+      "name": "Rodri",
+      "season": "2024-25",
+      "position": "DM",
+      "actual_market_value_eur": 130000000.0,
+      "predicted_value_eur": 15740000.0,
+      "ci_80_low_eur": 5110000.0,
+      "ci_80_high_eur": 39240000.0,
+      "diff_percent": -87.9,
+      "is_flagged_over_35_pct": true
+    },
+    {
+      "name": "Kevin De Bruyne",
+      "season": "2024-25",
+      "position": "AM",
+      "actual_market_value_eur": 50000000.0,
+      "predicted_value_eur": 9990000.0,
+      "ci_80_low_eur": 3780000.0,
+      "ci_80_high_eur": 21090000.0,
+      "diff_percent": -80.0,
+      "is_flagged_over_35_pct": true
+    },
+    {
+      "name": "Rafael Le\u00e3o",
+      "season": "2024-25",
+      "position": "LW",
+      "actual_market_value_eur": 90000000.0,
+      "predicted_value_eur": 11270000.0,
+      "ci_80_low_eur": 5100000.0,
+      "ci_80_high_eur": 45080000.0,
+      "diff_percent": -87.5,
+      "is_flagged_over_35_pct": true
+    },
+    {
+      "name": "Federico Valverde",
+      "season": "2024-25",
+      "position": "CM",
+      "actual_market_value_eur": 130000000.0,
+      "predicted_value_eur": 26070000.0,
+      "ci_80_low_eur": 5650000.0,
+      "ci_80_high_eur": 67980000.0,
+      "diff_percent": -79.9,
+      "is_flagged_over_35_pct": true
+    },
+    {
+      "name": "Gavi",
+      "season": "2024-25",
+      "position": "CM",
+      "actual_market_value_eur": 90000000.0,
+      "predicted_value_eur": 5220000.0,
+      "ci_80_low_eur": 1720000.0,
+      "ci_80_high_eur": 40770000.0,
+      "diff_percent": -94.2,
+      "is_flagged_over_35_pct": true
+    },
+    {
+      "name": "Jamal Musiala",
+      "season": "2024-25",
+      "position": "AM",
+      "actual_market_value_eur": 140000000.0,
+      "predicted_value_eur": 13670000.0,
+      "ci_80_low_eur": 4120000.0,
+      "ci_80_high_eur": 52510000.0,
+      "diff_percent": -90.2,
+      "is_flagged_over_35_pct": true
+    },
+    {
+      "name": "Florian Wirtz",
+      "season": "2024-25",
+      "position": "AM",
+      "actual_market_value_eur": 140000000.0,
+      "predicted_value_eur": 24910000.0,
+      "ci_80_low_eur": 8280000.0,
+      "ci_80_high_eur": 60500000.0,
+      "diff_percent": -82.2,
+      "is_flagged_over_35_pct": true
+    },
+    {
+      "name": "Khvicha Kvaratskhelia",
+      "season": "2024-25",
+      "position": "LW",
+      "actual_market_value_eur": 85000000.0,
+      "predicted_value_eur": 20530000.0,
+      "ci_80_low_eur": 6220000.0,
+      "ci_80_high_eur": 64150000.0,
+      "diff_percent": -75.8,
+      "is_flagged_over_35_pct": true
+    },
+    {
+      "name": "Trent Alexander-Arnold",
+      "season": "2024-25",
+      "position": "RB",
+      "actual_market_value_eur": 75000000.0,
+      "predicted_value_eur": 19530000.0,
+      "ci_80_low_eur": 5970000.0,
+      "ci_80_high_eur": 48030000.0,
+      "diff_percent": -74.0,
+      "is_flagged_over_35_pct": true
+    },
+    {
+      "name": "Antoine Griezmann",
+      "season": "2024-25",
+      "position": "CF",
+      "actual_market_value_eur": 22000000.0,
+      "predicted_value_eur": 11320000.0,
+      "ci_80_low_eur": 4220000.0,
+      "ci_80_high_eur": 29100000.0,
+      "diff_percent": -48.5,
+      "is_flagged_over_35_pct": true
+    },
+    {
+      "name": "Cole Palmer",
+      "season": "2024-25",
+      "position": "AM",
+      "actual_market_value_eur": 130000000.0,
+      "predicted_value_eur": 18210000.0,
+      "ci_80_low_eur": 14180000.0,
+      "ci_80_high_eur": 85280000.0,
+      "diff_percent": -86.0,
+      "is_flagged_over_35_pct": true
+    },
+    {
+      "name": "Martin \u00d8degaard",
+      "season": "2024-25",
+      "position": "AM",
+      "actual_market_value_eur": 110000000.0,
+      "predicted_value_eur": 25880000.0,
+      "ci_80_low_eur": 11620000.0,
+      "ci_80_high_eur": 74620000.0,
+      "diff_percent": -76.5,
+      "is_flagged_over_35_pct": true
+    },
+    {
+      "name": "William Saliba",
+      "season": "2024-25",
+      "position": "CB",
+      "actual_market_value_eur": 80000000.0,
+      "predicted_value_eur": 9150000.0,
+      "ci_80_low_eur": 4500000.0,
+      "ci_80_high_eur": 47760000.0,
+      "diff_percent": -88.6,
+      "is_flagged_over_35_pct": true
+    }
+  ],
+  "scatter_sample": [
+    {
+      "actual_eur": 3500000.0,
+      "predicted_eur": 2149927.25,
+      "name": "Daniele Rugani",
+      "position": "CB"
+    },
+    {
+      "actual_eur": 1000000.0,
+      "predicted_eur": 1871990.625,
+      "name": "Juma Bah",
+      "position": "CB"
+    },
+    {
+      "actual_eur": 7000000.0,
+      "predicted_eur": 3707500.75,
+      "name": "Florian Neuhaus",
+      "position": "CM"
+    },
+    {
+      "actual_eur": 60000000.0,
+      "predicted_eur": 5342137.0,
+      "name": "Jo\u00e3o Neves",
+      "position": "CM"
+    },
+    {
+      "actual_eur": 28000000.0,
+      "predicted_eur": 5764885.5,
+      "name": "Giacomo Raspadori",
+      "position": "CF"
+    },
+    {
+      "actual_eur": 3000000.0,
+      "predicted_eur": 4436087.5,
+      "name": "Iago Aspas",
+      "position": "ST"
+    },
+    {
+      "actual_eur": 2500000.0,
+      "predicted_eur": 2128926.5,
+      "name": "C\u00e9dric Bakambu",
+      "position": "ST"
+    },
+    {
+      "actual_eur": 12000000.0,
+      "predicted_eur": 2641660.5,
+      "name": "Robin Gosens",
+      "position": "LB"
+    },
+    {
+      "actual_eur": 35000000.0,
+      "predicted_eur": 4265834.5,
+      "name": "Odilon Kossounou",
+      "position": "CB"
+    },
+    {
+      "actual_eur": 15000000.0,
+      "predicted_eur": 9125494.0,
+      "name": "Kenny Tete",
+      "position": "RB"
+    },
+    {
+      "actual_eur": 9000000.0,
+      "predicted_eur": 3284403.5,
+      "name": "M\u00e1ximo Perrone",
+      "position": "DM"
+    },
+    {
+      "actual_eur": 6000000.0,
+      "predicted_eur": 3089333.25,
+      "name": "Gianluca Gaetano",
+      "position": "DM"
+    },
+    {
+      "actual_eur": 80000000.0,
+      "predicted_eur": 23507044.0,
+      "name": "Gabriel Martinelli",
+      "position": "LW"
+    },
+    {
+      "actual_eur": 8000000.0,
+      "predicted_eur": 4666654.5,
+      "name": "Santi Comesa\u00f1a",
+      "position": "CM"
+    },
+    {
+      "actual_eur": 9000000.0,
+      "predicted_eur": 2678137.5,
+      "name": "Amir Richardson",
+      "position": "CM"
+    },
+    {
+      "actual_eur": 20000000.0,
+      "predicted_eur": 11043829.0,
+      "name": "Emiliano Buend\u00eda",
+      "position": "LW"
+    },
+    {
+      "actual_eur": 5000000.0,
+      "predicted_eur": 2073405.5,
+      "name": "Domagoj Bradari\u0107",
+      "position": "LB"
+    },
+    {
+      "actual_eur": 7500000.0,
+      "predicted_eur": 2004380.625,
+      "name": "Javi L\u00f3pez",
+      "position": "LB"
+    },
+    {
+      "actual_eur": 15000000.0,
+      "predicted_eur": 6040782.0,
+      "name": "Boulaye Dia",
+      "position": "ST"
+    },
+    {
+      "actual_eur": 5000000.0,
+      "predicted_eur": 4731237.5,
+      "name": "Ante Budimir",
+      "position": "ST"
+    },
+    {
+      "actual_eur": 1500000.0,
+      "predicted_eur": 1894230.5,
+      "name": "Adam Masina",
+      "position": "CB"
+    },
+    {
+      "actual_eur": 20000000.0,
+      "predicted_eur": 1762326.375,
+      "name": "Arthur Theate",
+      "position": "CB"
+    },
+    {
+      "actual_eur": 20000000.0,
+      "predicted_eur": 601579.0625,
+      "name": "Marco Carnesecchi",
+      "position": "GK"
+    },
+    {
+      "actual_eur": 800000.0,
+      "predicted_eur": 950080.625,
+      "name": "Ousmane Camara",
+      "position": "CB"
+    },
+    {
+      "actual_eur": 3000000.0,
+      "predicted_eur": 3772790.75,
+      "name": "Eray C\u00f6mert",
+      "position": "CB"
+    },
+    {
+      "actual_eur": 2500000.0,
+      "predicted_eur": 4415481.5,
+      "name": "Mathias Pereira Lage",
+      "position": "LW"
+    },
+    {
+      "actual_eur": 15000000.0,
+      "predicted_eur": 1555493.75,
+      "name": "Niklas Beste",
+      "position": "RW"
+    },
+    {
+      "actual_eur": 300000.0,
+      "predicted_eur": 132656.203125,
+      "name": "Tobias Sippel",
+      "position": "GK"
+    },
+    {
+      "actual_eur": 30000000.0,
+      "predicted_eur": 7681864.5,
+      "name": "Marc Casad\u00f3",
+      "position": "DM"
+    },
+    {
+      "actual_eur": 15000000.0,
+      "predicted_eur": 1874835.0,
+      "name": "Pietro Comuzzo",
+      "position": "CB"
+    },
+    {
+      "actual_eur": 20000000.0,
+      "predicted_eur": 13702727.0,
+      "name": "Beto",
+      "position": "ST"
+    },
+    {
+      "actual_eur": 20000000.0,
+      "predicted_eur": 4883216.0,
+      "name": "Yangel Herrera",
+      "position": "CM"
+    },
+    {
+      "actual_eur": 8000000.0,
+      "predicted_eur": 1643576.0,
+      "name": "Sam Johnstone",
+      "position": "GK"
+    },
+    {
+      "actual_eur": 2000000.0,
+      "predicted_eur": 2171862.0,
+      "name": "Pere Milla",
+      "position": "LW"
+    },
+    {
+      "actual_eur": 15000000.0,
+      "predicted_eur": 4126186.25,
+      "name": "Gift Orban",
+      "position": "ST"
+    },
+    {
+      "actual_eur": 4000000.0,
+      "predicted_eur": 2661095.0,
+      "name": "Luis Rioja",
+      "position": "RW"
+    },
+    {
+      "actual_eur": 7000000.0,
+      "predicted_eur": 1369660.875,
+      "name": "Grischa Pr\u00f6mel",
+      "position": "CM"
+    },
+    {
+      "actual_eur": 3000000.0,
+      "predicted_eur": 2738955.75,
+      "name": "Ignace Van der Brempt",
+      "position": "RB"
+    },
+    {
+      "actual_eur": 5000000.0,
+      "predicted_eur": 1841817.25,
+      "name": "Eric Smith",
+      "position": "CB"
+    },
+    {
+      "actual_eur": 12000000.0,
+      "predicted_eur": 3375759.5,
+      "name": "Eren Dink\u00e7i",
+      "position": "RW"
+    },
+    {
+      "actual_eur": 30000000.0,
+      "predicted_eur": 22394968.0,
+      "name": "Pervis Estupi\u00f1\u00e1n",
+      "position": "LB"
+    },
+    {
+      "actual_eur": 10000000.0,
+      "predicted_eur": 5882289.0,
+      "name": "Mostafa Mohamed",
+      "position": "ST"
+    },
+    {
+      "actual_eur": 4000000.0,
+      "predicted_eur": 286654.4375,
+      "name": "Arijon Ibrahimovic",
+      "position": "AM"
+    },
+    {
+      "actual_eur": 20000000.0,
+      "predicted_eur": 9565169.0,
+      "name": "Paulo Dybala",
+      "position": "CF"
+    },
+    {
+      "actual_eur": 45000000.0,
+      "predicted_eur": 9097375.0,
+      "name": "Arda G\u00fcler",
+      "position": "AM"
+    },
+    {
+      "actual_eur": 5000000.0,
+      "predicted_eur": 2157574.25,
+      "name": "Jordan Zemura",
+      "position": "LB"
+    },
+    {
+      "actual_eur": 2500000.0,
+      "predicted_eur": 5632045.5,
+      "name": "Stanley Nsoki",
+      "position": "CB"
+    },
+    {
+      "actual_eur": 100000000.0,
+      "predicted_eur": 8970643.0,
+      "name": "Aur\u00e9lien Tchouam\u00e9ni",
+      "position": "DM"
+    },
+    {
+      "actual_eur": 2500000.0,
+      "predicted_eur": 7738172.5,
+      "name": "Path\u00e9 Ciss",
+      "position": "CM"
+    },
+    {
+      "actual_eur": 1800000.0,
+      "predicted_eur": 1881266.625,
+      "name": "Cristhian Stuani",
+      "position": "ST"
+    },
+    {
+      "actual_eur": 55000000.0,
+      "predicted_eur": 13281315.0,
+      "name": "Ousmane Demb\u00e9l\u00e9",
+      "position": "ST"
+    },
+    {
+      "actual_eur": 3000000.0,
+      "predicted_eur": 2792252.5,
+      "name": "Dani Parejo",
+      "position": "CM"
+    },
+    {
+      "actual_eur": 300000.0,
+      "predicted_eur": 1356063.25,
+      "name": "Zach Abbott",
+      "position": "CB"
+    },
+    {
+      "actual_eur": 15000000.0,
+      "predicted_eur": 2519426.0,
+      "name": "Chadi Riad",
+      "position": "CB"
+    },
+    {
+      "actual_eur": 6500000.0,
+      "predicted_eur": 4066654.0,
+      "name": "Lucas Da Cunha",
+      "position": "CM"
+    },
+    {
+      "actual_eur": 1500000.0,
+      "predicted_eur": 3903902.0,
+      "name": "Ramon Hendriks",
+      "position": "CB"
+    },
+    {
+      "actual_eur": 8000000.0,
+      "predicted_eur": 1090166.75,
+      "name": "Jean Butez",
+      "position": "GK"
+    },
+    {
+      "actual_eur": 30000000.0,
+      "predicted_eur": 4783685.5,
+      "name": "Eliesse Ben Seghir",
+      "position": "LW"
+    },
+    {
+      "actual_eur": 28000000.0,
+      "predicted_eur": 2265819.75,
+      "name": "Ben Chilwell",
+      "position": "LB"
+    },
+    {
+      "actual_eur": 1800000.0,
+      "predicted_eur": 751536.75,
+      "name": "Yuri Berchiche",
+      "position": "LB"
+    },
+    {
+      "actual_eur": 20000000.0,
+      "predicted_eur": 12790703.0,
+      "name": "Rodrigo Muniz",
+      "position": "ST"
+    },
+    {
+      "actual_eur": 12000000.0,
+      "predicted_eur": 2710280.25,
+      "name": "Yukinari Sugawara",
+      "position": "RB"
+    },
+    {
+      "actual_eur": 20000000.0,
+      "predicted_eur": 9003469.0,
+      "name": "Sander Berge",
+      "position": "DM"
+    },
+    {
+      "actual_eur": 12000000.0,
+      "predicted_eur": 2536289.0,
+      "name": "Tariq Lamptey",
+      "position": "RB"
+    },
+    {
+      "actual_eur": 50000000.0,
+      "predicted_eur": 18200834.0,
+      "name": "Matheus Nunes",
+      "position": "RB"
+    },
+    {
+      "actual_eur": 3500000.0,
+      "predicted_eur": 3625175.75,
+      "name": "Kevin Kampl",
+      "position": "CM"
+    },
+    {
+      "actual_eur": 7500000.0,
+      "predicted_eur": 3012550.0,
+      "name": "Fabiano Parisi",
+      "position": "LB"
+    },
+    {
+      "actual_eur": 800000.0,
+      "predicted_eur": 543978.0625,
+      "name": "Luka Topalovi\u0107",
+      "position": "CM"
+    },
+    {
+      "actual_eur": 3000000.0,
+      "predicted_eur": 1343238.5,
+      "name": "\u00c1lex Valle",
+      "position": "LB"
+    },
+    {
+      "actual_eur": 18000000.0,
+      "predicted_eur": 2529588.25,
+      "name": "Juan Foyth",
+      "position": "CB"
+    },
+    {
+      "actual_eur": 12000000.0,
+      "predicted_eur": 1650668.25,
+      "name": "Mads Hermansen",
+      "position": "GK"
+    },
+    {
+      "actual_eur": 2500000.0,
+      "predicted_eur": 4746526.5,
+      "name": "Manu Morlanes",
+      "position": "CM"
+    },
+    {
+      "actual_eur": 8000000.0,
+      "predicted_eur": 5494695.0,
+      "name": "Pape Gueye",
+      "position": "CM"
+    },
+    {
+      "actual_eur": 5000000.0,
+      "predicted_eur": 1007474.25,
+      "name": "Yann Sommer",
+      "position": "GK"
+    },
+    {
+      "actual_eur": 2500000.0,
+      "predicted_eur": 4102432.25,
+      "name": "Pablo Ib\u00e1\u00f1ez",
+      "position": "CM"
+    },
+    {
+      "actual_eur": 8000000.0,
+      "predicted_eur": 1113158.875,
+      "name": "Jes\u00fas Areso",
+      "position": "RB"
+    },
+    {
+      "actual_eur": 7000000.0,
+      "predicted_eur": 2944021.75,
+      "name": "Javi Gal\u00e1n",
+      "position": "LB"
+    },
+    {
+      "actual_eur": 35000000.0,
+      "predicted_eur": 26933796.0,
+      "name": "Harvey Barnes",
+      "position": "LW"
+    },
+    {
+      "actual_eur": 3000000.0,
+      "predicted_eur": 3021855.5,
+      "name": "Han-Noah Massengo",
+      "position": "CM"
+    },
+    {
+      "actual_eur": 2000000.0,
+      "predicted_eur": 1392297.125,
+      "name": "Pep Chavarr\u00eda",
+      "position": "LB"
+    },
+    {
+      "actual_eur": 9000000.0,
+      "predicted_eur": 876661.1875,
+      "name": "Rafa Mar\u00edn",
+      "position": "CB"
+    },
+    {
+      "actual_eur": 6000000.0,
+      "predicted_eur": 3195074.75,
+      "name": "Felix Agu",
+      "position": "LB"
+    },
+    {
+      "actual_eur": 50000.0,
+      "predicted_eur": 1481667.25,
+      "name": "Louis Leroux",
+      "position": "AM"
+    },
+    {
+      "actual_eur": 300000.0,
+      "predicted_eur": 135674.828125,
+      "name": "\u00c1lex Dom\u00ednguez",
+      "position": "GK"
+    },
+    {
+      "actual_eur": 25000000.0,
+      "predicted_eur": 26789264.0,
+      "name": "Alexander S\u00f8rloth",
+      "position": "ST"
+    },
+    {
+      "actual_eur": 23000000.0,
+      "predicted_eur": 17236970.0,
+      "name": "John McGinn",
+      "position": "CM"
+    },
+    {
+      "actual_eur": 5000000.0,
+      "predicted_eur": 4117530.5,
+      "name": "Jordan James",
+      "position": "CM"
+    },
+    {
+      "actual_eur": 13000000.0,
+      "predicted_eur": 11634123.0,
+      "name": "Ryan Yates",
+      "position": "CM"
+    },
+    {
+      "actual_eur": 1000000.0,
+      "predicted_eur": 1596305.625,
+      "name": "Juan Cuadrado",
+      "position": "RM"
+    },
+    {
+      "actual_eur": 700000.0,
+      "predicted_eur": 1241059.75,
+      "name": "Javi Serrano",
+      "position": "CM"
+    },
+    {
+      "actual_eur": 50000.0,
+      "predicted_eur": 342687.25,
+      "name": "Iliesse Salhi",
+      "position": "LB"
+    },
+    {
+      "actual_eur": 30000000.0,
+      "predicted_eur": 6426480.0,
+      "name": "Ferdi Kad\u0131o\u011flu",
+      "position": "LB"
+    },
+    {
+      "actual_eur": 12000000.0,
+      "predicted_eur": 12801759.0,
+      "name": "Wataru Endo",
+      "position": "DM"
+    },
+    {
+      "actual_eur": 2000000.0,
+      "predicted_eur": 3645989.0,
+      "name": "Rui Modesto",
+      "position": "RW"
+    },
+    {
+      "actual_eur": 17000000.0,
+      "predicted_eur": 8026170.0,
+      "name": "Nicol\u00e1s Dom\u00ednguez",
+      "position": "CM"
+    },
+    {
+      "actual_eur": 2000000.0,
+      "predicted_eur": 3592209.5,
+      "name": "Adrian Beck",
+      "position": "AM"
+    },
+    {
+      "actual_eur": 20000000.0,
+      "predicted_eur": 12259218.0,
+      "name": "Adam Webster",
+      "position": "CB"
+    },
+    {
+      "actual_eur": 5000000.0,
+      "predicted_eur": 4402312.5,
+      "name": "Danny Welbeck",
+      "position": "ST"
+    },
+    {
+      "actual_eur": 100000.0,
+      "predicted_eur": 257983.609375,
+      "name": "Th\u00e9o De Percin",
+      "position": "GK"
+    },
+    {
+      "actual_eur": 40000000.0,
+      "predicted_eur": 17277160.0,
+      "name": "Joelinton",
+      "position": "CM"
+    },
+    {
+      "actual_eur": 5000000.0,
+      "predicted_eur": 3998314.0,
+      "name": "Nelson Weiper",
+      "position": "ST"
+    },
+    {
+      "actual_eur": 30000000.0,
+      "predicted_eur": 12780972.0,
+      "name": "Yann Bisseck",
+      "position": "CB"
+    },
+    {
+      "actual_eur": 6000000.0,
+      "predicted_eur": 1332956.875,
+      "name": "C\u00e9sar T\u00e1rrega",
+      "position": "CB"
+    },
+    {
+      "actual_eur": 9000000.0,
+      "predicted_eur": 5255103.5,
+      "name": "Tiago Tom\u00e1s",
+      "position": "RW"
+    },
+    {
+      "actual_eur": 30000000.0,
+      "predicted_eur": 11673177.0,
+      "name": "Marcos Llorente",
+      "position": "RB"
+    },
+    {
+      "actual_eur": 15000000.0,
+      "predicted_eur": 4591641.5,
+      "name": "Kamaldeen Sulemana",
+      "position": "LW"
+    },
+    {
+      "actual_eur": 20000000.0,
+      "predicted_eur": 3006895.5,
+      "name": "Lovro Majer",
+      "position": "AM"
+    },
+    {
+      "actual_eur": 400000.0,
+      "predicted_eur": 1046035.125,
+      "name": "Abdoulaye Bamba",
+      "position": "CB"
+    },
+    {
+      "actual_eur": 55000000.0,
+      "predicted_eur": 21187364.0,
+      "name": "Nicolas Jackson",
+      "position": "ST"
+    },
+    {
+      "actual_eur": 12000000.0,
+      "predicted_eur": 9426327.0,
+      "name": "Koni De Winter",
+      "position": "CB"
+    },
+    {
+      "actual_eur": 1700000.0,
+      "predicted_eur": 2770097.75,
+      "name": "Hamza Rafia",
+      "position": "CM"
+    },
+    {
+      "actual_eur": 18000000.0,
+      "predicted_eur": 8253251.5,
+      "name": "Math\u00edas Olivera",
+      "position": "LB"
+    },
+    {
+      "actual_eur": 7000000.0,
+      "predicted_eur": 4484506.5,
+      "name": "Patrick Cutrone",
+      "position": "ST"
+    },
+    {
+      "actual_eur": 2500000.0,
+      "predicted_eur": 2684289.5,
+      "name": "Jonah Kusi-Asare",
+      "position": "ST"
+    },
+    {
+      "actual_eur": 3500000.0,
+      "predicted_eur": 1868901.125,
+      "name": "Jordy Makengo",
+      "position": "LB"
+    },
+    {
+      "actual_eur": 20000000.0,
+      "predicted_eur": 4341420.5,
+      "name": "Orel Mangala",
+      "position": "DM"
+    },
+    {
+      "actual_eur": 22000000.0,
+      "predicted_eur": 4157636.5,
+      "name": "Julio Enciso",
+      "position": "AM"
+    },
+    {
+      "actual_eur": 7500000.0,
+      "predicted_eur": 4659001.5,
+      "name": "Abdel Abqar",
+      "position": "CB"
+    },
+    {
+      "actual_eur": 12000000.0,
+      "predicted_eur": 2077314.5,
+      "name": "Isma\u00ebl Kon\u00e9",
+      "position": "CM"
+    },
+    {
+      "actual_eur": 1000000.0,
+      "predicted_eur": 733682.9375,
+      "name": "Fabian Bredlow",
+      "position": "GK"
+    },
+    {
+      "actual_eur": 20000000.0,
+      "predicted_eur": 8233134.0,
+      "name": "Patrick Dorgu",
+      "position": "LW"
+    },
+    {
+      "actual_eur": 10000000.0,
+      "predicted_eur": 6979864.0,
+      "name": "Ethan Pinnock",
+      "position": "CB"
+    },
+    {
+      "actual_eur": 8000000.0,
+      "predicted_eur": 2894255.0,
+      "name": "Nathaniel Brown",
+      "position": "LB"
+    },
+    {
+      "actual_eur": 4000000.0,
+      "predicted_eur": 664383.4375,
+      "name": "Michael Zetterer",
+      "position": "GK"
+    },
+    {
+      "actual_eur": 18000000.0,
+      "predicted_eur": 6441113.5,
+      "name": "Giovanni Reyna",
+      "position": "AM"
+    },
+    {
+      "actual_eur": 10000000.0,
+      "predicted_eur": 4917105.5,
+      "name": "Romain Del Castillo",
+      "position": "RW"
+    },
+    {
+      "actual_eur": 10000000.0,
+      "predicted_eur": 2405401.5,
+      "name": "Kyle Walker",
+      "position": "RB"
+    },
+    {
+      "actual_eur": 4500000.0,
+      "predicted_eur": 4311679.5,
+      "name": "Thomas Kristensen",
+      "position": "CB"
+    },
+    {
+      "actual_eur": 65000000.0,
+      "predicted_eur": 16705784.0,
+      "name": "Bruno Fernandes",
+      "position": "AM"
+    },
+    {
+      "actual_eur": 30000000.0,
+      "predicted_eur": 13424755.0,
+      "name": "Andrea Cambiaso",
+      "position": "LB"
+    },
+    {
+      "actual_eur": 2000000.0,
+      "predicted_eur": 7821484.0,
+      "name": "Cl\u00e9ment Akpa",
+      "position": "CB"
+    },
+    {
+      "actual_eur": 12000000.0,
+      "predicted_eur": 4240249.0,
+      "name": "Quentin Merlin",
+      "position": "LB"
+    },
+    {
+      "actual_eur": 1000000.0,
+      "predicted_eur": 1999329.125,
+      "name": "Jamie Vardy",
+      "position": "ST"
+    },
+    {
+      "actual_eur": 1000000.0,
+      "predicted_eur": 793816.625,
+      "name": "Tommaso Corazza",
+      "position": "LM"
+    },
+    {
+      "actual_eur": 2000000.0,
+      "predicted_eur": 5025006.0,
+      "name": "Tom Cairney",
+      "position": "CM"
+    },
+    {
+      "actual_eur": 10000000.0,
+      "predicted_eur": 1325828.0,
+      "name": "Francesco Camarda",
+      "position": "ST"
+    },
+    {
+      "actual_eur": 3500000.0,
+      "predicted_eur": 2328950.5,
+      "name": "\u00d3scar Valent\u00edn",
+      "position": "CM"
+    },
+    {
+      "actual_eur": 200000.0,
+      "predicted_eur": 256633.234375,
+      "name": "Lasse Rie\u00df",
+      "position": "GK"
+    },
+    {
+      "actual_eur": 500000.0,
+      "predicted_eur": 1570972.75,
+      "name": "Jean-Daniel Akpa Akpro",
+      "position": "CM"
+    },
+    {
+      "actual_eur": 5000000.0,
+      "predicted_eur": 4415684.0,
+      "name": "Rani Khedira",
+      "position": "DM"
+    },
+    {
+      "actual_eur": 3000000.0,
+      "predicted_eur": 3985420.0,
+      "name": "Pontus Almqvist",
+      "position": "RW"
+    },
+    {
+      "actual_eur": 24000000.0,
+      "predicted_eur": 9755425.0,
+      "name": "Waldemar Anton",
+      "position": "CB"
+    },
+    {
+      "actual_eur": 8000000.0,
+      "predicted_eur": 13285952.0,
+      "name": "Dani Ceballos",
+      "position": "CM"
+    },
+    {
+      "actual_eur": 9000000.0,
+      "predicted_eur": 773938.4375,
+      "name": "Yehvann Diouf",
+      "position": "GK"
+    },
+    {
+      "actual_eur": 45000000.0,
+      "predicted_eur": 18006604.0,
+      "name": "Hakan \u00c7alhano\u011flu",
+      "position": "DM"
+    },
+    {
+      "actual_eur": 15000000.0,
+      "predicted_eur": 5502991.0,
+      "name": "Nathan Patterson",
+      "position": "RB"
+    },
+    {
+      "actual_eur": 17000000.0,
+      "predicted_eur": 3165558.0,
+      "name": "Victor Nelsson",
+      "position": "CB"
+    },
+    {
+      "actual_eur": 12000000.0,
+      "predicted_eur": 2981800.25,
+      "name": "Moses Simon",
+      "position": "LW"
+    },
+    {
+      "actual_eur": 9000000.0,
+      "predicted_eur": 4260146.5,
+      "name": "Juan Miranda",
+      "position": "LB"
+    },
+    {
+      "actual_eur": 3000000.0,
+      "predicted_eur": 1397375.875,
+      "name": "Omar El Hilali",
+      "position": "RB"
+    }
+  ]
+}

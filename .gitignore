@@ -26,7 +26,9 @@ env/
 Thumbs.db
 
 # Large Raw Data files & Archives
-data/
+data/*
+!data/model_metrics.json
+ml/saved_models_backup/
 *.zip
 *.tar.gz
 
@@ -43,4 +45,6 @@ yarn-debug.log*
 
 # ML model weights (allow production trained model)
 !ml/saved_models/model.joblib
-!ml/saved_models/scaler.joblib
+!ml/saved_models/model_q10.joblib
+!ml/saved_models/model_q90.joblib
+!ml/saved_models/features.json
