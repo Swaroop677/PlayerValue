@@ -3,69 +3,260 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PlayerValue | Market Opportunities</title>
+    <title>PlayerValue | Market Opportunities & Scouting</title>
     <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/opportunities.css">
 </head>
 <body>
-    <div class="app-container">
-        <main class="main-content">
-            <div id="breadcrumbs-container"></div>
-            
-            <header class="page-header" style="flex-direction: column; align-items: flex-start; gap: 6px;">
-                <h1 class="page-title">Market Opportunities</h1>
-                <p class="page-subtitle">Players whose statistical performance suggests a higher valuation than recorded market price.</p>
-            </header>
+    <div class="opp-container">
+        <!-- Breadcrumbs -->
+        <div id="breadcrumbs-container" style="margin-bottom:12px;"></div>
 
-            <div class="filter-bar">
-                <div class="filter-group">
-                    <label class="filter-label">Position</label>
-                    <select id="o-position" class="filter-input">
-                        <option value="">All Positions</option>
-                        <option value="ST">ST</option><option value="LW">LW</option><option value="RW">RW</option>
-                        <option value="AM">AM</option><option value="CM">CM</option><option value="DM">DM</option>
-                        <option value="CB">CB</option><option value="LB">LB</option><option value="RB">RB</option>
-                        <option value="GK">GK</option>
-                    </select>
+        <!-- Page Header & Suite Tabs -->
+        <header class="opp-header">
+            <div class="opp-title-row">
+                <div>
+                    <h1>Market Intelligence & Scouting</h1>
+                    <p>Identify market valuation discrepancies and scout emerging talent across 5 European leagues.</p>
                 </div>
-                <div class="filter-group">
-                    <label class="filter-label">Max Age</label>
-                    <input type="number" id="o-max-age" class="filter-input" placeholder="e.g. 25">
-                </div>
-                <div class="filter-group">
-                    <label class="filter-label">Min Gap %</label>
-                    <input type="number" id="o-min-gap" class="filter-input" placeholder="e.g. 20">
-                </div>
-                <div class="filter-group">
-                    <label class="filter-label">Max Market Value (M€)</label>
-                    <input type="number" id="o-max-val" class="filter-input" placeholder="e.g. 10">
+                <!-- Unified Suite Switcher: Opportunities vs Scouting -->
+                <div class="opp-tabs-nav">
+                    <button id="tab-btn-opp" class="opp-tab-btn active" type="button">Market Opportunities</button>
+                    <button id="tab-btn-scout" class="opp-tab-btn" type="button">Scouting Finder</button>
                 </div>
             </div>
 
-            <div class="table-container">
-                <table class="data-table">
+            <!-- Star-Bias Caveat Banner -->
+            <div class="caveat-banner">
+                <svg class="caveat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>
+                </svg>
+                <div class="caveat-content">
+                    <div class="caveat-title">Why do top-club superstars look overvalued?</div>
+                    <p class="caveat-text">
+                        The model values on-pitch statistical output, not commercial hype. Global superstars carry massive enterprise premiums (shirt sales, sponsorship, social reach, brand equity) that pure match performance data alone does not capture.
+                    </p>
+                </div>
+            </div>
+        </header>
+
+        <!-- SECTION 1: MARKET OPPORTUNITIES -->
+        <section id="opp-section">
+            <!-- Filter Bar -->
+            <div class="opp-filter-bar">
+                <!-- Minutes Filter Pills -->
+                <div class="opp-filter-item">
+                    <span class="opp-filter-label">Minutes Played Filter</span>
+                    <div class="minutes-pills">
+                        <button type="button" class="minute-pill opp-min-pill active" data-mins="900">Regulars (≥900m)</button>
+                        <button type="button" class="minute-pill opp-min-pill" data-mins="450">Half-Season (≥450m)</button>
+                        <button type="button" class="minute-pill opp-min-pill" data-mins="1800">Starters (≥1800m)</button>
+                        <button type="button" class="minute-pill opp-min-pill" data-mins="0">All Minutes</button>
+                    </div>
+                </div>
+
+                <!-- Position -->
+                <div class="opp-filter-item">
+                    <label class="opp-filter-label">Position</label>
+                    <select id="o-position" class="opp-filter-select">
+                        <option value="">All Positions</option>
+                        <option value="ST">ST</option>
+                        <option value="LW">LW</option>
+                        <option value="RW">RW</option>
+                        <option value="AM">AM</option>
+                        <option value="CM">CM</option>
+                        <option value="DM">DM</option>
+                        <option value="CB">CB</option>
+                        <option value="LB">LB</option>
+                        <option value="RB">RB</option>
+                        <option value="GK">GK</option>
+                    </select>
+                </div>
+
+                <!-- Max Age -->
+                <div class="opp-filter-item">
+                    <label class="opp-filter-label">Max Age</label>
+                    <input type="number" id="o-max-age" class="opp-filter-input" placeholder="e.g. 24" style="width:90px;">
+                </div>
+
+                <!-- Min Gap % -->
+                <div class="opp-filter-item">
+                    <label class="opp-filter-label">Min Undervalued Gap %</label>
+                    <input type="number" id="o-min-gap" class="opp-filter-input" placeholder="e.g. 20" style="width:90px;">
+                </div>
+
+                <!-- Max Market Value -->
+                <div class="opp-filter-item">
+                    <label class="opp-filter-label">Max Price (M€)</label>
+                    <input type="number" id="o-max-val" class="opp-filter-input" placeholder="e.g. 15" style="width:90px;">
+                </div>
+            </div>
+
+            <!-- Opportunities Table -->
+            <div class="opp-table-card">
+                <table class="opp-table">
                     <thead>
                         <tr>
-                            <th>Player</th>
+                            <th>Player & Club</th>
                             <th>Age</th>
-                            <th>Position</th>
-                            <th>Club</th>
-                            <th>League</th>
-                            <th>Market Value</th>
-                            <th>Model Implied</th>
-                            <th>Valuation Gap</th>
+                            <th>Pos</th>
+                            <th>Mins</th>
+                            <th>Confidence</th>
+                            <th>Model vs Transfermarkt</th>
+                            <th>Gap %</th>
                         </tr>
                     </thead>
                     <tbody id="opp-tbody"></tbody>
                 </table>
             </div>
 
-            <div id="pagination-container" style="display:flex; justify-content:center; margin-top:24px;"></div>
-        </main>
+            <!-- Pagination -->
+            <div id="opp-pagination" style="display:flex; justify-content:center; margin-top:24px;"></div>
+        </section>
+
+        <!-- SECTION 2: SCOUTING FINDER (MERGED) -->
+        <section id="scout-section" style="display:none;">
+            <!-- Scouting Filters -->
+            <div class="opp-filter-bar" style="margin-bottom:16px;">
+                <div class="opp-filter-item">
+                    <label class="opp-filter-label">Position</label>
+                    <select id="s-position" class="opp-filter-select">
+                        <option value="">All Positions</option>
+                        <option value="ST">ST</option><option value="LW">LW</option><option value="RW">RW</option>
+                        <option value="AM">AM</option><option value="CM">CM</option><option value="DM">DM</option>
+                        <option value="CB">CB</option><option value="LB">LB</option><option value="RB">RB</option>
+                    </select>
+                </div>
+
+                <div class="opp-filter-item">
+                    <label class="opp-filter-label">Age Bracket</label>
+                    <div style="display:flex; gap:6px;">
+                        <input type="number" id="s-min-age" class="opp-filter-input" placeholder="Min" style="width:65px;">
+                        <input type="number" id="s-max-age" class="opp-filter-input" placeholder="Max" style="width:65px;">
+                    </div>
+                </div>
+
+                <div class="opp-filter-item">
+                    <label class="opp-filter-label">Max Price (€M)</label>
+                    <input type="number" id="s-max-val" class="opp-filter-input" placeholder="e.g. 20" style="width:85px;">
+                </div>
+
+                <div class="opp-filter-item">
+                    <label class="opp-filter-label">Min Goals</label>
+                    <input type="number" id="s-min-goals" class="opp-filter-input" placeholder="e.g. 5" style="width:75px;">
+                </div>
+
+                <div class="opp-filter-item">
+                    <label class="opp-filter-label">Min Assists</label>
+                    <input type="number" id="s-min-assists" class="opp-filter-input" placeholder="e.g. 3" style="width:75px;">
+                </div>
+
+                <div class="opp-filter-item">
+                    <label class="opp-filter-label">Min Tackles /90</label>
+                    <input type="number" id="s-min-tackles" class="opp-filter-input" step="0.1" placeholder="e.g. 1.5" style="width:75px;">
+                </div>
+
+                <div class="opp-filter-item">
+                    <label class="opp-filter-label">Min Int /90</label>
+                    <input type="number" id="s-min-interceptions" class="opp-filter-input" step="0.1" placeholder="e.g. 1.0" style="width:75px;">
+                </div>
+
+                <div style="margin-left:auto; display:flex; align-items:flex-end; gap:8px;">
+                    <button id="s-reset-filters" class="pred-btn" type="button">Reset</button>
+                    <button id="btn-compare-selected" class="pred-btn active" type="button" disabled>Compare Selected (0)</button>
+                </div>
+            </div>
+
+            <!-- Scouting Table -->
+            <div class="opp-table-card">
+                <table class="opp-table">
+                    <thead>
+                        <tr>
+                            <th style="width:40px;">Select</th>
+                            <th>Player</th>
+                            <th>Age</th>
+                            <th>Pos</th>
+                            <th>Mins</th>
+                            <th>Transfermarkt MV</th>
+                            <th>Model Implied</th>
+                        </tr>
+                    </thead>
+                    <tbody id="scout-tbody"></tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <div id="scout-pagination" style="display:flex; justify-content:center; margin-top:24px;"></div>
+        </section>
+    </div>
+
+    <!-- Slide-Over Drawer for Player Quick-View -->
+    <div id="drawer-backdrop" class="drawer-backdrop"></div>
+    <div id="player-drawer" class="slide-over-drawer">
+        <div class="drawer-header">
+            <span style="font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:0.06em; color:var(--pv-muted);">Player Quick Intelligence</span>
+            <button id="drawer-close-btn" class="drawer-close-btn" type="button" aria-label="Close drawer">✕</button>
+        </div>
+
+        <div class="drawer-body">
+            <div class="drawer-player-profile">
+                <div id="drawer-avatar-container"></div>
+                <div>
+                    <div id="drawer-name" class="drawer-player-name">Player Name</div>
+                    <div id="drawer-meta" class="drawer-player-meta">Club · Age -- · Pos</div>
+                </div>
+            </div>
+
+            <!-- Valuation Comparison -->
+            <div class="drawer-val-grid">
+                <div>
+                    <div class="drawer-val-box-label">Model-Implied Value</div>
+                    <div id="drawer-pred-val" class="drawer-val-box-num" style="color:var(--pv-accent);">€--M</div>
+                </div>
+                <div>
+                    <div class="drawer-val-box-label">Transfermarkt Value</div>
+                    <div id="drawer-market-val" class="drawer-val-box-num" style="color:var(--pv-muted);">€--M</div>
+                </div>
+            </div>
+
+            <!-- Season Stats Overview -->
+            <div>
+                <div style="font-size:12px; font-weight:600; text-transform:uppercase; color:var(--pv-muted); margin-bottom:10px;">Season Performance Stats</div>
+                <div class="drawer-stats-grid">
+                    <div class="drawer-stat-item">
+                        <div class="drawer-stat-label">Minutes</div>
+                        <div id="drawer-stat-min" class="drawer-stat-val">--</div>
+                    </div>
+                    <div class="drawer-stat-item">
+                        <div class="drawer-stat-label">Goals</div>
+                        <div id="drawer-stat-goals" class="drawer-stat-val">--</div>
+                    </div>
+                    <div class="drawer-stat-item">
+                        <div class="drawer-stat-label">Assists</div>
+                        <div id="drawer-stat-assists" class="drawer-stat-val">--</div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="background:var(--pv-surface-2); border-radius:10px; padding:14px; font-size:12px; line-height:1.4; color:var(--pv-muted);">
+                💡 <strong>What-if Simulation:</strong> Click below to test custom improvements (e.g. +5 goals or moving to an elite club tier) directly inside the Valuation Predictor.
+            </div>
+        </div>
+
+        <div class="drawer-actions">
+            <a id="drawer-btn-predictor" href="#" class="drawer-btn-primary">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg>
+                Open in Predictor
+            </a>
+            <a id="drawer-btn-profile" href="#" class="drawer-btn-secondary">
+                Full Profile →
+            </a>
+        </div>
     </div>
 
     <script src="js/api.js"></script>
-    <script src="js/utils.js"></script>
     <script src="js/club_logos_data.js"></script>
+    <script src="js/utils.js"></script>
     <script src="js/components.js"></script>
     <script src="js/opportunities.js"></script>
 </body>

@@ -35,9 +35,8 @@ function createNavbar(activePage) {
         { id: 'players', label: 'Players', url: 'players.html' },
         { id: 'predictor', label: 'Predictor', url: 'predictor.html' },
         { id: 'opportunities', label: 'Opportunities', url: 'opportunities.html' },
-        { id: 'scouting', label: 'Scouting', url: 'scouting.html' },
         { id: 'clubs', label: 'Clubs', url: 'clubs.html' },
-        { id: 'model', label: 'Model', url: 'model.html' }
+        { id: 'model', label: 'Methodology', url: 'model.html' }
     ];
 
     const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';

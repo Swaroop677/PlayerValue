@@ -24,12 +24,13 @@ def get_market_opportunities(db: Session, filters: Dict[str, Any], page: int = 1
     """
     Find players whose model-implied value exceeds their current market value.
     
-    The min_gap_percent filter ensures we only return players where the model
-    thinks they are worth more than their recorded market valuation.
+    Default min_minutes to 900 to eliminate noisy rate-stat distortions from small samples.
     """
-    # Ensure we only show players with a positive gap
     if "min_gap_percent" not in filters or filters["min_gap_percent"] is None:
         filters["min_gap_percent"] = 0.01  # At least slightly undervalued
+
+    if "min_minutes" not in filters or filters["min_minutes"] is None:
+        filters["min_minutes"] = 900  # Default 900 minutes (full season regular)
     
     return get_players(db, filters, page=page, page_size=page_size,
                        sort_by="value_gap_percent", sort_dir="desc")
