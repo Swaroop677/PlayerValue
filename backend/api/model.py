@@ -315,6 +315,7 @@ def predict_custom_valuation(stats: CustomPlayerStats):
             "raw_feature": col,
             "log_contribution": round(c_log, 4),
             "contribution_eur": round(c_eur, -4),
+            "importance": round(share * 100, 1),
             "direction": "positive" if c_log > 0 else "negative",
             "abs_impact": abs(c_log)
         })

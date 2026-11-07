@@ -4,16 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PlayerValue | Valuation Predictor</title>
-    <script>
-      (function() {
-        try {
-          var s = localStorage.getItem('playervalue_theme');
-          var t = s ? s : (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
-          document.documentElement.setAttribute('data-theme', t);
-        } catch(e) {}
-      })();
-    </script>
-    <link rel="icon" type="image/png" href="assets/logo-icon.png">
     <link rel="stylesheet" href="css/styles.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
@@ -22,16 +12,10 @@
         <main class="main-content">
             <div id="breadcrumbs-container"></div>
 
-            <header class="page-header" style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom: 24px; flex-wrap:wrap; gap:16px;">
+            <header class="page-header">
                 <div>
                     <h1 class="page-title">Valuation Predictor</h1>
                     <p class="page-subtitle">Interactive what-if simulator: test player performance stat lines and compute model-implied market value in real-time.</p>
-                </div>
-                <div style="display:flex; gap:8px;">
-                    <button class="btn btn-secondary" onclick="loadPreset('haaland')" style="font-size:12px; padding:6px 12px;">Haaland</button>
-                    <button class="btn btn-secondary" onclick="loadPreset('saka')" style="font-size:12px; padding:6px 12px;">Saka</button>
-                    <button class="btn btn-secondary" onclick="loadPreset('bellingham')" style="font-size:12px; padding:6px 12px;">Bellingham</button>
-                    <button class="btn btn-secondary" onclick="loadPreset('saliba')" style="font-size:12px; padding:6px 12px;">Saliba</button>
                 </div>
             </header>
 
@@ -43,6 +27,7 @@
                             <h3 class="card-title">Performance Metrics & Profile</h3>
                             <p class="card-subtitle">Adjust parameters to simulate market valuations</p>
                         </div>
+                        <button class="btn btn-secondary" onclick="loadPreset('haaland')" style="font-size:12px; padding:6px 12px;">Haaland Preset</button>
                     </div>
 
                     <form id="predictor-form" onsubmit="runPrediction(event)">
@@ -64,7 +49,7 @@
                             </div>
                             <div class="filter-group">
                                 <label class="filter-label">Player Age</label>
-                                <input type="number" id="p-age" class="filter-input" value="24" min="16" max="42">
+                                <input type="number" id="p-age" class="filter-input" value="23" min="16" max="42">
                             </div>
                         </div>
 
@@ -75,7 +60,7 @@
                             </div>
                             <div class="filter-group">
                                 <label class="filter-label">Minutes Played</label>
-                                <input type="number" id="p-minutes" class="filter-input" value="2560" min="90" max="4000">
+                                <input type="number" id="p-minutes" class="filter-input" value="2400" min="90" max="4000">
                             </div>
                         </div>
 
@@ -83,30 +68,30 @@
                         <div class="grid-3 mb-2">
                             <div class="filter-group">
                                 <label class="filter-label">Goals</label>
-                                <input type="number" id="p-goals" class="filter-input" value="27" min="0">
+                                <input type="number" id="p-goals" class="filter-input" value="25" min="0">
                             </div>
                             <div class="filter-group">
                                 <label class="filter-label">Assists</label>
-                                <input type="number" id="p-assists" class="filter-input" value="5" min="0">
+                                <input type="number" id="p-assists" class="filter-input" value="7" min="0">
                             </div>
                             <div class="filter-group">
                                 <label class="filter-label">Expected Goals (xG)</label>
-                                <input type="number" id="p-xg" class="filter-input" value="24.8" step="0.1" min="0">
+                                <input type="number" id="p-xg" class="filter-input" value="22.4" step="0.1" min="0">
                             </div>
                         </div>
 
                         <div class="grid-3 mb-2">
                             <div class="filter-group">
                                 <label class="filter-label">Expected Assists (xA)</label>
-                                <input type="number" id="p-xa" class="filter-input" value="4.2" step="0.1" min="0">
+                                <input type="number" id="p-xa" class="filter-input" value="6.1" step="0.1" min="0">
                             </div>
                             <div class="filter-group">
                                 <label class="filter-label">Shots</label>
-                                <input type="number" id="p-shots" class="filter-input" value="105" min="0">
+                                <input type="number" id="p-shots" class="filter-input" value="95" min="0">
                             </div>
                             <div class="filter-group">
                                 <label class="filter-label">Key Passes</label>
-                                <input type="number" id="p-kp" class="filter-input" value="28" min="0">
+                                <input type="number" id="p-kp" class="filter-input" value="38" min="0">
                             </div>
                         </div>
 
@@ -114,15 +99,15 @@
                         <div class="grid-3 mb-4">
                             <div class="filter-group">
                                 <label class="filter-label">Prog. Carries</label>
-                                <input type="number" id="p-prgc" class="filter-input" value="42" min="0">
+                                <input type="number" id="p-prgc" class="filter-input" value="65" min="0">
                             </div>
                             <div class="filter-group">
                                 <label class="filter-label">Prog. Passes</label>
-                                <input type="number" id="p-prgp" class="filter-input" value="38" min="0">
+                                <input type="number" id="p-prgp" class="filter-input" value="70" min="0">
                             </div>
                             <div class="filter-group">
                                 <label class="filter-label">Tackles</label>
-                                <input type="number" id="p-tkl" class="filter-input" value="11" min="0">
+                                <input type="number" id="p-tkl" class="filter-input" value="18" min="0">
                             </div>
                         </div>
 
@@ -134,22 +119,22 @@
 
                 <!-- Prediction Results -->
                 <div style="display:flex; flex-direction:column; gap:20px;">
-                    <div class="card" style="text-align:center; padding:32px 24px;">
-                        <span class="kpi-label" style="font-size:12px; text-transform:uppercase; letter-spacing:0.05em;">Model-Implied Valuation</span>
-                        <div id="pred-result-val" class="tabular-nums" style="font-size:42px; font-weight:800; color:var(--color-primary-dark); margin:12px 0 6px 0;">
-                            €--M
+                    <div class="card" style="border: 1px solid var(--color-border);">
+                        <span class="badge" style="background:var(--color-primary-tint); color:var(--color-primary-dark); font-weight:700; margin-bottom:10px;">XGBoost Regressor</span>
+                        <div class="kpi-label">Model-Implied Valuation</div>
+                        <div id="pred-result-val" class="tabular-nums" style="font-size:42px; font-weight:800; color:var(--color-primary-dark); line-height:1.1; margin:6px 0 10px 0;">
+                            €--.-M
                         </div>
-                        <div style="font-size:13px; color:var(--color-ink-muted);">
-                            80% Prediction Interval: <strong id="pred-range-val" class="tabular-nums" style="color:var(--color-ink)">€--M – €--M</strong>
+                        <div style="font-size:13px; color:var(--color-ink-soft);">
+                            Confidence Range: <strong id="pred-range-val" class="tabular-nums" style="color:var(--color-ink)">€--M – €--M</strong>
                         </div>
-                        <div id="pred-confidence-badge" style="margin-top:10px;"></div>
                     </div>
 
                     <div class="card">
                         <div class="card-header">
                             <div>
-                                <h3 class="card-title">Key Value Drivers (Tree-SHAP)</h3>
-                                <p class="card-subtitle">Exact feature contributions to valuation</p>
+                                <h3 class="card-title">Key Value Drivers</h3>
+                                <p class="card-subtitle">Features influencing this model valuation</p>
                             </div>
                         </div>
                         <div id="pred-drivers-container" style="display:flex; flex-direction:column; gap:8px;">
@@ -167,36 +152,14 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             initPage('predictor');
-            const breadcrumbs = document.getElementById('breadcrumbs-container');
-            if (breadcrumbs) {
-                breadcrumbs.innerHTML = createBreadcrumbs([
-                    { label: 'Dashboard', url: 'index.html' },
-                    { label: 'Valuation Predictor', url: '#' }
-                ]);
-            }
             runPrediction();
         });
 
         const PRESETS = {
             haaland: {
-                position: 'ST', age: 24, league_strength: 5.0, minutes: 2560,
-                goals: 27, assists: 5, xg: 24.8, xa: 4.2, shots: 105, kp: 28,
-                progressive_carries: 42, progressive_passes: 38, tackles: 11
-            },
-            saka: {
-                position: 'RW', age: 23, league_strength: 5.0, minutes: 2700,
-                goals: 16, assists: 9, xg: 13.5, xa: 8.8, shots: 85, kp: 72,
-                progressive_carries: 115, progressive_passes: 92, tackles: 54
-            },
-            bellingham: {
-                position: 'AM', age: 21, league_strength: 5.0, minutes: 2450,
-                goals: 19, assists: 6, xg: 15.2, xa: 5.6, shots: 68, kp: 52,
-                progressive_carries: 78, progressive_passes: 105, tackles: 48
-            },
-            saliba: {
-                position: 'CB', age: 23, league_strength: 5.0, minutes: 3000,
-                goals: 2, assists: 1, xg: 1.2, xa: 0.5, shots: 14, kp: 6,
-                progressive_carries: 28, progressive_passes: 112, tackles: 62
+                position: 'ST', age: 24, league_strength: 5.0, minutes: 2600,
+                goals: 32, assists: 6, xg: 29.5, xa: 5.2, shots: 110, kp: 32,
+                progressive_carries: 45, progressive_passes: 40, tackles: 12
             }
         };
 
@@ -223,9 +186,9 @@
             if (e) e.preventDefault();
             const payload = {
                 position: document.getElementById('p-position').value,
-                age: parseInt(document.getElementById('p-age').value) || 24,
+                age: parseInt(document.getElementById('p-age').value) || 22,
                 league_strength: parseFloat(document.getElementById('p-league').value) || 5.0,
-                minutes: parseInt(document.getElementById('p-minutes').value) || 2000,
+                minutes: parseInt(document.getElementById('p-minutes').value) || 1800,
                 goals: parseInt(document.getElementById('p-goals').value) || 0,
                 assists: parseInt(document.getElementById('p-assists').value) || 0,
                 xg: parseFloat(document.getElementById('p-xg').value) || 0.0,
@@ -241,60 +204,33 @@
             const valElem = document.getElementById('pred-result-val');
             const rangeElem = document.getElementById('pred-range-val');
             const driversElem = document.getElementById('pred-drivers-container');
-            const confBadge = document.getElementById('pred-confidence-badge');
 
             valElem.textContent = 'Calculating...';
 
             try {
-                let res;
-                try {
-                    res = await fetch('/api/model/predict-custom', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload)
-                    });
-                    if (!res.ok) throw new Error('Local API failed');
-                } catch(e) {
-                    res = await fetch('https://playervalue.up.railway.app/api/model/predict-custom', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload)
-                    });
-                }
+                const res = await fetch('/api/model/predict', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
                 const data = await res.json();
 
                 valElem.textContent = formatCurrency(data.predicted_value_eur);
-                if (data.confidence_range_eur) {
-                    rangeElem.textContent = `${formatCurrency(data.confidence_range_eur.low)} – ${formatCurrency(data.confidence_range_eur.high)}`;
-                }
+                rangeElem.textContent = `${formatCurrency(data.confidence_range_eur.low)} – ${formatCurrency(data.confidence_range_eur.high)}`;
 
-                if (confBadge) {
-                    const isLow = data.is_low_confidence;
-                    confBadge.innerHTML = `<span class="badge ${isLow ? 'val-badge negative' : 'val-badge positive'}" style="font-size:11px;">
-                        ${isLow ? '⚠️ Sample Notice: ' + (data.confidence_reason || 'Out of core distribution') : '✓ High Sample Confidence'}
-                    </span>`;
-                }
-
-                const factors = data.top_factors || [];
-                if (factors.length > 0) {
-                    driversElem.innerHTML = factors.map(f => {
-                        const isPos = f.direction === 'positive' || (f.contribution_eur && f.contribution_eur > 0);
-                        const eurText = f.contribution_eur ? formatCurrency(Math.abs(f.contribution_eur)) : '';
-                        return `
-                            <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 14px; border-radius:var(--radius-sm); background:var(--color-surface-alt); font-size:12.5px;">
-                                <span style="font-weight:600; color:var(--color-ink)">${safeText(f.feature)}</span>
-                                <span class="badge ${isPos ? 'val-badge positive' : 'val-badge negative'}">
-                                    ${isPos ? '+' : '-'}${eurText ? ' ' + eurText : ''}
-                                </span>
-                            </div>
-                        `;
-                    }).join('');
+                if (data.top_factors && data.top_factors.length > 0) {
+                    driversElem.innerHTML = data.top_factors.map(f => `
+                        <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 14px; border-radius:var(--radius-sm); background:var(--color-surface-alt); font-size:12.5px;">
+                            <span style="font-weight:600; color:var(--color-ink)">${f.feature}</span>
+                            <span class="badge ${f.direction === 'positive' ? 'val-badge positive' : 'val-badge negative'}">
+                                ${f.direction === 'positive' ? '+' : '-'} ${f.importance}% Weight
+                            </span>
+                        </div>
+                    `).join('');
                 }
             } catch (err) {
                 console.error(err);
-                valElem.textContent = '€25.3M';
-                rangeElem.textContent = '€19.5M – €32.8M';
-                driversElem.innerHTML = '<div style="font-size:12px; color:var(--color-ink-muted)">Feature attributions available on local/live engine.</div>';
+                valElem.textContent = 'Error';
             }
         }
     </script>

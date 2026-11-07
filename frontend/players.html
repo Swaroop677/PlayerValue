@@ -4,16 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PlayerValue | Players Database</title>
-    <script>
-      (function() {
-        try {
-          var s = localStorage.getItem('playervalue_theme');
-          var t = s ? s : (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
-          document.documentElement.setAttribute('data-theme', t);
-        } catch(e) {}
-      })();
-    </script>
-    <link rel="icon" type="image/png" href="assets/logo-icon.png">
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
@@ -72,8 +62,8 @@
 
                     <!-- Sort dropdown -->
                     <select id="f-sort-by" class="filter-select" aria-label="Sort by field">
-                        <option value="market_value_eur">Sort by: Transfermarkt Market Value</option>
-                        <option value="predicted_value_eur">Sort by: Model-Implied Value</option>
+                        <option value="market_value_eur">Sort by: Market Value</option>
+                        <option value="predicted_value_eur">Sort by: Model Implied</option>
                         <option value="age">Sort by: Age</option>
                         <option value="minutes">Sort by: Minutes Played</option>
                         <option value="name">Sort by: Name</option>
@@ -108,8 +98,8 @@
                             <th onclick="toggleSortColumn('primary_position')">Pos</th>
                             <th>League</th>
                             <th onclick="toggleSortColumn('minutes')">Minutes</th>
-                            <th onclick="toggleSortColumn('market_value_eur')">Transfermarkt MV</th>
-                            <th onclick="toggleSortColumn('predicted_value_eur')">Model-Implied Value</th>
+                            <th onclick="toggleSortColumn('market_value_eur')">Market Value</th>
+                            <th onclick="toggleSortColumn('predicted_value_eur')">Model Value</th>
                             <th>Value Gap</th>
                         </tr>
                     </thead>

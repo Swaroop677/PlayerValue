@@ -64,21 +64,21 @@ function renderProfile(player, stats, history, transfers, prediction, similar) {
 
                 <div style="display:flex; gap:20px; align-items:center; background:var(--color-surface-alt); padding:16px 20px; border-radius:var(--radius-md); border:1px solid var(--color-border);">
                     <div>
-                        <div class="kpi-label">Transfermarkt Market Value</div>
+                        <div class="kpi-label">Market Value</div>
                         <div class="tabular-nums" style="font-size:24px; font-weight:800; color:var(--color-ink)">
                             ${formatCurrency(player.market_value_eur)}
                         </div>
                     </div>
                     <div style="width:1px; height:40px; background:var(--color-border);"></div>
                     <div>
-                        <div class="kpi-label">Model-Implied Value</div>
+                        <div class="kpi-label">Model Implied</div>
                         <div class="tabular-nums" style="font-size:24px; font-weight:800; color:var(--color-primary-dark)">
                             ${formatCurrency(player.predicted_value_eur)}
                         </div>
                     </div>
                     <div style="width:1px; height:40px; background:var(--color-border);"></div>
                     <div>
-                        <div class="kpi-label">Valuation Gap</div>
+                        <div class="kpi-label">Gap</div>
                         ${createValueBadge(gapPercent, true)}
                     </div>
                 </div>

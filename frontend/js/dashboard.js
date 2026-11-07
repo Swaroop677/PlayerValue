@@ -50,10 +50,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                                 <div style="display:flex; align-items:center; gap:10px;">
                                     ${createPlayerAvatar(p.name, p.primary_position, 'avatar-sm')}
                                     <div>
-                                        <div style="font-weight:700; font-size:13.5px; color:var(--color-ink);">${safeText(p.name)}</div>
+                                        <div style="font-weight:700; font-size:13.5px; color:var(--color-ink);">${p.name}</div>
                                         <div style="font-size:11.5px; color:var(--color-ink-soft); display:flex; align-items:center; gap:4px;">
                                             ${createClubLogo(p.club_id, p.club_name, 14)}
-                                            <span>${safeText(p.club_name, '—')}</span> • ${safeText(p.primary_position, '—')} • ${safeText(p.age, '—')} yrs
+                                            <span>${p.club_name || '-'}</span> • ${p.primary_position} • ${p.age || '-'} yrs
                                         </div>
                                     </div>
                                 </div>
@@ -83,14 +83,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     const kpiContainer = document.getElementById('kpi-container');
     const risersTbody = document.getElementById('risers-tbody');
     const fallersTbody = document.getElementById('fallers-tbody');
-
-    // Load Discrepancy Board
-    loadMarketBoard();
+    const undervaluedTbody = document.getElementById('undervalued-tbody');
 
     try {
         if (kpiContainer) showLoading(kpiContainer, 'card', 5);
         if (risersTbody) risersTbody.innerHTML = createSkeleton('table-row');
         if (fallersTbody) fallersTbody.innerHTML = createSkeleton('table-row');
+        if (undervaluedTbody) undervaluedTbody.innerHTML = createSkeleton('table-row');
 
         const data = await getDashboard();
 
@@ -161,12 +160,12 @@ document.addEventListener('DOMContentLoaded', async () => {
                             ${createPlayerAvatar(p.name, p.primary_position)}
                             <div style="min-width:0; overflow:hidden;">
                                 <div style="display:flex; align-items:center; gap:5px; flex-wrap:nowrap;">
-                                    <span style="font-weight:700; font-size:13px; color:var(--color-ink); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${safeText(p.name)}</span>
-                                    <span class="${getPositionBadgeClass(p.primary_position)}" style="font-size:9.5px; padding:1px 5px; flex-shrink:0;">${safeText(p.primary_position)}</span>
+                                    <span style="font-weight:700; font-size:13px; color:var(--color-ink); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${p.name}</span>
+                                    <span class="${getPositionBadgeClass(p.primary_position)}" style="font-size:9.5px; padding:1px 5px; flex-shrink:0;">${p.primary_position || ''}</span>
                                 </div>
                                 <div style="font-size:11px; color:var(--color-ink-soft); margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; display:flex; align-items:center; gap:4px;">
                                     ${createClubLogo(null, p.club_name, 13)}
-                                    <span>${safeText(p.club_name, '—')}</span>
+                                    <span>${p.club_name || ''}</span>
                                 </div>
                             </div>
                         </div>
@@ -191,12 +190,12 @@ document.addEventListener('DOMContentLoaded', async () => {
                             ${createPlayerAvatar(p.name, p.primary_position)}
                             <div style="min-width:0; overflow:hidden;">
                                 <div style="display:flex; align-items:center; gap:5px; flex-wrap:nowrap;">
-                                    <span style="font-weight:700; font-size:13px; color:var(--color-ink); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${safeText(p.name)}</span>
-                                    <span class="${getPositionBadgeClass(p.primary_position)}" style="font-size:9.5px; padding:1px 5px; flex-shrink:0;">${safeText(p.primary_position)}</span>
+                                    <span style="font-weight:700; font-size:13px; color:var(--color-ink); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${p.name}</span>
+                                    <span class="${getPositionBadgeClass(p.primary_position)}" style="font-size:9.5px; padding:1px 5px; flex-shrink:0;">${p.primary_position || ''}</span>
                                 </div>
                                 <div style="font-size:11px; color:var(--color-ink-soft); margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; display:flex; align-items:center; gap:4px;">
                                     ${createClubLogo(null, p.club_name, 13)}
-                                    <span>${safeText(p.club_name, '—')}</span>
+                                    <span>${p.club_name || ''}</span>
                                 </div>
                             </div>
                         </div>
@@ -259,224 +258,122 @@ function initKpiScrollAnimation(container) {
     if (!cards.length) return;
 
     function animateKpiNumber(el) {
-        if (el.dataset.animated === 'true') return;
-        el.dataset.animated = 'true';
-
-        const rawValue = el.dataset.rawValue || '';
-        const isCurrency = el.dataset.isCurrency === 'true';
-
-        let targetNumber = 0;
-        let suffix = '';
-        let prefix = isCurrency ? '€' : '';
-
-        if (rawValue.includes('B')) {
-            targetNumber = parseFloat(rawValue.replace(/[^0-9.]/g, ''));
-            suffix = 'B';
-        } else if (rawValue.includes('M')) {
-            targetNumber = parseFloat(rawValue.replace(/[^0-9.]/g, ''));
-            suffix = 'M';
-        } else if (rawValue.includes('K')) {
-            targetNumber = parseFloat(rawValue.replace(/[^0-9.]/g, ''));
-            suffix = 'K';
-        } else {
-            targetNumber = parseFloat(rawValue.replace(/,/g, '')) || 0;
-        }
-
-        const duration = 1200;
+        const rawVal = parseFloat(el.getAttribute('data-raw-value') || '0');
+        const isCurrency = el.getAttribute('data-is-currency') === 'true';
+        const duration = 1400; // ms
         const startTime = performance.now();
 
-        function updateCount(currentTime) {
-            const elapsed = currentTime - startTime;
+        function easeOutExpo(x) {
+            return x === 1 ? 1 : 1 - Math.pow(2, -10 * x);
+        }
+
+        function step(now) {
+            const elapsed = now - startTime;
             const progress = Math.min(elapsed / duration, 1);
-            const easeOutQuart = 1 - Math.pow(1 - progress, 4);
+            const ease = easeOutExpo(progress);
 
-            const currentVal = targetNumber * easeOutQuart;
-
-            if (suffix === 'B' || suffix === 'M') {
-                el.textContent = `${prefix}${currentVal.toFixed(1)}${suffix}`;
-            } else if (targetNumber % 1 !== 0) {
-                el.textContent = `${prefix}${currentVal.toFixed(1)}${suffix}`;
+            if (isCurrency) {
+                if (rawVal >= 1e9) {
+                    const currentB = ((rawVal / 1e9) * ease).toFixed(1);
+                    el.textContent = `€${currentB}B`;
+                } else if (rawVal >= 1e6) {
+                    const currentM = ((rawVal / 1e6) * ease).toFixed(1);
+                    el.textContent = `€${currentM}M`;
+                } else {
+                    el.textContent = `€${Math.round(rawVal * ease).toLocaleString()}`;
+                }
             } else {
-                el.textContent = `${prefix}${Math.round(currentVal).toLocaleString()}${suffix}`;
+                const currentInt = Math.round(rawVal * ease);
+                el.textContent = currentInt.toLocaleString();
             }
 
             if (progress < 1) {
-                requestAnimationFrame(updateCount);
+                requestAnimationFrame(step);
             } else {
-                el.textContent = rawValue;
+                // Final exact formatting fallback
+                if (isCurrency) {
+                    el.textContent = formatCurrency(rawVal);
+                } else {
+                    el.textContent = formatNumber(rawVal);
+                }
             }
         }
-        requestAnimationFrame(updateCount);
+
+        requestAnimationFrame(step);
+    }
+
+    if (!('IntersectionObserver' in window)) {
+        cards.forEach((card, i) => {
+            const valEl = card.querySelector('.kpi-metric-value');
+            if (valEl) setTimeout(() => animateKpiNumber(valEl), i * 80);
+        });
+        return;
     }
 
     const observer = new IntersectionObserver((entries, obs) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
-                const numEl = entry.target.querySelector('.kpi-metric-value');
-                if (numEl) animateKpiNumber(numEl);
-                obs.unobserve(entry.target);
+                const card = entry.target;
+                const valEl = card.querySelector('.kpi-metric-value');
+                if (valEl && !valEl.classList.contains('counted')) {
+                    valEl.classList.add('counted');
+                    const idx = parseInt(card.getAttribute('data-index') || '0', 10);
+                    setTimeout(() => animateKpiNumber(valEl), idx * 80);
+                }
+                obs.unobserve(card);
             }
         });
-    }, { threshold: 0.15 });
+    }, {
+        threshold: 0.15,
+        rootMargin: '0px 0px -20px 0px'
+    });
 
     cards.forEach(card => observer.observe(card));
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Valuation by Age Chart Mode Controller & Fallback Data
+// ─────────────────────────────────────────────────────────────────────────────
 function updateValueAgeToggleButtons(activeType) {
-    const btns = document.querySelectorAll('#val-age-mode-toggle .chart-mode-btn');
-    btns.forEach(btn => {
-        if (btn.dataset.chartType === activeType) {
-            btn.classList.add('active');
-        } else {
-            btn.classList.remove('active');
-        }
+    document.querySelectorAll('#val-age-mode-toggle .chart-mode-btn').forEach(btn => {
+        const isActive = btn.getAttribute('data-chart-type') === activeType;
+        btn.classList.toggle('active', isActive);
     });
 }
 
 window.switchValueAgeChartType = function(type) {
     localStorage.setItem('val_age_chart_type', type);
     updateValueAgeToggleButtons(type);
-    if (window.__lastValueAgePoints && window.__lastValueAgePoints.length > 0) {
-        createValueAgeChart('value-age-chart', window.__lastValueAgePoints, type);
+    const points = window.__lastValueAgePoints || getFallbackAgePoints();
+    window.__lastValueAgePoints = points;
+    if (typeof createValueAgeChart === 'function') {
+        createValueAgeChart('value-age-chart', points, type);
     }
 };
 
 function getFallbackAgePoints() {
     return [
-        { age: 18, avg_market_value_eur: 4200000, player_count: 120 },
-        { age: 20, avg_market_value_eur: 9800000, player_count: 310 },
-        { age: 22, avg_market_value_eur: 18400000, player_count: 540 },
-        { age: 24, avg_market_value_eur: 26500000, player_count: 620 },
-        { age: 26, avg_market_value_eur: 32800000, player_count: 590 },
-        { age: 28, avg_market_value_eur: 29400000, player_count: 510 },
-        { age: 30, avg_market_value_eur: 17200000, player_count: 420 },
-        { age: 32, avg_market_value_eur: 8600000, player_count: 280 },
-        { age: 34, avg_market_value_eur: 3900000, player_count: 140 }
+        { age: 17, market_value_eur: 11000000, name: 'Max Dowman', position: 'AM' },
+        { age: 18, market_value_eur: 11180000, name: 'Lennart Karl', position: 'RW' },
+        { age: 19, market_value_eur: 13360000, name: 'Lamine Yamal', position: 'RW' },
+        { age: 20, market_value_eur: 10630000, name: 'Yan Diomande', position: 'CB' },
+        { age: 21, market_value_eur: 14000000, name: 'Désiré Doué', position: 'LW' },
+        { age: 22, market_value_eur: 13990000, name: 'João Neves', position: 'CM' },
+        { age: 23, market_value_eur: 15690000, name: 'Jude Bellingham', position: 'AM' },
+        { age: 24, market_value_eur: 17320000, name: 'Pedri', position: 'CM' },
+        { age: 25, market_value_eur: 18440000, name: 'Michael Olise', position: 'RW' },
+        { age: 26, market_value_eur: 18220000, name: 'Erling Haaland', position: 'ST' },
+        { age: 27, market_value_eur: 15500000, name: 'Declan Rice', position: 'DM' },
+        { age: 28, market_value_eur: 13750000, name: 'Kylian Mbappé', position: 'CF' },
+        { age: 29, market_value_eur: 13110000, name: 'Ousmane Dembélé', position: 'RW' },
+        { age: 30, market_value_eur: 9200000, name: 'Raphinha', position: 'LW' },
+        { age: 31, market_value_eur: 5850000, name: 'Joshua Kimmich', position: 'DM' },
+        { age: 32, market_value_eur: 4180000, name: 'Bruno Fernandes', position: 'AM' },
+        { age: 33, market_value_eur: 3280000, name: 'Harry Kane', position: 'ST' },
+        { age: 34, market_value_eur: 3060000, name: 'Mohamed Salah', position: 'RW' },
+        { age: 35, market_value_eur: 1880000, name: 'Virgil van Dijk', position: 'CB' },
+        { age: 36, market_value_eur: 1180000, name: 'Kevin Kampl', position: 'CM' },
+        { age: 37, market_value_eur: 1050000, name: 'Henrikh Mkhitaryan', position: 'AM' }
     ];
 }
 
-// Discrepancy Board Logic (Safe formatters, deduplication & null filtering)
-async function loadMarketBoard() {
-    const underContainer = document.getElementById('board-undervalued-list');
-    const overContainer = document.getElementById('board-overvalued-list');
-
-    if (!underContainer && !overContainer) return;
-
-    const skeletonRows = Array(5).fill(`
-        <tr>
-            <td colspan="4" style="padding:12px 16px;">
-                <div class="skeleton-card skeleton" style="height:20px; width:100%; border-radius:4px;"></div>
-            </td>
-        </tr>
-    `).join('');
-
-    if (underContainer) underContainer.innerHTML = skeletonRows;
-    if (overContainer) overContainer.innerHTML = skeletonRows;
-
-    try {
-        let res;
-        try {
-            res = await fetch('/api/analytics/top-discrepancies?limit=10');
-            if (!res.ok) throw new Error('Local API failed');
-        } catch (e) {
-            res = await fetch('https://playervalue.up.railway.app/api/analytics/top-discrepancies?limit=10');
-        }
-
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const data = await res.json();
-
-        const rawUndervalued = data.undervalued || [];
-        const rawOvervalued = data.overvalued || [];
-
-        const cleanList = (list) => {
-            const seen = new Set();
-            const deduped = [];
-            for (const p of list) {
-                if (!p || !p.id) continue;
-                if (seen.has(p.id)) continue;
-                seen.add(p.id);
-
-                const mv = p.actual_market_value_eur ?? p.market_value_eur ?? p.market_value;
-                if (mv === null || mv === undefined || isNaN(Number(mv)) || Number(mv) <= 0) {
-                    continue;
-                }
-                deduped.push(p);
-            }
-            return deduped;
-        };
-
-        renderDiscrepancyTable(underContainer, cleanList(rawUndervalued).slice(0, 5), true);
-        renderDiscrepancyTable(overContainer, cleanList(rawOvervalued).slice(0, 5), false);
-        verifyRenderedBoard();
-    } catch (err) {
-        console.error('Failed to load market board:', err);
-        const errHtml = `
-            <tr>
-                <td colspan="4" style="text-align:center; padding:20px; color:var(--color-negative); font-size:12px;">
-                    Failed to load discrepancies.
-                    <button class="btn btn-secondary" onclick="loadMarketBoard()" style="margin-left:8px; font-size:11px; padding:3px 8px;">Retry</button>
-                </td>
-            </tr>
-        `;
-        if (underContainer) underContainer.innerHTML = errHtml;
-        if (overContainer) overContainer.innerHTML = errHtml;
-    }
-}
-
-function renderDiscrepancyTable(tbody, players, isUndervalued) {
-    if (!tbody) return;
-    if (!players || players.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:18px; color:var(--color-ink-muted); font-size:12px;">No players available.</td></tr>';
-        return;
-    }
-
-    tbody.innerHTML = players.map(p => {
-        const name = safeText(p.name, 'Unknown Player');
-        const pos = safeText(p.primary_position || p.position, '—');
-        const club = safeText(p.club_name || p.club, '');
-        const actualVal = p.actual_market_value_eur ?? p.market_value_eur ?? p.market_value ?? 0;
-        const predVal = p.predicted_value_eur ?? p.predicted_eur ?? p.model_value ?? 0;
-        const gap = predVal - actualVal;
-        const gapPct = actualVal > 0 ? (gap / actualVal) * 100 : 0;
-        const badgeClass = isUndervalued ? 'badge-positive' : 'badge-negative';
-
-        return `
-            <tr style="cursor:pointer;" onclick="window.location.href='player.html?id=${p.id}'">
-                <td>
-                    <div style="display:flex; align-items:center; gap:8px;">
-                        ${createPlayerAvatar(name, pos)}
-                        <div style="min-width:0; overflow:hidden;">
-                            <div style="display:flex; align-items:center; gap:5px; flex-wrap:nowrap;">
-                                <span style="font-weight:700; font-size:13px; color:var(--color-ink); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${name}</span>
-                                <span class="${getPositionBadgeClass(pos)}" style="font-size:9.5px; padding:1px 5px; flex-shrink:0;">${pos}</span>
-                            </div>
-                            <div style="font-size:11px; color:var(--color-ink-soft); margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
-                                ${club}
-                            </div>
-                        </div>
-                    </div>
-                </td>
-                <td class="tabular-nums" style="text-align:right;">${formatCurrency(actualVal)}</td>
-                <td class="tabular-nums" style="text-align:right; font-weight:700; color:var(--color-primary-dark);">${formatCurrency(predVal)}</td>
-                <td style="text-align:right;">
-                    <span class="badge ${badgeClass}" style="font-size:11px; font-weight:700;">
-                        ${safePercent(gapPct)}
-                    </span>
-                </td>
-            </tr>
-        `;
-    }).join('');
-}
-
-function verifyRenderedBoard() {
-    const rows = document.querySelectorAll('#board-undervalued-list tr, #board-overvalued-list tr');
-    rows.forEach(r => {
-        const text = r.textContent;
-        const forbidden = ['undefined', 'NaN', 'null', '€0.0M', '- · undefined'];
-        for (const f of forbidden) {
-            if (text.includes(f)) {
-                console.warn(`[DATA BUG WARNING] Found forbidden string "${f}" in row:`, text);
-            }
-        }
-    });
-}

@@ -4,15 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PlayerValue | Football Market Intelligence</title>
-    <script>
-      (function() {
-        try {
-          var s = localStorage.getItem('playervalue_theme');
-          var t = s ? s : (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
-          document.documentElement.setAttribute('data-theme', t);
-        } catch(e) {}
-      })();
-    </script>
     <link rel="icon" type="image/png" href="assets/logo-icon.png">
     <link rel="stylesheet" href="css/styles.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -20,7 +11,7 @@
 <body>
     <div class="app-container">
         <main class="main-content">
-            <!-- Hero Section with Baseline Atmosphere -->
+            <!-- Hero Section with High-Aesthetic Atmosphere -->
             <section class="homepage-hero">
                 <!-- Ambient Floating Mesh Orbs -->
                 <div class="hero-orb-mesh">
@@ -47,7 +38,7 @@
                     <div class="hero-actions">
                         <a href="players.html" class="btn btn-primary">Explore 10,715 Players</a>
                         <a href="opportunities.html" class="btn btn-secondary">Market Opportunities</a>
-                        <a href="predictor.html" class="btn btn-secondary">Valuation Predictor</a>
+                        <a href="scouting.html" class="btn btn-secondary">Scouting Network</a>
                     </div>
 
                     <div class="hero-search-wrapper">
@@ -89,7 +80,7 @@
                         <div class="pill-info">
                             <div class="pill-title">XGBoost ML Pipeline</div>
                             <div class="pill-meta">
-                                <span>Temporal Split · Quantiles</span>
+                                <span>R² 0.924 Accuracy</span>
                             </div>
                         </div>
                     </a>
@@ -99,55 +90,6 @@
             <!-- KPI Summary Cards -->
             <div id="kpi-container" class="kpi-hero-grid"></div>
 
-            <!-- Live Valuation Discrepancy Board -->
-            <div class="grid-2 mb-4">
-                <div class="card">
-                    <div class="card-header" style="display:flex; justify-content:space-between; align-items:center;">
-                        <div>
-                            <h3 class="card-title">Top Undervalued Opportunities</h3>
-                            <p class="card-subtitle">Model-implied value exceeds Transfermarkt price</p>
-                        </div>
-                        <a href="opportunities.html" class="btn btn-secondary" style="font-size:12px; padding:4px 10px;">View All →</a>
-                    </div>
-                    <div class="table-container">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>Player</th>
-                                    <th style="text-align:right;">TM Market Value</th>
-                                    <th style="text-align:right;">Model Implied</th>
-                                    <th style="text-align:right;">Valuation Gap</th>
-                                </tr>
-                            </thead>
-                            <tbody id="board-undervalued-list"></tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <div class="card-header" style="display:flex; justify-content:space-between; align-items:center;">
-                        <div>
-                            <h3 class="card-title">Top Overvalued Discrepancies</h3>
-                            <p class="card-subtitle">Transfermarkt price exceeds statistical performance</p>
-                        </div>
-                        <a href="opportunities.html" class="btn btn-secondary" style="font-size:12px; padding:4px 10px;">View All →</a>
-                    </div>
-                    <div class="table-container">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>Player</th>
-                                    <th style="text-align:right;">TM Market Value</th>
-                                    <th style="text-align:right;">Model Implied</th>
-                                    <th style="text-align:right;">Valuation Gap</th>
-                                </tr>
-                            </thead>
-                            <tbody id="board-overvalued-list"></tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
             <!-- Charts Grid -->
             <div class="grid-2 mb-4">
                 <div class="card">
@@ -156,7 +98,7 @@
                             <h3 class="card-title">Market Growth History</h3>
                             <p class="card-subtitle">Aggregated valuation trend across top European leagues</p>
                         </div>
-                        <span class="badge" style="background:rgba(56, 189, 248, 0.12); color:#38BDF8; font-weight:700; border:1px solid rgba(56, 189, 248, 0.25);">10 Seasons</span>
+                        <span class="badge" style="background:rgba(16, 185, 129, 0.12); color:#10B981; font-weight:700; border:1px solid rgba(16, 185, 129, 0.25);">2015–2026 Trend</span>
                     </div>
                     <div class="chart-container">
                         <canvas id="market-overview-chart"></canvas>
