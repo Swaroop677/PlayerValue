@@ -10,11 +10,11 @@ import time
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 from sqlalchemy import func
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Optional
 
 from backend.database.database import get_db
 from backend.services.dashboard_service import get_dashboard_data
-from backend.database.models import Player, Club, League, MarketValue, ModelPrediction, PlayerClubHistory
+from backend.database.models import Player, Club, League, MarketValue, ModelPrediction, PlayerClubHistory, SeasonStats
 
 router = APIRouter(tags=["Dashboard"])
 
@@ -71,35 +71,123 @@ def api_get_value_vs_age(position: str = Query("ALL"), db: Session = Depends(get
 
 
 @router.get("/analytics/top-discrepancies")
-def api_get_top_discrepancies(db: Session = Depends(get_db)):
+def api_get_top_discrepancies(
+    league: Optional[str] = Query(None),
+    limit: int = Query(10),
+    min_minutes: int = Query(0),
+    db: Session = Depends(get_db)
+):
     """
-    Returns top 10 most undervalued and top 10 most overvalued players.
+    Returns top undervalued and overvalued players with latest predictions,
+    deduplicated, with club, league and minutes details.
     """
-    cached = _get_cached("top_discrepancies")
+    cache_key = f"top_discrepancies_{league}_{limit}_{min_minutes}"
+    cached = _get_cached(cache_key)
     if cached is not None:
         return cached
 
-    undervalued = db.query(Player.id, Player.name, Player.primary_position, ModelPrediction.actual_market_value_eur, ModelPrediction.predicted_value_eur, ModelPrediction.difference_percent)\
-        .join(ModelPrediction, Player.id == ModelPrediction.player_id)\
-        .filter(ModelPrediction.actual_market_value_eur >= 2_000_000, ModelPrediction.difference_percent > 0)\
-        .order_by(ModelPrediction.difference_percent.desc()).limit(10).all()
+    # Subquery for latest prediction per player
+    latest_pred_sub = (
+        db.query(
+            ModelPrediction.player_id,
+            func.max(ModelPrediction.prediction_date).label("max_date")
+        )
+        .group_by(ModelPrediction.player_id)
+        .subquery()
+    )
 
-    overvalued = db.query(Player.id, Player.name, Player.primary_position, ModelPrediction.actual_market_value_eur, ModelPrediction.predicted_value_eur, ModelPrediction.difference_percent)\
-        .join(ModelPrediction, Player.id == ModelPrediction.player_id)\
-        .filter(ModelPrediction.actual_market_value_eur >= 10_000_000, ModelPrediction.difference_percent < 0)\
-        .order_by(ModelPrediction.difference_percent.asc()).limit(10).all()
+    # Subquery for latest season stats (for minutes)
+    latest_season_sub = (
+        db.query(
+            SeasonStats.player_id,
+            func.max(SeasonStats.season).label("max_season")
+        )
+        .group_by(SeasonStats.player_id)
+        .subquery()
+    )
+
+    base_q = (
+        db.query(
+            Player.id,
+            Player.name,
+            Player.primary_position,
+            Player.age,
+            Club.name.label("club_name"),
+            League.name.label("league_name"),
+            ModelPrediction.actual_market_value_eur,
+            ModelPrediction.predicted_value_eur,
+            ModelPrediction.difference_percent,
+            SeasonStats.minutes,
+        )
+        .join(latest_pred_sub, Player.id == latest_pred_sub.c.player_id)
+        .join(
+            ModelPrediction,
+            (Player.id == ModelPrediction.player_id) & (ModelPrediction.prediction_date == latest_pred_sub.c.max_date)
+        )
+        .outerjoin(
+            PlayerClubHistory,
+            (Player.id == PlayerClubHistory.player_id) & (PlayerClubHistory.is_current == True)
+        )
+        .outerjoin(Club, PlayerClubHistory.club_id == Club.id)
+        .outerjoin(League, Club.league_id == League.id)
+        .outerjoin(latest_season_sub, Player.id == latest_season_sub.c.player_id)
+        .outerjoin(
+            SeasonStats,
+            (Player.id == SeasonStats.player_id) & (SeasonStats.season == latest_season_sub.c.max_season)
+        )
+    )
+
+    if league and league.lower() not in ("all", ""):
+        base_q = base_q.filter(League.name.ilike(f"%{league}%"))
+
+    if min_minutes > 0:
+        base_q = base_q.filter(func.coalesce(SeasonStats.minutes, 0) >= min_minutes)
+
+    undervalued_rows = (
+        base_q
+        .filter(ModelPrediction.actual_market_value_eur >= 2_000_000, ModelPrediction.difference_percent > 0)
+        .order_by(ModelPrediction.difference_percent.desc())
+        .limit(limit)
+        .all()
+    )
+
+    overvalued_rows = (
+        base_q
+        .filter(ModelPrediction.actual_market_value_eur >= 10_000_000, ModelPrediction.difference_percent < 0)
+        .order_by(ModelPrediction.difference_percent.asc())
+        .limit(limit)
+        .all()
+    )
+
+    def _fmt(r):
+        return {
+            "id": r[0],
+            "name": r[1],
+            "position": r[2] or "—",
+            "primary_position": r[2] or "—",
+            "age": r[3],
+            "club": r[4] or "",
+            "club_name": r[4] or "",
+            "league": r[5] or "",
+            "league_name": r[5] or "",
+            "actual_eur": float(r[6] or 0),
+            "actual_market_value_eur": float(r[6] or 0),
+            "market_value_eur": float(r[6] or 0),
+            "market_value": float(r[6] or 0),
+            "predicted_eur": float(r[7] or 0),
+            "predicted_value_eur": float(r[7] or 0),
+            "model_value": float(r[7] or 0),
+            "gap_percent": round(float(r[8] or 0), 1),
+            "value_gap_percent": round(float(r[8] or 0), 1),
+            "difference_percent": round(float(r[8] or 0), 1),
+            "minutes": int(r[9] or 0),
+        }
 
     data = {
-        "undervalued": [
-            {"id": r[0], "name": r[1], "position": r[2], "actual_eur": r[3], "predicted_eur": r[4], "gap_percent": round(r[5], 1)}
-            for r in undervalued
-        ],
-        "overvalued": [
-            {"id": r[0], "name": r[1], "position": r[2], "actual_eur": r[3], "predicted_eur": r[4], "gap_percent": round(r[5], 1)}
-            for r in overvalued
-        ]
+        "undervalued": [_fmt(r) for r in undervalued_rows],
+        "overvalued": [_fmt(r) for r in overvalued_rows],
     }
-    return _set_cached("top_discrepancies", data)
+    return _set_cached(cache_key, data)
 
 
 @router.get("/analytics/club-squad-values")

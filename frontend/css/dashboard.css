@@ -306,6 +306,103 @@
   color: #F87171;
 }
 
+/* Board Skeleton & Loading / Error States */
+@keyframes skeleton-shimmer {
+  0% { opacity: 0.4; }
+  50% { opacity: 0.85; }
+  100% { opacity: 0.4; }
+}
+
+.board-skeleton-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  background: var(--pv-surface-2, #16191E);
+  border: 1px solid var(--pv-border, rgba(255, 255, 255, 0.05));
+  border-radius: 10px;
+  animation: skeleton-shimmer 1.4s ease-in-out infinite;
+}
+
+.board-skeleton-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--pv-surface-3, rgba(255, 255, 255, 0.08));
+  flex-shrink: 0;
+}
+
+.board-skeleton-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+  margin-left: 10px;
+}
+
+.board-skeleton-val {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+.board-skeleton-line {
+  height: 10px;
+  background: var(--pv-surface-3, rgba(255, 255, 255, 0.08));
+  border-radius: 4px;
+}
+
+.board-skeleton-line.name {
+  width: 100px;
+  height: 12px;
+}
+
+.board-skeleton-line.sub {
+  width: 65px;
+  height: 10px;
+}
+
+.board-skeleton-line.val {
+  width: 50px;
+  height: 12px;
+}
+
+.board-skeleton-line.chip {
+  width: 70px;
+  height: 14px;
+  border-radius: 4px;
+}
+
+.board-error-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
+  gap: 10px;
+  color: var(--pv-muted, #8B919A);
+  text-align: center;
+  font-size: 13px;
+}
+
+.board-retry-btn {
+  background: var(--pv-surface-2, #16191E);
+  border: 1px solid var(--pv-border, rgba(255, 255, 255, 0.12));
+  color: var(--pv-text, #E8EAED);
+  font-size: 12px;
+  font-weight: 500;
+  padding: 6px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 150ms ease;
+}
+
+.board-retry-btn:hover {
+  background: var(--pv-surface-3, rgba(255, 255, 255, 0.08));
+  border-color: var(--pv-accent, #34D399);
+}
+
 /* Spotlight Player Card */
 .spotlight-section {
   margin-bottom: 56px;

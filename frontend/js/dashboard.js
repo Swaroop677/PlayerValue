@@ -59,22 +59,30 @@ function setupSearchAutocomplete() {
 
         if (items.length > 0) {
           dropdown.innerHTML = items.map(p => {
+            const name = typeof safeText === 'function' ? safeText(p.name, 'Player') : (p.name || 'Player');
+            const club = typeof safeText === 'function' ? safeText(p.club_name, '') : (p.club_name || '');
+            const pos = typeof safeText === 'function' ? safeText(p.primary_position, '—') : (p.primary_position || '—');
+            const ageStr = p.age ? `Age ${p.age}` : '';
+            const metaParts = [club, pos, ageStr].filter(Boolean).join(' · ') || '—';
+            const mvStr = typeof formatCurrency === 'function' ? formatCurrency(p.market_value_eur) : `€${((p.market_value_eur || 0) / 1e6).toFixed(1)}M`;
+            const pvStr = typeof formatCurrency === 'function' ? formatCurrency(p.predicted_value_eur) : `€${((p.predicted_value_eur || 0) / 1e6).toFixed(1)}M`;
+
             const avatarHtml = typeof createPlayerAvatar === 'function' ?
-              createPlayerAvatar(p.name, p.primary_position, 'avatar-sm') :
-              `<div class="player-avatar">${p.name.slice(0, 2)}</div>`;
+              createPlayerAvatar(name, pos, 'avatar-sm') :
+              `<div class="player-avatar">${name.slice(0, 2)}</div>`;
 
             return `
               <a href="player.html?id=${p.id}" class="home-search-item">
                 <div style="display:flex; align-items:center; gap:10px;">
                   ${avatarHtml}
                   <div>
-                    <div style="font-weight:600; font-size:13px; color:var(--pv-text);">${p.name}</div>
-                    <div style="font-size:11.5px; color:var(--pv-muted);">${p.club_name || '-'} · ${p.primary_position} · Age ${p.age || '-'}</div>
+                    <div style="font-weight:600; font-size:13px; color:var(--pv-text);">${name}</div>
+                    <div style="font-size:11.5px; color:var(--pv-muted);">${metaParts}</div>
                   </div>
                 </div>
                 <div style="text-align:right;">
-                  <div style="font-size:12.5px; font-weight:600; color:var(--pv-text); font-variant-numeric:tabular-nums;">€${((p.market_value_eur || 0) / 1e6).toFixed(1)}M</div>
-                  <div style="font-size:11px; color:var(--pv-accent);">Model: €${((p.predicted_value_eur || 0) / 1e6).toFixed(1)}M</div>
+                  <div style="font-size:12.5px; font-weight:600; color:var(--pv-text); font-variant-numeric:tabular-nums;">${mvStr}</div>
+                  <div style="font-size:11px; color:var(--pv-accent);">Model: ${pvStr}</div>
                 </div>
               </a>
             `;
@@ -116,12 +124,23 @@ async function loadMarketBoard() {
   const underContainer = document.getElementById('board-undervalued-list');
   const overContainer = document.getElementById('board-overvalued-list');
 
-  if (underContainer) {
-    underContainer.innerHTML = Array(5).fill('<div style="padding:12px; color:var(--pv-muted); font-size:12px; animation:shimmer 1s infinite;">Loading top undervalued...</div>').join('');
-  }
-  if (overContainer) {
-    overContainer.innerHTML = Array(5).fill('<div style="padding:12px; color:var(--pv-muted); font-size:12px; animation:shimmer 1s infinite;">Loading top overvalued...</div>').join('');
-  }
+  // Render skeleton rows while loading
+  const skeletonHtml = Array(5).fill(`
+    <div class="board-skeleton-row" aria-hidden="true">
+      <div class="board-skeleton-avatar"></div>
+      <div class="board-skeleton-meta">
+        <div class="board-skeleton-line name"></div>
+        <div class="board-skeleton-line sub"></div>
+      </div>
+      <div class="board-skeleton-val">
+        <div class="board-skeleton-line val"></div>
+        <div class="board-skeleton-line chip"></div>
+      </div>
+    </div>
+  `).join('');
+
+  if (underContainer) underContainer.innerHTML = skeletonHtml;
+  if (overContainer) overContainer.innerHTML = skeletonHtml;
 
   try {
     const leagueParam = activeLeagueFilter !== 'all' ? `&league=${encodeURIComponent(activeLeagueFilter)}` : '';
@@ -134,59 +153,131 @@ async function loadMarketBoard() {
       res = await fetch(`https://playervalue.up.railway.app/api/analytics/top-discrepancies?limit=10${leagueParam}`);
     }
 
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
-    const undervalued = data.undervalued || [];
-    const overvalued = data.overvalued || [];
 
-    renderBoardList(underContainer, undervalued.slice(0, 5), true);
-    renderBoardList(overContainer, overvalued.slice(0, 5), false);
+    const rawUndervalued = data.undervalued || [];
+    const rawOvervalued = data.overvalued || [];
+
+    // Helper to deduplicate by player id and filter invalid rows
+    const cleanList = (list) => {
+      const seen = new Set();
+      const deduped = [];
+      for (const p of list) {
+        if (!p || !p.id) continue;
+        if (seen.has(p.id)) continue;
+        seen.add(p.id);
+
+        const marketVal = p.market_value_eur ?? p.actual_market_value_eur ?? p.actual_eur ?? p.market_value;
+        const mins = p.minutes !== undefined ? Number(p.minutes) : 999;
+
+        // Filter out rows with null, zero, or negative market value
+        if (marketVal === null || marketVal === undefined || isNaN(Number(marketVal)) || Number(marketVal) <= 0) {
+          continue;
+        }
+        // Filter out invalid minutes
+        if (isNaN(mins) || mins < 0) {
+          continue;
+        }
+
+        deduped.push(p);
+      }
+      return deduped;
+    };
+
+    const cleanUndervalued = cleanList(rawUndervalued);
+    const cleanOvervalued = cleanList(rawOvervalued);
+
+    renderBoardList(underContainer, cleanUndervalued.slice(0, 5), true);
+    renderBoardList(overContainer, cleanOvervalued.slice(0, 5), false);
+
+    // Sanity check for forbidden strings
+    verifyRenderedBoard();
   } catch (err) {
-    console.error(err);
-    if (underContainer) underContainer.innerHTML = '<div style="padding:16px; color:#F87171; font-size:12px;">Failed to load data.</div>';
-    if (overContainer) overContainer.innerHTML = '<div style="padding:16px; color:#F87171; font-size:12px;">Failed to load data.</div>';
+    console.error('[Dashboard] Discrepancies fetch failed:', err);
+    const renderError = (container) => {
+      if (!container) return;
+      container.innerHTML = `
+        <div class="board-error-state">
+          <div>Failed to load market discrepancies.</div>
+          <button type="button" class="board-retry-btn">
+            Retry
+          </button>
+        </div>
+      `;
+      container.querySelector('.board-retry-btn')?.addEventListener('click', () => loadMarketBoard());
+    };
+    renderError(underContainer);
+    renderError(overContainer);
   }
 }
 
 function renderBoardList(container, players, isUndervalued) {
   if (!container) return;
   if (!players || players.length === 0) {
-    container.innerHTML = '<div style="padding:14px; color:var(--pv-muted); font-size:12px; text-align:center;">No players in this category.</div>';
+    container.innerHTML = '<div style="padding:20px; color:var(--pv-muted); font-size:12.5px; text-align:center;">No players in this category.</div>';
     return;
   }
 
+  // Safe formatter fallbacks
+  const fmtMoney = typeof formatCurrency === 'function' ? formatCurrency : (v) => (v ? `€${(v / 1e6).toFixed(1)}M` : '—');
+  const fmtPercent = typeof formatPercent === 'function' ? formatPercent : (v) => (v !== undefined ? `${Number(v) > 0 ? '+' : ''}${Number(v).toFixed(1)}%` : '—');
+  const txtSafe = typeof safeText === 'function' ? safeText : (v, d = '—') => (v ? String(v) : d);
+
   container.innerHTML = players.map(p => {
+    const name = txtSafe(p.name, 'Unknown Player');
+    const pos = txtSafe(p.primary_position || p.position, '—');
+    const club = txtSafe(p.club_name || p.club || p.current_club, '');
+    const metaSub = club ? `${club} · ${pos}` : pos;
+
     const avatarHtml = typeof createPlayerAvatar === 'function' ?
-      createPlayerAvatar(p.name, p.primary_position, 'avatar-sm') :
-      `<div class="player-avatar">${p.name.slice(0, 2)}</div>`;
+      createPlayerAvatar(name, pos, 'avatar-sm') :
+      `<div class="player-avatar">${name.slice(0, 2)}</div>`;
 
-    const predVal = p.predicted_value_eur || 0;
-    const actualVal = p.market_value_eur || 0;
-    const gapPct = p.value_gap_percent !== undefined ? p.value_gap_percent :
-      (actualVal > 0 ? ((predVal - actualVal) / actualVal) * 100 : 0);
+    const predVal = p.predicted_value_eur ?? p.predicted_eur ?? p.model_value ?? 0;
+    const actualVal = p.market_value_eur ?? p.actual_market_value_eur ?? p.actual_eur ?? p.market_value ?? 0;
+    
+    let gapPct = p.value_gap_percent !== undefined ? Number(p.value_gap_percent) :
+      (p.gap_percent !== undefined ? Number(p.gap_percent) :
+      (p.difference_percent !== undefined ? Number(p.difference_percent) :
+      (actualVal > 0 ? ((predVal - actualVal) / actualVal) * 100 : 0)));
 
-    const sign = gapPct >= 0 ? '+' : '';
     const chipClass = isUndervalued ? 'undervalued' : 'overvalued';
+    const formattedVal = fmtMoney(predVal);
+    const formattedGap = fmtPercent(gapPct);
 
     return `
       <a href="player.html?id=${p.id}" class="board-row">
         <div class="board-player-meta">
           ${avatarHtml}
           <div>
-            <div style="font-weight:600; font-size:13px; color:var(--pv-text);">${p.name}</div>
-            <div style="font-size:11.5px; color:var(--pv-muted);">${p.club_name || '-'} · ${p.primary_position}</div>
+            <div style="font-weight:600; font-size:13px; color:var(--pv-text);">${name}</div>
+            <div style="font-size:11.5px; color:var(--pv-muted);">${metaSub}</div>
           </div>
         </div>
         <div class="board-val-meta">
           <div style="font-size:12.5px; font-weight:600; color:var(--pv-text); font-variant-numeric:tabular-nums;">
-            €${(predVal / 1e6).toFixed(1)}M
+            ${formattedVal}
           </div>
           <div class="board-gap-chip ${chipClass}">
-            ${sign}${gapPct.toFixed(1)}% vs TM
+            ${formattedGap} vs TM
           </div>
         </div>
       </a>
     `;
   }).join('');
+}
+
+function verifyRenderedBoard() {
+  const container = document.querySelector('.market-board-grid') || document.body;
+  if (!container) return;
+  const html = container.innerHTML;
+  const forbidden = ['undefined', 'NaN', 'null', '€0.0M', '- · undefined'];
+  for (const item of forbidden) {
+    if (html.includes(item)) {
+      console.warn(`[DATA BUG WARNING] Found forbidden string "${item}" in rendered discrepancy board.`);
+    }
+  }
 }
 
 function loadSpotlightPlayer() {

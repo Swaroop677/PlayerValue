@@ -3,35 +3,58 @@
  * Uses clean CSS classes and design tokens with zero hardcoded colors.
  */
 
-function formatCurrency(value) {
-    if (value === null || value === undefined) return '-';
-    if (value === 0) return '€0';
-    if (value >= 1000000000) {
-        return '€' + (value / 1000000000).toFixed(2) + 'B';
-    }
-    if (value >= 1000000) {
-        return '€' + (value / 1000000).toFixed(1) + 'M';
-    }
-    if (value >= 1000) {
-        return '€' + (value / 1000).toFixed(0) + 'K';
-    }
-    return '€' + Math.round(value).toLocaleString();
+function safeText(value, fallback = '—') {
+    if (value === null || value === undefined) return fallback;
+    const str = String(value).trim();
+    if (str === '' || str === 'undefined' || str === 'null' || str === 'NaN') return fallback;
+    return str;
 }
 
-function formatNumber(value, decimals = 0) {
-    if (value === null || value === undefined) return '-';
-    return Number(value).toLocaleString(undefined, {
+function formatCurrency(value, fallback = '—') {
+    if (value === null || value === undefined || value === '' || value === 'undefined' || value === 'null') return fallback;
+    const num = Number(value);
+    if (isNaN(num)) return fallback;
+    if (num === 0) return '€0';
+    const abs = Math.abs(num);
+    const sign = num < 0 ? '-' : '';
+    if (abs >= 1000000000) {
+        return sign + '€' + (abs / 1000000000).toFixed(2) + 'B';
+    }
+    if (abs >= 1000000) {
+        return sign + '€' + (abs / 1000000).toFixed(1) + 'M';
+    }
+    if (abs >= 1000) {
+        return sign + '€' + (abs / 1000).toFixed(0) + 'K';
+    }
+    return sign + '€' + Math.round(abs).toLocaleString();
+}
+
+function safeCurrency(value, fallback = '—') {
+    return formatCurrency(value, fallback);
+}
+
+function formatNumber(value, decimals = 0, fallback = '—') {
+    if (value === null || value === undefined || value === '' || value === 'undefined' || value === 'null') return fallback;
+    const num = Number(value);
+    if (isNaN(num)) return fallback;
+    return num.toLocaleString(undefined, {
         minimumFractionDigits: decimals,
         maximumFractionDigits: decimals
     });
 }
 
-function formatPercent(value, showSign = true) {
-    if (value === null || value === undefined) return '-';
+function formatPercent(value, showSign = true, fallback = '—') {
+    if (value === null || value === undefined || value === '' || value === 'undefined' || value === 'null') return fallback;
     const num = Number(value);
-    const formatted = num.toFixed(1) + '%';
+    if (isNaN(num)) return fallback;
+    const formatted = Math.abs(num).toFixed(1) + '%';
     if (showSign && num > 0) return '+' + formatted;
+    if (num < 0) return '-' + formatted;
     return formatted;
+}
+
+function safePercent(value, showSign = true, fallback = '—') {
+    return formatPercent(value, showSign, fallback);
 }
 
 function formatDate(dateStr) {
