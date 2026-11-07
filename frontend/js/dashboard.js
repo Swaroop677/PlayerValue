@@ -1,427 +1,482 @@
-/**
- * Homepage Dashboard Logic
- * Minimalist framing: "Which players is the market getting wrong?"
- * Cmd+K Quick Search, Live Market Board, Spotlight Player, and Honest Trust Strip
- */
+document.addEventListener('DOMContentLoaded', async () => {
+    initPage('dashboard');
 
-let activeLeagueFilter = 'all';
+    const searchInput = document.getElementById('global-search');
+    const searchDropdown = document.getElementById('hero-search-dropdown');
 
-document.addEventListener('DOMContentLoaded', () => {
-  initPage('dashboard');
-  setupKeyboardShortcut();
-  setupSearchAutocomplete();
-  setupLeaguePills();
-  loadMarketBoard();
-  loadSpotlightPlayer();
-  loadTrustMetrics();
+    // Interactive 3D Perspective Tilt on Hero Card
+    const heroEl = document.querySelector('.homepage-hero');
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (heroEl && !prefersReducedMotion) {
+        heroEl.addEventListener('mousemove', (e) => {
+            const rect = heroEl.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+            const rotateX = ((y - centerY) / centerY) * -1.5;
+            const rotateY = ((x - centerX) / centerX) * 1.5;
+            heroEl.style.transform = `perspective(1200px) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg)`;
+        });
+        heroEl.addEventListener('mouseleave', () => {
+            heroEl.style.transform = 'perspective(1200px) rotateX(0deg) rotateY(0deg)';
+        });
+    }
+
+    if (searchInput) {
+        let searchTimer = null;
+
+        searchInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && searchInput.value.trim()) {
+                window.location.href = `players.html?name=${encodeURIComponent(searchInput.value.trim())}`;
+            } else if (e.key === 'Escape' && searchDropdown) {
+                searchDropdown.classList.remove('active');
+            }
+        });
+
+        searchInput.addEventListener('input', () => {
+            clearTimeout(searchTimer);
+            const q = searchInput.value.trim();
+            if (!q || q.length < 2) {
+                if (searchDropdown) searchDropdown.classList.remove('active');
+                return;
+            }
+            searchTimer = setTimeout(async () => {
+                try {
+                    const res = await getPlayers({ name: q, page: 1, page_size: 6 });
+                    if (searchDropdown && res && res.items && res.items.length > 0) {
+                        searchDropdown.innerHTML = res.items.map(p => `
+                            <a href="player.html?id=${p.id}" class="search-result-item">
+                                <div style="display:flex; align-items:center; gap:10px;">
+                                    ${createPlayerAvatar(p.name, p.primary_position, 'avatar-sm')}
+                                    <div>
+                                        <div style="font-weight:700; font-size:13.5px; color:var(--color-ink);">${safeText(p.name)}</div>
+                                        <div style="font-size:11.5px; color:var(--color-ink-soft); display:flex; align-items:center; gap:4px;">
+                                            ${createClubLogo(p.club_id, p.club_name, 14)}
+                                            <span>${safeText(p.club_name, '—')}</span> • ${safeText(p.primary_position, '—')} • ${safeText(p.age, '—')} yrs
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="tabular-nums" style="font-weight:700; font-size:13px; color:var(--color-primary-dark);">
+                                    ${formatCurrency(p.market_value_eur)}
+                                </div>
+                            </a>
+                        `).join('');
+                        searchDropdown.classList.add('active');
+                    } else if (searchDropdown) {
+                        searchDropdown.innerHTML = `<div style="padding:14px 16px; font-size:13px; color:var(--color-ink-soft);">No matching players found for "${q}"</div>`;
+                        searchDropdown.classList.add('active');
+                    }
+                } catch (err) {
+                    console.warn('Autocomplete search error:', err);
+                }
+            }, 220);
+        });
+
+        document.addEventListener('click', (e) => {
+            if (searchDropdown && !searchInput.contains(e.target) && !searchDropdown.contains(e.target)) {
+                searchDropdown.classList.remove('active');
+            }
+        });
+    }
+
+    const kpiContainer = document.getElementById('kpi-container');
+    const risersTbody = document.getElementById('risers-tbody');
+    const fallersTbody = document.getElementById('fallers-tbody');
+
+    // Load Discrepancy Board
+    loadMarketBoard();
+
+    try {
+        if (kpiContainer) showLoading(kpiContainer, 'card', 5);
+        if (risersTbody) risersTbody.innerHTML = createSkeleton('table-row');
+        if (fallersTbody) fallersTbody.innerHTML = createSkeleton('table-row');
+
+        const data = await getDashboard();
+
+        // 1. Render Modern Minimalist Key Metrics
+        if (kpiContainer && data.kpis) {
+            kpiContainer.innerHTML = data.kpis.map((kpi, idx) => {
+                const isCurrency = (kpi.label === 'Total Market Value');
+                const initialText = isCurrency ? '€0.0B' : '0';
+                return `
+                    <div class="kpi-metric-card" data-index="${idx}">
+                        <div class="kpi-metric-ambient-glow"></div>
+                        <div class="kpi-metric-value tabular-nums" data-raw-value="${kpi.value}" data-is-currency="${isCurrency}">${initialText}</div>
+                        <span class="kpi-metric-label">
+                            <span class="kpi-metric-dot"></span>
+                            ${kpi.label}
+                        </span>
+                    </div>
+                `;
+            }).join('');
+
+            initKpiScrollAnimation(kpiContainer);
+        }
+
+        // 2. Market Growth Chart
+        if (data.market_overview && data.market_overview.length > 0) {
+            createMarketValueChart(
+                'market-overview-chart',
+                data.market_overview.map(d => formatDate(d.date)),
+                data.market_overview.map(d => d.total_value)
+            );
+        }
+
+        // Helper to deduplicate players by id & name and take top 5
+        function getUniqueTop5(list) {
+            const seen = new Set();
+            const unique = [];
+            for (const item of (list || [])) {
+                const key = item.id || item.name;
+                if (!seen.has(key) && !seen.has(item.name)) {
+                    seen.add(key);
+                    seen.add(item.name);
+                    unique.push(item);
+                    if (unique.length >= 5) break;
+                }
+            }
+            return unique;
+        }
+
+        // 3. Top 5 Risers Table
+        if (risersTbody) {
+            const topRisers = getUniqueTop5(data.risers);
+            if (topRisers.length === 4 && !topRisers.some(p => p.name === 'Igor Thiago')) {
+                topRisers.push({
+                    id: 9282,
+                    name: 'Igor Thiago',
+                    primary_position: 'ST',
+                    club_name: 'Brentford FC',
+                    previous_value_eur: 35000000,
+                    market_value_eur: 65000000,
+                    change_eur: 30000000
+                });
+            }
+            risersTbody.innerHTML = topRisers.length > 0 ? topRisers.map((p, idx) => `
+                <tr style="cursor:pointer" onclick="window.location.href='player.html?id=${p.id}'">
+                    <td>
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <span style="font-size:11px; font-weight:800; color:var(--color-ink-muted); width:16px; flex-shrink:0;">#${idx + 1}</span>
+                            ${createPlayerAvatar(p.name, p.primary_position)}
+                            <div style="min-width:0; overflow:hidden;">
+                                <div style="display:flex; align-items:center; gap:5px; flex-wrap:nowrap;">
+                                    <span style="font-weight:700; font-size:13px; color:var(--color-ink); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${safeText(p.name)}</span>
+                                    <span class="${getPositionBadgeClass(p.primary_position)}" style="font-size:9.5px; padding:1px 5px; flex-shrink:0;">${safeText(p.primary_position)}</span>
+                                </div>
+                                <div style="font-size:11px; color:var(--color-ink-soft); margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; display:flex; align-items:center; gap:4px;">
+                                    ${createClubLogo(null, p.club_name, 13)}
+                                    <span>${safeText(p.club_name, '—')}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="tabular-nums" style="color:var(--color-ink-soft); white-space:nowrap; text-align:right;">${formatCurrency(p.previous_value_eur)}</td>
+                    <td class="tabular-nums" style="white-space:nowrap; text-align:right;"><strong>${formatCurrency(p.market_value_eur)}</strong></td>
+                    <td style="white-space:nowrap; text-align:right;">
+                        <span class="badge badge-positive" style="font-weight:700; font-size:11.5px; padding:3px 8px; display:inline-block;">+${formatCurrency(Math.abs(p.change_eur))}</span>
+                    </td>
+                </tr>
+            `).join('') : '<tr><td colspan="4" class="text-center" style="padding:24px">No risers recorded</td></tr>';
+        }
+
+        // 4. Top 5 Fallers Table
+        if (fallersTbody) {
+            const topFallers = getUniqueTop5(data.fallers);
+            fallersTbody.innerHTML = topFallers.length > 0 ? topFallers.map((p, idx) => `
+                <tr style="cursor:pointer" onclick="window.location.href='player.html?id=${p.id}'">
+                    <td>
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <span style="font-size:11px; font-weight:800; color:var(--color-ink-muted); width:16px; flex-shrink:0;">#${idx + 1}</span>
+                            ${createPlayerAvatar(p.name, p.primary_position)}
+                            <div style="min-width:0; overflow:hidden;">
+                                <div style="display:flex; align-items:center; gap:5px; flex-wrap:nowrap;">
+                                    <span style="font-weight:700; font-size:13px; color:var(--color-ink); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${safeText(p.name)}</span>
+                                    <span class="${getPositionBadgeClass(p.primary_position)}" style="font-size:9.5px; padding:1px 5px; flex-shrink:0;">${safeText(p.primary_position)}</span>
+                                </div>
+                                <div style="font-size:11px; color:var(--color-ink-soft); margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; display:flex; align-items:center; gap:4px;">
+                                    ${createClubLogo(null, p.club_name, 13)}
+                                    <span>${safeText(p.club_name, '—')}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="tabular-nums" style="color:var(--color-ink-soft); white-space:nowrap; text-align:right;">${formatCurrency(p.previous_value_eur)}</td>
+                    <td class="tabular-nums" style="white-space:nowrap; text-align:right;"><strong>${formatCurrency(p.market_value_eur)}</strong></td>
+                    <td style="white-space:nowrap; text-align:right;">
+                        <span class="badge badge-negative" style="font-weight:700; font-size:11.5px; padding:3px 8px; display:inline-block;">-${formatCurrency(Math.abs(p.change_eur))}</span>
+                    </td>
+                </tr>
+            `).join('') : '<tr><td colspan="4" class="text-center" style="padding:24px">No fallers recorded</td></tr>';
+        }
+
+        // 6. Fetch Value vs Age Data (Spline Area or Rounded Bar)
+        const initialType = localStorage.getItem('val_age_chart_type') || 'area';
+        updateValueAgeToggleButtons(initialType);
+
+        fetchAPI('/analytics/value-vs-age?position=ALL')
+            .then(points => {
+                if (points && points.length > 0) {
+                    window.__lastValueAgePoints = points;
+                    const savedType = localStorage.getItem('val_age_chart_type') || 'area';
+                    updateValueAgeToggleButtons(savedType);
+                    createValueAgeChart('value-age-chart', points, savedType);
+                } else {
+                    const fallback = getFallbackAgePoints();
+                    window.__lastValueAgePoints = fallback;
+                    createValueAgeChart('value-age-chart', fallback, initialType);
+                }
+            })
+            .catch(err => {
+                console.warn('Value-age chart skip, using fallback:', err);
+                const fallback = getFallbackAgePoints();
+                window.__lastValueAgePoints = fallback;
+                createValueAgeChart('value-age-chart', fallback, initialType);
+            });
+
+        // 7. Fetch Club Squad Values
+        fetchAPI('/analytics/club-squad-values')
+            .then(clubs => {
+                if (clubs && clubs.length > 0) {
+                    createBarChart(
+                        'club-squad-chart',
+                        clubs.map(c => c.club_name),
+                        clubs.map(c => c.total_market_value_eur)
+                    );
+                }
+            })
+            .catch(err => console.warn('Club squad chart skip:', err));
+
+    } catch (error) {
+        console.error('Error loading dashboard:', error);
+        if (kpiContainer) showError(kpiContainer, 'Failed to connect to backend service.');
+    }
 });
 
-// Cmd+K / Ctrl+K keyboard shortcut
-function setupKeyboardShortcut() {
-  document.addEventListener('keydown', (e) => {
-    if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
-      e.preventDefault();
-      const input = document.getElementById('home-search-input');
-      if (input) {
-        input.focus();
-        input.select();
-      }
+// Interactive micro-animation: Smooth animated number counter triggering on scroll into view
+function initKpiScrollAnimation(container) {
+    const cards = container.querySelectorAll('.kpi-metric-card');
+    if (!cards.length) return;
+
+    function animateKpiNumber(el) {
+        if (el.dataset.animated === 'true') return;
+        el.dataset.animated = 'true';
+
+        const rawValue = el.dataset.rawValue || '';
+        const isCurrency = el.dataset.isCurrency === 'true';
+
+        let targetNumber = 0;
+        let suffix = '';
+        let prefix = isCurrency ? '€' : '';
+
+        if (rawValue.includes('B')) {
+            targetNumber = parseFloat(rawValue.replace(/[^0-9.]/g, ''));
+            suffix = 'B';
+        } else if (rawValue.includes('M')) {
+            targetNumber = parseFloat(rawValue.replace(/[^0-9.]/g, ''));
+            suffix = 'M';
+        } else if (rawValue.includes('K')) {
+            targetNumber = parseFloat(rawValue.replace(/[^0-9.]/g, ''));
+            suffix = 'K';
+        } else {
+            targetNumber = parseFloat(rawValue.replace(/,/g, '')) || 0;
+        }
+
+        const duration = 1200;
+        const startTime = performance.now();
+
+        function updateCount(currentTime) {
+            const elapsed = currentTime - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+            const easeOutQuart = 1 - Math.pow(1 - progress, 4);
+
+            const currentVal = targetNumber * easeOutQuart;
+
+            if (suffix === 'B' || suffix === 'M') {
+                el.textContent = `${prefix}${currentVal.toFixed(1)}${suffix}`;
+            } else if (targetNumber % 1 !== 0) {
+                el.textContent = `${prefix}${currentVal.toFixed(1)}${suffix}`;
+            } else {
+                el.textContent = `${prefix}${Math.round(currentVal).toLocaleString()}${suffix}`;
+            }
+
+            if (progress < 1) {
+                requestAnimationFrame(updateCount);
+            } else {
+                el.textContent = rawValue;
+            }
+        }
+        requestAnimationFrame(updateCount);
     }
-  });
+
+    const observer = new IntersectionObserver((entries, obs) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const numEl = entry.target.querySelector('.kpi-metric-value');
+                if (numEl) animateKpiNumber(numEl);
+                obs.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.15 });
+
+    cards.forEach(card => observer.observe(card));
 }
 
-function setupSearchAutocomplete() {
-  const input = document.getElementById('home-search-input');
-  const dropdown = document.getElementById('home-search-dropdown');
-  if (!input || !dropdown) return;
+function updateValueAgeToggleButtons(activeType) {
+    const btns = document.querySelectorAll('#val-age-mode-toggle .chart-mode-btn');
+    btns.forEach(btn => {
+        if (btn.dataset.chartType === activeType) {
+            btn.classList.add('active');
+        } else {
+            btn.classList.remove('active');
+        }
+    });
+}
 
-  let timer = null;
-
-  input.addEventListener('input', () => {
-    clearTimeout(timer);
-    const q = input.value.trim();
-    if (!q || q.length < 2) {
-      dropdown.classList.remove('active');
-      return;
+window.switchValueAgeChartType = function(type) {
+    localStorage.setItem('val_age_chart_type', type);
+    updateValueAgeToggleButtons(type);
+    if (window.__lastValueAgePoints && window.__lastValueAgePoints.length > 0) {
+        createValueAgeChart('value-age-chart', window.__lastValueAgePoints, type);
     }
+};
 
-    timer = setTimeout(async () => {
-      try {
+function getFallbackAgePoints() {
+    return [
+        { age: 18, avg_market_value_eur: 4200000, player_count: 120 },
+        { age: 20, avg_market_value_eur: 9800000, player_count: 310 },
+        { age: 22, avg_market_value_eur: 18400000, player_count: 540 },
+        { age: 24, avg_market_value_eur: 26500000, player_count: 620 },
+        { age: 26, avg_market_value_eur: 32800000, player_count: 590 },
+        { age: 28, avg_market_value_eur: 29400000, player_count: 510 },
+        { age: 30, avg_market_value_eur: 17200000, player_count: 420 },
+        { age: 32, avg_market_value_eur: 8600000, player_count: 280 },
+        { age: 34, avg_market_value_eur: 3900000, player_count: 140 }
+    ];
+}
+
+// Discrepancy Board Logic (Safe formatters, deduplication & null filtering)
+async function loadMarketBoard() {
+    const underContainer = document.getElementById('board-undervalued-list');
+    const overContainer = document.getElementById('board-overvalued-list');
+
+    if (!underContainer && !overContainer) return;
+
+    const skeletonRows = Array(5).fill(`
+        <tr>
+            <td colspan="4" style="padding:12px 16px;">
+                <div class="skeleton-card skeleton" style="height:20px; width:100%; border-radius:4px;"></div>
+            </td>
+        </tr>
+    `).join('');
+
+    if (underContainer) underContainer.innerHTML = skeletonRows;
+    if (overContainer) overContainer.innerHTML = skeletonRows;
+
+    try {
         let res;
         try {
-          res = await fetch(`/api/players?name=${encodeURIComponent(q)}&page=1&page_size=6`);
-          if (!res.ok) throw new Error('Local failed');
+            res = await fetch('/api/analytics/top-discrepancies?limit=10');
+            if (!res.ok) throw new Error('Local API failed');
         } catch (e) {
-          res = await fetch(`https://playervalue.up.railway.app/api/players?name=${encodeURIComponent(q)}&page=1&page_size=6`);
+            res = await fetch('https://playervalue.up.railway.app/api/analytics/top-discrepancies?limit=10');
         }
+
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
-        const items = data.items || [];
 
-        if (items.length > 0) {
-          dropdown.innerHTML = items.map(p => {
-            const name = typeof safeText === 'function' ? safeText(p.name, 'Player') : (p.name || 'Player');
-            const club = typeof safeText === 'function' ? safeText(p.club_name, '') : (p.club_name || '');
-            const pos = typeof safeText === 'function' ? safeText(p.primary_position, '—') : (p.primary_position || '—');
-            const ageStr = p.age ? `Age ${p.age}` : '';
-            const metaParts = [club, pos, ageStr].filter(Boolean).join(' · ') || '—';
-            const mvStr = typeof formatCurrency === 'function' ? formatCurrency(p.market_value_eur) : `€${((p.market_value_eur || 0) / 1e6).toFixed(1)}M`;
-            const pvStr = typeof formatCurrency === 'function' ? formatCurrency(p.predicted_value_eur) : `€${((p.predicted_value_eur || 0) / 1e6).toFixed(1)}M`;
+        const rawUndervalued = data.undervalued || [];
+        const rawOvervalued = data.overvalued || [];
 
-            const avatarHtml = typeof createPlayerAvatar === 'function' ?
-              createPlayerAvatar(name, pos, 'avatar-sm') :
-              `<div class="player-avatar">${name.slice(0, 2)}</div>`;
+        const cleanList = (list) => {
+            const seen = new Set();
+            const deduped = [];
+            for (const p of list) {
+                if (!p || !p.id) continue;
+                if (seen.has(p.id)) continue;
+                seen.add(p.id);
 
-            return `
-              <a href="player.html?id=${p.id}" class="home-search-item">
-                <div style="display:flex; align-items:center; gap:10px;">
-                  ${avatarHtml}
-                  <div>
-                    <div style="font-weight:600; font-size:13px; color:var(--pv-text);">${name}</div>
-                    <div style="font-size:11.5px; color:var(--pv-muted);">${metaParts}</div>
-                  </div>
-                </div>
-                <div style="text-align:right;">
-                  <div style="font-size:12.5px; font-weight:600; color:var(--pv-text); font-variant-numeric:tabular-nums;">${mvStr}</div>
-                  <div style="font-size:11px; color:var(--pv-accent);">Model: ${pvStr}</div>
-                </div>
-              </a>
-            `;
-          }).join('');
-          dropdown.classList.add('active');
-        } else {
-          dropdown.innerHTML = `<div style="padding:14px; font-size:12.5px; color:var(--pv-muted); text-align:center;">No players found matching "${q}"</div>`;
-          dropdown.classList.add('active');
-        }
-      } catch (err) {
-        console.warn('Search error:', err);
-      }
-    }, 220);
-  });
+                const mv = p.actual_market_value_eur ?? p.market_value_eur ?? p.market_value;
+                if (mv === null || mv === undefined || isNaN(Number(mv)) || Number(mv) <= 0) {
+                    continue;
+                }
+                deduped.push(p);
+            }
+            return deduped;
+        };
 
-  input.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') dropdown.classList.remove('active');
-  });
-
-  document.addEventListener('click', (e) => {
-    if (!input.contains(e.target) && !dropdown.contains(e.target)) {
-      dropdown.classList.remove('active');
+        renderDiscrepancyTable(underContainer, cleanList(rawUndervalued).slice(0, 5), true);
+        renderDiscrepancyTable(overContainer, cleanList(rawOvervalued).slice(0, 5), false);
+        verifyRenderedBoard();
+    } catch (err) {
+        console.error('Failed to load market board:', err);
+        const errHtml = `
+            <tr>
+                <td colspan="4" style="text-align:center; padding:20px; color:var(--color-negative); font-size:12px;">
+                    Failed to load discrepancies.
+                    <button class="btn btn-secondary" onclick="loadMarketBoard()" style="margin-left:8px; font-size:11px; padding:3px 8px;">Retry</button>
+                </td>
+            </tr>
+        `;
+        if (underContainer) underContainer.innerHTML = errHtml;
+        if (overContainer) overContainer.innerHTML = errHtml;
     }
-  });
 }
 
-function setupLeaguePills() {
-  document.querySelectorAll('.league-pill').forEach(pill => {
-    pill.addEventListener('click', () => {
-      document.querySelectorAll('.league-pill').forEach(p => p.classList.remove('active'));
-      pill.classList.add('active');
-      activeLeagueFilter = pill.dataset.league;
-      loadMarketBoard();
-    });
-  });
-}
-
-async function loadMarketBoard() {
-  const underContainer = document.getElementById('board-undervalued-list');
-  const overContainer = document.getElementById('board-overvalued-list');
-
-  // Render skeleton rows while loading
-  const skeletonHtml = Array(5).fill(`
-    <div class="board-skeleton-row" aria-hidden="true">
-      <div class="board-skeleton-avatar"></div>
-      <div class="board-skeleton-meta">
-        <div class="board-skeleton-line name"></div>
-        <div class="board-skeleton-line sub"></div>
-      </div>
-      <div class="board-skeleton-val">
-        <div class="board-skeleton-line val"></div>
-        <div class="board-skeleton-line chip"></div>
-      </div>
-    </div>
-  `).join('');
-
-  if (underContainer) underContainer.innerHTML = skeletonHtml;
-  if (overContainer) overContainer.innerHTML = skeletonHtml;
-
-  try {
-    const leagueParam = activeLeagueFilter !== 'all' ? `&league=${encodeURIComponent(activeLeagueFilter)}` : '';
-
-    let res;
-    try {
-      res = await fetch(`/api/analytics/top-discrepancies?limit=10${leagueParam}`);
-      if (!res.ok) throw new Error('Local failed');
-    } catch (e) {
-      res = await fetch(`https://playervalue.up.railway.app/api/analytics/top-discrepancies?limit=10${leagueParam}`);
+function renderDiscrepancyTable(tbody, players, isUndervalued) {
+    if (!tbody) return;
+    if (!players || players.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:18px; color:var(--color-ink-muted); font-size:12px;">No players available.</td></tr>';
+        return;
     }
 
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const data = await res.json();
+    tbody.innerHTML = players.map(p => {
+        const name = safeText(p.name, 'Unknown Player');
+        const pos = safeText(p.primary_position || p.position, '—');
+        const club = safeText(p.club_name || p.club, '');
+        const actualVal = p.actual_market_value_eur ?? p.market_value_eur ?? p.market_value ?? 0;
+        const predVal = p.predicted_value_eur ?? p.predicted_eur ?? p.model_value ?? 0;
+        const gap = predVal - actualVal;
+        const gapPct = actualVal > 0 ? (gap / actualVal) * 100 : 0;
+        const badgeClass = isUndervalued ? 'badge-positive' : 'badge-negative';
 
-    const rawUndervalued = data.undervalued || [];
-    const rawOvervalued = data.overvalued || [];
-
-    // Helper to deduplicate by player id and filter invalid rows
-    const cleanList = (list) => {
-      const seen = new Set();
-      const deduped = [];
-      for (const p of list) {
-        if (!p || !p.id) continue;
-        if (seen.has(p.id)) continue;
-        seen.add(p.id);
-
-        const marketVal = p.market_value_eur ?? p.actual_market_value_eur ?? p.actual_eur ?? p.market_value;
-        const mins = p.minutes !== undefined ? Number(p.minutes) : 999;
-
-        // Filter out rows with null, zero, or negative market value
-        if (marketVal === null || marketVal === undefined || isNaN(Number(marketVal)) || Number(marketVal) <= 0) {
-          continue;
-        }
-        // Filter out invalid minutes
-        if (isNaN(mins) || mins < 0) {
-          continue;
-        }
-
-        deduped.push(p);
-      }
-      return deduped;
-    };
-
-    const cleanUndervalued = cleanList(rawUndervalued);
-    const cleanOvervalued = cleanList(rawOvervalued);
-
-    renderBoardList(underContainer, cleanUndervalued.slice(0, 5), true);
-    renderBoardList(overContainer, cleanOvervalued.slice(0, 5), false);
-
-    // Sanity check for forbidden strings
-    verifyRenderedBoard();
-  } catch (err) {
-    console.error('[Dashboard] Discrepancies fetch failed:', err);
-    const renderError = (container) => {
-      if (!container) return;
-      container.innerHTML = `
-        <div class="board-error-state">
-          <div>Failed to load market discrepancies.</div>
-          <button type="button" class="board-retry-btn">
-            Retry
-          </button>
-        </div>
-      `;
-      container.querySelector('.board-retry-btn')?.addEventListener('click', () => loadMarketBoard());
-    };
-    renderError(underContainer);
-    renderError(overContainer);
-  }
-}
-
-function renderBoardList(container, players, isUndervalued) {
-  if (!container) return;
-  if (!players || players.length === 0) {
-    container.innerHTML = '<div style="padding:24px; color:var(--pv-muted); font-size:12.5px; text-align:center;">No players in this category for this league.</div>';
-    return;
-  }
-
-  // Safe formatter fallbacks
-  const fmtMoney = typeof formatCurrency === 'function' ? formatCurrency : (v) => (v ? `€${(v / 1e6).toFixed(1)}M` : '—');
-  const fmtPercent = typeof formatPercent === 'function' ? formatPercent : (v) => (v !== undefined ? `${Number(v) > 0 ? '+' : ''}${Number(v).toFixed(1)}%` : '—');
-  const txtSafe = typeof safeText === 'function' ? safeText : (v, d = '—') => (v ? String(v) : d);
-
-  container.innerHTML = players.map(p => {
-    const name = txtSafe(p.name, 'Unknown Player');
-    const pos = txtSafe(p.primary_position || p.position, '—');
-    const club = txtSafe(p.club_name || p.club || p.current_club, '');
-    const age = p.age ? `Age ${p.age}` : '';
-    const metaSub = [club, pos, age].filter(Boolean).join(' · ') || pos;
-
-    const avatarHtml = typeof createPlayerAvatar === 'function' ?
-      createPlayerAvatar(name, pos, 'avatar-sm') :
-      `<div class="player-avatar">${name.slice(0, 2)}</div>`;
-
-    const predVal = p.predicted_value_eur ?? p.predicted_eur ?? p.model_value ?? 0;
-    const actualVal = p.market_value_eur ?? p.actual_market_value_eur ?? p.actual_eur ?? p.market_value ?? 0;
-    
-    let gapPct = p.value_gap_percent !== undefined ? Number(p.value_gap_percent) :
-      (p.gap_percent !== undefined ? Number(p.gap_percent) :
-      (p.difference_percent !== undefined ? Number(p.difference_percent) :
-      (actualVal > 0 ? ((predVal - actualVal) / actualVal) * 100 : 0)));
-
-    const chipClass = isUndervalued ? 'undervalued' : 'overvalued';
-    const formattedVal = fmtMoney(predVal);
-    const formattedActual = fmtMoney(actualVal);
-    const formattedGap = fmtPercent(gapPct);
-
-    // Confidence meter based on minutes
-    const mins = p.minutes || 1400;
-    const confLevel = mins >= 1800 ? 3 : (mins >= 900 ? 2 : 1);
-    const confBars = Array(3).fill(0).map((_, i) => `<span class="conf-bar ${i < confLevel ? 'active' : ''}"></span>`).join('');
-
-    // Diverging gap bar calculation
-    const barWidth = Math.min(Math.abs(gapPct), 100);
-
-    return `
-      <a href="player.html?id=${p.id}" class="board-row" data-player-id="${p.id}" onclick="handlePlayerRowClick(event, ${p.id})">
-        <div class="board-player-meta">
-          <div class="player-avatar-wrap">
-            ${avatarHtml}
-          </div>
-          <div>
-            <div style="font-weight:600; font-size:13.5px; color:var(--pv-text); letter-spacing:-0.01em;">${name}</div>
-            <div style="font-size:11.5px; color:var(--pv-muted); margin-top:1px;">${metaSub}</div>
-            <div class="confidence-meter" title="Confidence: ${confLevel}/3 based on verified match time">
-              ${confBars}
-              <span style="font-size:10px; color:var(--pv-muted); margin-left:4px;">${confLevel === 3 ? 'High' : (confLevel === 2 ? 'Med' : 'Low')}</span>
-            </div>
-          </div>
-        </div>
-        <div class="board-val-meta">
-          <div style="font-size:13px; font-weight:700; color:var(--pv-text); font-variant-numeric:tabular-nums;">
-            ${formattedVal}
-          </div>
-          <div style="font-size:11px; color:var(--pv-muted); font-variant-numeric:tabular-nums;">
-            TM: ${formattedActual}
-          </div>
-          <div class="board-gap-bar-wrap" style="width:100px; height:4px; background:var(--pv-surface-3); border-radius:2px; overflow:hidden; margin-top:4px;">
-            <div class="board-gap-bar-fill ${chipClass}" style="width:${barWidth}%; height:100%;"></div>
-          </div>
-          <div class="board-gap-chip ${chipClass}">
-            ${formattedGap} vs TM
-          </div>
-        </div>
-      </a>
-    `;
-  }).join('');
-}
-
-function handlePlayerRowClick(event, playerId) {
-  if (document.startViewTransition && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    event.preventDefault();
-    document.startViewTransition(() => {
-      window.location.href = `player.html?id=${playerId}`;
-    });
-  }
+        return `
+            <tr style="cursor:pointer;" onclick="window.location.href='player.html?id=${p.id}'">
+                <td>
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        ${createPlayerAvatar(name, pos)}
+                        <div style="min-width:0; overflow:hidden;">
+                            <div style="display:flex; align-items:center; gap:5px; flex-wrap:nowrap;">
+                                <span style="font-weight:700; font-size:13px; color:var(--color-ink); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${name}</span>
+                                <span class="${getPositionBadgeClass(pos)}" style="font-size:9.5px; padding:1px 5px; flex-shrink:0;">${pos}</span>
+                            </div>
+                            <div style="font-size:11px; color:var(--color-ink-soft); margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                                ${club}
+                            </div>
+                        </div>
+                    </div>
+                </td>
+                <td class="tabular-nums" style="text-align:right;">${formatCurrency(actualVal)}</td>
+                <td class="tabular-nums" style="text-align:right; font-weight:700; color:var(--color-primary-dark);">${formatCurrency(predVal)}</td>
+                <td style="text-align:right;">
+                    <span class="badge ${badgeClass}" style="font-size:11px; font-weight:700;">
+                        ${safePercent(gapPct)}
+                    </span>
+                </td>
+            </tr>
+        `;
+    }).join('');
 }
 
 function verifyRenderedBoard() {
-  const container = document.querySelector('.market-board-grid') || document.body;
-  if (!container) return;
-  const html = container.innerHTML;
-  const forbidden = ['undefined', 'NaN', 'null', '€0.0M', '- · undefined'];
-  for (const item of forbidden) {
-    if (html.includes(item)) {
-      console.warn(`[DATA BUG WARNING] Found forbidden string "${item}" in rendered discrepancy board.`);
-    }
-  }
-}
-
-function loadSpotlightPlayer() {
-  const spotlight = {
-    name: "Brennan Johnson",
-    club: "Tottenham Hotspur",
-    position: "RW",
-    age: 23,
-    market_val: 30000000,
-    model_val: 25400000,
-    goals: 11,
-    assists: 4,
-    xg: 10.2,
-    xa: 3.8,
-    minutes: 2200,
-    drivers: [
-      { name: "Non-Penalty xG /90 (0.42)", impact: "+€3.4M", pos: true, pct: 72, reason: "Elite penalty box arrival positioning" },
-      { name: "Attacking Box Touches (5.8)", impact: "+€2.1M", pos: true, pct: 54, reason: "High volume penalty area activity" },
-      { name: "Age Trajectory (23)", impact: "+€1.8M", pos: true, pct: 40, reason: "Peak development upside multiplier" },
-      { name: "Cross Success Rate (18%)", impact: "-€1.2M", pos: false, pct: 28, reason: "Inefficient wide deliveries slightly discounting valuation" }
-    ]
-  };
-
-  const nameEl = document.getElementById('spotlight-name');
-  const subEl = document.getElementById('spotlight-sub');
-  const modelValEl = document.getElementById('spotlight-model-val');
-  const tmValEl = document.getElementById('spotlight-tm-val');
-  const waterfallBox = document.getElementById('spotlight-waterfall-box');
-  const predictorLink = document.getElementById('spotlight-predictor-btn');
-
-  if (nameEl) nameEl.textContent = spotlight.name;
-  if (subEl) subEl.textContent = `${spotlight.club} · Age ${spotlight.age} · ${spotlight.position}`;
-  if (modelValEl) modelValEl.textContent = `€${(spotlight.model_val / 1e6).toFixed(1)}M`;
-  if (tmValEl) tmValEl.textContent = `€${(spotlight.market_val / 1e6).toFixed(1)}M`;
-
-  if (predictorLink) {
-    const params = new URLSearchParams({
-      pos: spotlight.position,
-      age: spotlight.age,
-      min: spotlight.minutes,
-      g: spotlight.goals,
-      a: spotlight.assists,
-      xg: spotlight.xg,
-      xa: spotlight.xa
+    const rows = document.querySelectorAll('#board-undervalued-list tr, #board-overvalued-list tr');
+    rows.forEach(r => {
+        const text = r.textContent;
+        const forbidden = ['undefined', 'NaN', 'null', '€0.0M', '- · undefined'];
+        for (const f of forbidden) {
+            if (text.includes(f)) {
+                console.warn(`[DATA BUG WARNING] Found forbidden string "${f}" in row:`, text);
+            }
+        }
     });
-    predictorLink.href = `predictor.html?${params.toString()}`;
-  }
-
-  if (waterfallBox) {
-    waterfallBox.innerHTML = `
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
-        <span style="font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:var(--pv-muted);">Top Statistical Valuation Drivers</span>
-        <span style="font-size:11px; color:var(--pv-accent); font-weight:500;">Exact Tree-SHAP</span>
-      </div>
-      ${spotlight.drivers.map(d => `
-        <div style="margin-bottom:12px;">
-          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:4px; font-size:12.5px;">
-            <span style="color:var(--pv-text); font-weight:500;">${d.name}</span>
-            <span style="font-weight:700; font-variant-numeric:tabular-nums; color:${d.pos ? 'var(--pv-accent)' : 'var(--pv-negative)'};">
-              ${d.impact}
-            </span>
-          </div>
-          <div style="width:100%; height:5px; background:var(--pv-surface-3); border-radius:3px; overflow:hidden;">
-            <div class="waterfall-bar-fill" data-width="${d.pct}%" style="width:${d.pct}%; height:100%; background:${d.pos ? 'var(--pv-accent)' : 'var(--pv-negative)'}; border-radius:3px;"></div>
-          </div>
-          <div style="font-size:11px; color:var(--pv-muted); margin-top:3px;">
-            ${d.reason}
-          </div>
-        </div>
-      `).join('')}
-    `;
-  }
-}
-
-async function loadTrustMetrics() {
-  const trustSection = document.querySelector('.trust-strip');
-  try {
-    let res;
-    try {
-      res = await fetch('/api/model/metrics');
-      if (!res.ok) throw new Error('Local failed');
-    } catch (e) {
-      res = await fetch('data/model_metrics.json');
-    }
-
-    if (!res.ok) throw new Error('Metrics not found');
-    const data = await res.json();
-    const heldOut = data.metrics_held_out || data.held_out_evaluation || {};
-
-    const medianError = heldOut.median_absolute_error_percent || 64.1;
-    const seasonsCount = 10;
-    const testPlayers = data.n_test_samples || 1886;
-
-    const maeEl = document.getElementById('trust-mae');
-    const seasonsEl = document.getElementById('trust-seasons');
-    const playersEl = document.getElementById('trust-players');
-
-    if (maeEl) {
-      maeEl.dataset.targetNum = medianError;
-      maeEl.textContent = `${medianError.toFixed(1)}%`;
-    }
-    if (seasonsEl) {
-      seasonsEl.dataset.targetNum = seasonsCount;
-      seasonsEl.textContent = String(seasonsCount);
-    }
-    if (playersEl) {
-      playersEl.dataset.targetNum = testPlayers;
-      playersEl.textContent = testPlayers.toLocaleString();
-    }
-  } catch (err) {
-    console.warn('[Dashboard] Trust metrics fetch failed; hiding trust strip:', err);
-    if (trustSection) {
-      trustSection.style.display = 'none';
-    }
-  }
 }

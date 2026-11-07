@@ -3,59 +3,20 @@
  * Features Sticky Navbar, Playful Micro-interactions, AA-Compliant Badges & Clean Footer
  */
 
-function toggleTheme(event) {
-    const current = document.documentElement.getAttribute('data-theme') || 'dark';
-    const next = current === 'dark' ? 'light' : 'dark';
+function toggleTheme() {
+    const current = document.documentElement.getAttribute('data-theme') || 'light';
+    const next = current === 'light' ? 'dark' : 'light';
+    document.documentElement.setAttribute('data-theme', next);
+    localStorage.setItem('playervalue_theme', next);
 
-    const applyThemeChange = () => {
-        document.documentElement.setAttribute('data-theme', next);
-        localStorage.setItem('playervalue_theme', next);
-
-        const lbl = document.getElementById('theme-toggle-label');
-        if (lbl) {
-            lbl.textContent = next === 'dark' ? 'Light' : 'Dark';
-        }
-
-        window.dispatchEvent(new CustomEvent('themechange', { detail: { theme: next } }));
-        if (window.onThemeChange) {
-            window.onThemeChange(next);
-        }
-    };
-
-    // If View Transitions API is not supported or user prefers reduced motion, fallback
-    if (!document.startViewTransition || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-        applyThemeChange();
-        return;
+    const btn = document.getElementById('theme-toggle-label');
+    if (btn) {
+        btn.textContent = next === 'dark' ? '☀️ Light' : '🌙 Dark';
     }
 
-    const rect = event?.currentTarget?.getBoundingClientRect();
-    const x = rect ? rect.left + rect.width / 2 : (event?.clientX ?? window.innerWidth / 2);
-    const y = rect ? rect.top + rect.height / 2 : (event?.clientY ?? 0);
-    const endRadius = Math.hypot(
-        Math.max(x, window.innerWidth - x),
-        Math.max(y, window.innerHeight - y)
-    );
-
-    const transition = document.startViewTransition(() => {
-        applyThemeChange();
-    });
-
-    transition.ready.then(() => {
-        const clipPath = [
-            `circle(0px at ${x}px ${y}px)`,
-            `circle(${endRadius}px at ${x}px ${y}px)`
-        ];
-        document.documentElement.animate(
-            {
-                clipPath: next === 'dark' ? clipPath.slice().reverse() : clipPath
-            },
-            {
-                duration: 380,
-                easing: 'cubic-bezier(0.22, 1, 0.36, 1)',
-                pseudoElement: next === 'dark' ? '::view-transition-old(root)' : '::view-transition-new(root)'
-            }
-        );
-    });
+    if (window.onThemeChange) {
+        window.onThemeChange(next);
+    }
 }
 
 function applyStoredTheme() {
@@ -68,31 +29,19 @@ function applyStoredTheme() {
     }
 }
 
-// Sync with system preference if user hasn't chosen manually
-if (typeof window !== 'undefined') {
-    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
-        if (!localStorage.getItem('playervalue_theme')) {
-            const newTheme = e.matches ? 'dark' : 'light';
-            document.documentElement.setAttribute('data-theme', newTheme);
-            const lbl = document.getElementById('theme-toggle-label');
-            if (lbl) lbl.textContent = newTheme === 'dark' ? 'Light' : 'Dark';
-            window.dispatchEvent(new CustomEvent('themechange', { detail: { theme: newTheme } }));
-        }
-    });
-}
-
 function createNavbar(activePage) {
     const navItems = [
         { id: 'dashboard', label: 'Dashboard', url: 'index.html' },
         { id: 'players', label: 'Players', url: 'players.html' },
         { id: 'predictor', label: 'Predictor', url: 'predictor.html' },
         { id: 'opportunities', label: 'Opportunities', url: 'opportunities.html' },
+        { id: 'scouting', label: 'Scouting', url: 'scouting.html' },
         { id: 'clubs', label: 'Clubs', url: 'clubs.html' },
-        { id: 'model', label: 'Methodology', url: 'model.html' }
+        { id: 'model', label: 'Model', url: 'model.html' }
     ];
 
-    const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
-    const toggleLabel = currentTheme === 'dark' ? 'Light' : 'Dark';
+    const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+    const toggleLabel = currentTheme === 'dark' ? '☀️ Light' : '🌙 Dark';
 
     let navHtml = `
         <nav class="navbar">
@@ -121,23 +70,7 @@ function createNavbar(activePage) {
                 </ul>
 
                 <div class="nav-actions">
-                    <button class="theme-toggle-btn" onclick="toggleTheme(event)" aria-label="Toggle light or dark theme" title="Toggle theme">
-                        <span class="theme-icon-wrap" aria-hidden="true">
-                            <svg class="theme-icon sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <circle cx="12" cy="12" r="5"></circle>
-                                <line x1="12" y1="1" x2="12" y2="3"></line>
-                                <line x1="12" y1="21" x2="12" y2="23"></line>
-                                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-                                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-                                <line x1="1" y1="12" x2="3" y2="12"></line>
-                                <line x1="21" y1="12" x2="23" y2="12"></line>
-                                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-                                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-                            </svg>
-                            <svg class="theme-icon moon-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-                            </svg>
-                        </span>
+                    <button class="theme-toggle-btn" onclick="toggleTheme()" aria-label="Toggle light or dark theme">
                         <span id="theme-toggle-label">${toggleLabel}</span>
                     </button>
                 </div>
@@ -159,7 +92,7 @@ function createFooter() {
                             <img src="assets/logo-full-dark.png" alt="PlayerValue" class="footer-logo-full logo-dark-only">
                         </div>
                         <p class="footer-desc">
-                            Model-implied valuations and machine-learning arbitrage across 10 seasons of verified European football records. Exposing commercial hype, finding hidden gems.
+                            Real football intelligence and ML-powered player market valuations built on 10 seasons of verified top-5 European league data.
                         </p>
                     </div>
 
@@ -174,7 +107,7 @@ function createFooter() {
                         <span class="footer-col-title">Intelligence</span>
                         <a href="opportunities.html" class="footer-link">Market Opportunities</a>
                         <a href="scouting.html" class="footer-link">Scouting Matrix</a>
-                        <a href="model.html" class="footer-link">Methodology & Diagnostics</a>
+                        <a href="model.html" class="footer-link">Model Diagnostics</a>
                     </div>
 
                     <div class="footer-col">
@@ -185,30 +118,19 @@ function createFooter() {
                     </div>
                 </div>
 
-                <div class="footer-wordmark-wrap" aria-hidden="true">
-                    <span class="footer-faint-wordmark">PLAYERVALUE</span>
-                </div>
-
                 <div class="footer-bottom">
                     <div>
                         © 2026 PlayerValue. Statistical valuations for intelligence, not commercial guarantees.
                     </div>
-                    <div class="footer-back-to-top">
-                        <button type="button" class="back-to-top-btn" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
-                            <span>Back to top</span>
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M18 15l-6-6-6 6"/>
-                            </svg>
-                        </button>
+                    <div>
+                        Data refreshed: 2024-25 Season (Latest verified)
                     </div>
                     <div class="footer-signature">
-                        Built for football intelligence
+                        Made by Swaroop Mane
                     </div>
                 </div>
             </div>
         </footer>
-    `;
-}
     `;
 }
 

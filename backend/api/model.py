@@ -175,6 +175,7 @@ def api_get_model_metrics(db: Session = Depends(get_db)):
 
 
 @router.post("/predict")
+@router.post("/predict-custom")
 def predict_custom_valuation(stats: CustomPlayerStats):
     model, model_q10, model_q90, feature_cols = get_artifacts()
     if not model or not feature_cols:

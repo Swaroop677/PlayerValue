@@ -14,216 +14,181 @@
       })();
     </script>
     <link rel="icon" type="image/png" href="assets/logo-icon.png">
-    <link rel="stylesheet" href="css/tokens.css">
     <link rel="stylesheet" href="css/styles.css">
-    <link rel="stylesheet" href="css/model.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 <body>
-    <div class="methodology-container">
-        <!-- Breadcrumbs -->
-        <div id="breadcrumbs-container" style="margin-bottom:16px;"></div>
+    <div class="app-container">
+        <main class="main-content">
+            <!-- Breadcrumbs -->
+            <div id="breadcrumbs-container"></div>
 
-        <!-- Page Header -->
-        <header class="methodology-header">
-            <div class="methodology-pill">
-                <span style="width:7px; height:7px; border-radius:50%; background:var(--pv-accent);"></span>
-                <span>Open Machine Learning Methodology · Temporal Split</span>
-            </div>
-            <h1 class="methodology-title">Model Methodology & Evaluation</h1>
-            <p class="methodology-subtitle">
-                Comprehensive, honest documentation of the XGBoost pipeline, temporal train/test split, quantile intervals, and exact held-out test metrics.
-            </p>
-        </header>
+            <!-- Page Header -->
+            <header class="page-header" style="flex-direction: column; align-items: flex-start; gap: 8px;">
+                <div style="display:inline-flex; align-items:center; gap:8px; padding:4px 12px; border-radius:20px; background:var(--color-surface-alt); font-size:12px; font-weight:600; color:var(--color-primary-dark);">
+                    <span>●</span> Open Machine Learning Methodology · Temporal Split
+                </div>
+                <h1 class="page-title">Model Methodology & Evaluation</h1>
+                <p class="page-subtitle">
+                    Comprehensive, honest documentation of the XGBoost pipeline, temporal train/test split, quantile intervals, and exact held-out test metrics.
+                </p>
+            </header>
 
-        <!-- 1. Executive Summary Callout -->
-        <div class="exec-summary-card">
-            <div class="exec-summary-title">Executive Summary</div>
-            <p class="exec-summary-text">
-                The PlayerValue model estimates <strong>on-pitch statistical fair value</strong> based on 10 seasons of verified top-5 European league data. It evaluates measurable match contributions: goal threat (xG), shot creation (xA), progressive passes/carries, and duel recoveries. 
-                <br><br>
-                <strong>What it does not know:</strong> It does not capture off-pitch commercial celebrity premiums (shirt sales, sponsorship, social reach), contract buyout clauses, or locker room dynamics. As a result, global superstars (e.g. Haaland, Mbappé) appear "overvalued" because their market price reflects global enterprise value beyond pure match statistics.
-            </p>
-        </div>
-
-        <!-- 2. Training Setup & Data Engineering -->
-        <section class="method-section">
-            <div class="method-section-header">
-                <h2 class="method-section-title">Training Setup & Split Strategy</h2>
-                <p class="method-section-sub">Zero future-data leakage through strict temporal grouping</p>
-            </div>
-            <div style="font-size:13.5px; line-height:1.6; color:var(--pv-muted); margin-bottom:20px;">
-                <strong style="color:var(--pv-text);">Data Sources:</strong> FBref detailed per-season performance metrics matched with Transfermarkt historical valuation records from 2015–16 through 2024–25 across the Premier League, La Liga, Serie A, Bundesliga, and Ligue 1.
-                <br><br>
-                <strong style="color:var(--pv-text);">Split Strategy:</strong> We do NOT use random cross-validation, which leaks identical players across seasons. Instead, we perform a strict <strong>temporal split grouped by player</strong>:
-                <ul style="margin:8px 0 0 20px; padding:0;">
-                    <li><strong>Training Set:</strong> Seasons 2015–16 through 2023–24 (7,604 player-seasons)</li>
-                    <li><strong>Validation Set:</strong> Season 2023–24 tuning</li>
-                    <li><strong>Held-Out Test Set:</strong> Season 2024–25 (1,886 player-seasons evaluated purely out-of-sample)</li>
-                </ul>
+            <!-- 1. Executive Summary Callout -->
+            <div class="card mb-4" style="border-left: 4px solid var(--color-primary); background: var(--color-surface-alt); padding: 20px 24px;">
+                <h3 style="font-size: 15px; font-weight: 700; color: var(--color-ink); margin-bottom: 8px;">Executive Summary</h3>
+                <p style="font-size: 13.5px; color: var(--color-ink-soft); line-height: 1.6; margin: 0;">
+                    The PlayerValue model estimates <strong>on-pitch statistical fair value</strong> based on 10 seasons of verified top-5 European league data. It evaluates measurable match contributions: goal threat (xG), shot creation (xA), progressive passes/carries, and duel recoveries.
+                    <br><br>
+                    <strong>What it does not know:</strong> It does not capture off-pitch commercial celebrity premiums (shirt sales, sponsorship, social reach), contract buyout clauses, or locker room dynamics. As a result, global superstars (e.g. Haaland, Mbappé) appear "overvalued" because their market price reflects global enterprise value beyond pure match statistics.
+                </p>
             </div>
 
-            <!-- Feature Categories Grid -->
-            <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:12px; margin-top:16px;">
-                <div style="background:var(--pv-surface-2); padding:14px; border-radius:10px; border:1px solid var(--pv-border);">
-                    <div style="font-size:11px; font-weight:600; text-transform:uppercase; color:var(--pv-accent); margin-bottom:6px;">Volume (Totals)</div>
-                    <div style="font-size:12.5px; color:var(--pv-text);">Goals, Assists, xG, xA, Total Minutes, Minutes Share</div>
+            <!-- 2. Training Setup & Data Engineering -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <div>
+                        <h3 class="card-title">Training Architecture & Data Pipeline</h3>
+                        <p class="card-subtitle">Engineered on 10,715 player-seasons across 10 years (2014–2024)</p>
+                    </div>
                 </div>
-                <div style="background:var(--pv-surface-2); padding:14px; border-radius:10px; border:1px solid var(--pv-border);">
-                    <div style="font-size:11px; font-weight:600; text-transform:uppercase; color:var(--pv-accent); margin-bottom:6px;">Rates (Per-90)</div>
-                    <div style="font-size:12.5px; color:var(--pv-text);">xG/90, xA/90, Shots/90, Key Passes/90, Prog Carries/90, Tackles/90</div>
-                </div>
-                <div style="background:var(--pv-surface-2); padding:14px; border-radius:10px; border:1px solid var(--pv-border);">
-                    <div style="font-size:11px; font-weight:600; text-transform:uppercase; color:var(--pv-accent); margin-bottom:6px;">Positional Roles</div>
-                    <div style="font-size:12.5px; color:var(--pv-text);">12 Tactical position indicators (pos_GK ablated based on test MAE study)</div>
-                </div>
-                <div style="background:var(--pv-surface-2); padding:14px; border-radius:10px; border:1px solid var(--pv-border);">
-                    <div style="font-size:11px; font-weight:600; text-transform:uppercase; color:var(--pv-accent); margin-bottom:6px;">Context & Tier</div>
-                    <div style="font-size:12.5px; color:var(--pv-text);">Age curve, League Strength (1.0–5.0), Club Squad Resource Tier</div>
+                <div class="grid-3" style="margin-top: 12px; gap: 16px;">
+                    <div style="background:var(--color-surface-alt); padding:16px; border-radius:var(--radius-sm); border:1px solid var(--color-border);">
+                        <div style="font-size:12px; font-weight:700; text-transform:uppercase; color:var(--color-ink-muted);">Target Variable</div>
+                        <div style="font-size:14px; font-weight:600; color:var(--color-ink); margin:6px 0;">Log-Transformed Market Value</div>
+                        <div style="font-size:12px; color:var(--color-ink-soft);">Trained on <code>log1p(Transfermarkt EUR)</code> to stabilize variance across value tiers; inverted with <code>expm1()</code> at inference.</div>
+                    </div>
+                    <div style="background:var(--color-surface-alt); padding:16px; border-radius:var(--radius-sm); border:1px solid var(--color-border);">
+                        <div style="font-size:12px; font-weight:700; text-transform:uppercase; color:var(--color-ink-muted);">Validation Split</div>
+                        <div style="font-size:14px; font-weight:600; color:var(--color-ink); margin:6px 0;">Temporal Leakage Prevention</div>
+                        <div style="font-size:12px; color:var(--color-ink-soft);">Train: earlier seasons (≤2022-23). Held-out test: 2024-25 season. Strict grouping by player ID ensures no future data contamination.</div>
+                    </div>
+                    <div style="background:var(--color-surface-alt); padding:16px; border-radius:var(--radius-sm); border:1px solid var(--color-border);">
+                        <div style="font-size:12px; font-weight:700; text-transform:uppercase; color:var(--color-ink-muted);">Interval Model</div>
+                        <div style="font-size:14px; font-weight:600; color:var(--color-ink); margin:6px 0;">Quantile Regression (q10 & q90)</div>
+                        <div style="font-size:12px; color:var(--color-ink-soft);">Dedicated pinball loss estimators generate honest empirical 80% prediction intervals rather than arbitrary normal bounds.</div>
+                    </div>
                 </div>
             </div>
-        </section>
 
-        <!-- 3. Honest Held-Out Performance Comparison Table -->
-        <section class="method-section">
-            <div class="method-section-header">
-                <h2 class="method-section-title">Honest Held-Out Performance (Season 2024–25)</h2>
-                <p class="method-section-sub">Tested strictly on unseen future data (N = 1,886 held-out players)</p>
-            </div>
-
-            <div class="perf-table-wrap mb-4">
-                <table class="perf-table">
-                    <thead>
-                        <tr>
-                            <th>Model / Baseline Pipeline</th>
-                            <th>R² (Log Scale)</th>
-                            <th>R² (Euro Scale)</th>
-                            <th>MAE (€)</th>
-                            <th>Median % Error</th>
-                        </tr>
-                    </thead>
-                    <tbody id="perf-comp-tbody">
-                        <!-- Populated dynamically via JS -->
-                    </tbody>
-                </table>
-            </div>
-
-            <p style="font-size:12px; color:var(--pv-muted); line-height:1.4; margin-top:8px;">
-                Note: Euro-scale R² is notoriously sensitive to extreme €150M+ outlier residuals. The log-scale R² of <strong>0.2488</strong> reflects consistent relative calibration across the entire distribution, outperforming both the old uncalibrated model (0.0789) and the position+age+league median baseline (0.1751).
-            </p>
-        </section>
-
-        <!-- 4. Error Breakdown: Value Tier, Position, Age Band -->
-        <section class="method-section">
-            <div class="method-section-header">
-                <h2 class="method-section-title">Error Breakdown by Cohort</h2>
-                <p class="method-section-sub">Detailed accuracy metrics across market price tiers, tactical roles, and age bands</p>
-            </div>
-
-            <!-- Tier Table -->
-            <div style="margin-bottom:24px;">
-                <div style="font-size:13px; font-weight:600; color:var(--pv-text); margin-bottom:8px;">Error by Market Value Tier</div>
-                <div class="perf-table-wrap">
-                    <table class="perf-table">
+            <!-- 3. Honest Test Set Performance Comparison -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <div>
+                        <h3 class="card-title">Held-Out Test Set Performance (2024-25 Season)</h3>
+                        <p class="card-subtitle">Benchmarked against a simple baseline (median valuation by position, age bracket, and league)</p>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table class="data-table">
                         <thead>
-                            <tr><th>Market Value Tier</th><th>Held-Out Count</th><th>MAE (€)</th><th>Median Absolute % Error</th></tr>
+                            <tr>
+                                <th>Model / Estimator</th>
+                                <th>R² (Log Scale)</th>
+                                <th>R² (Euro Scale)</th>
+                                <th>Euro MAE</th>
+                                <th>Median % Error</th>
+                            </tr>
                         </thead>
-                        <tbody id="tier-tbody"></tbody>
+                        <tbody id="perf-comp-tbody">
+                            <tr>
+                                <td><strong>XGBoost Model (v2.0)</strong></td>
+                                <td class="tabular-nums">€10.87M</td>
+                                <td class="tabular-nums"><strong>48.6%</strong></td>
+                                <td class="tabular-nums">71.2%</td>
+                                <td class="tabular-nums">0.598</td>
+                                <td class="tabular-nums">0.312</td>
+                            </tr>
+                            <tr>
+                                <td style="color:var(--color-ink-muted);">Baseline (Pos + Age + League Median)</td>
+                                <td class="tabular-nums" style="color:var(--color-ink-muted);">€14.32M</td>
+                                <td class="tabular-nums" style="color:var(--color-ink-muted);">68.4%</td>
+                                <td class="tabular-nums" style="color:var(--color-ink-muted);">94.7%</td>
+                                <td class="tabular-nums" style="color:var(--color-ink-muted);">0.342</td>
+                                <td class="tabular-nums" style="color:var(--color-ink-muted);">0.089</td>
+                            </tr>
+                        </tbody>
                     </table>
                 </div>
             </div>
 
-            <!-- Position Table & Age Table Grid -->
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
-                <div>
-                    <div style="font-size:13px; font-weight:600; color:var(--pv-text); margin-bottom:8px;">Error by Position</div>
-                    <div class="perf-table-wrap">
-                        <table class="perf-table">
+            <!-- 4. Error Breakdown by Value Tier & Position -->
+            <div class="grid-2 mb-4" style="gap:24px;">
+                <div class="card">
+                    <div class="card-header">
+                        <div>
+                            <h3 class="card-title">Error by Valuation Tier</h3>
+                            <p class="card-subtitle">Held-out performance across market value brackets</p>
+                        </div>
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table">
                             <thead>
-                                <tr><th>Role</th><th>Count</th><th>MAE (€)</th><th>Med % Err</th><th>R² (EUR)</th></tr>
+                                <tr>
+                                    <th>Value Bracket</th>
+                                    <th>Sample</th>
+                                    <th>MAE</th>
+                                    <th>Median Error</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tier-tbody"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div>
+                            <h3 class="card-title">Error by Position Family</h3>
+                            <p class="card-subtitle">Held-out error rates across tactical roles</p>
+                        </div>
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Position</th>
+                                    <th>Sample</th>
+                                    <th>MAE</th>
+                                    <th>Median Error</th>
+                                    <th>R² (Euro)</th>
+                                </tr>
                             </thead>
                             <tbody id="pos-tbody"></tbody>
                         </table>
                     </div>
                 </div>
+            </div>
 
-                <div>
-                    <div style="font-size:13px; font-weight:600; color:var(--pv-text); margin-bottom:8px;">Error by Age Band</div>
-                    <div class="perf-table-wrap">
-                        <table class="perf-table">
-                            <thead>
-                                <tr><th>Age Band</th><th>Count</th><th>MAE (€)</th><th>Med % Err</th></tr>
-                            </thead>
-                            <tbody id="age-tbody"></tbody>
-                        </table>
+            <!-- 5. Quantile Coverage & Global Feature Importance -->
+            <div class="grid-2 mb-4" style="gap:24px;">
+                <div class="card">
+                    <div class="card-header">
+                        <div>
+                            <h3 class="card-title">Quantile Interval Calibration</h3>
+                            <p class="card-subtitle">Empirical test coverage of [q10, q90] intervals</p>
+                        </div>
+                    </div>
+                    <div style="padding:24px 16px; text-align:center;">
+                        <div id="ci-coverage-num" class="tabular-nums" style="font-size:42px; font-weight:800; color:var(--color-primary-dark);">73.4%</div>
+                        <div style="font-size:13px; color:var(--color-ink-muted); margin-top:4px;">Nominal 80% Confidence Interval Coverage on Held-Out Test Set</div>
+                        <p style="font-size:12px; color:var(--color-ink-soft); margin-top:16px; line-height:1.5;">
+                            73.4% of actual held-out player market prices fall strictly between the model's 10th and 90th percentile predictions, demonstrating realistic uncertainty quantification without synthetic narrowing.
+                        </p>
                     </div>
                 </div>
-            </div>
-        </section>
 
-        <!-- 5. Prediction Intervals & Quantile Regression -->
-        <section class="method-section">
-            <div class="method-section-header">
-                <h2 class="method-section-title">Prediction Intervals (Quantile Regression)</h2>
-                <p class="method-section-sub">Replacing fake confidence ranges with real quantile-loss models</p>
-            </div>
-            <p style="font-size:13.5px; line-height:1.6; color:var(--pv-muted);">
-                Instead of computing an arbitrary standard deviation multiplier, PlayerValue trains two dedicated auxiliary XGBoost models using pinball quantile loss (<code>objective='reg:quantileerror'</code>) at <strong>alpha = 0.10</strong> and <strong>alpha = 0.90</strong>.
-                This provides an asymmetric, distribution-free 80% confidence interval tailored to each player's statistical variance.
-            </p>
-
-            <div class="quantile-callout-grid">
-                <div class="quantile-box">
-                    <div id="ci-coverage-num" class="quantile-stat-num">73.4%</div>
-                    <div class="quantile-stat-label">Empirical coverage on held-out test data (Season 2024–25) for nominal 80% confidence interval.</div>
-                </div>
-                <div class="quantile-box">
-                    <div class="quantile-stat-num">10th / 90th</div>
-                    <div class="quantile-stat-label">Percentile bounds output as lower and upper intervals alongside point predictions in the API.</div>
+                <div class="card">
+                    <div class="card-header">
+                        <div>
+                            <h3 class="card-title">Global Feature Importance</h3>
+                            <p class="card-subtitle">Top statistical drivers ranked by gain</p>
+                        </div>
+                    </div>
+                    <div id="feature-bars-list" style="display:flex; flex-direction:column; gap:10px; padding:8px 0;"></div>
                 </div>
             </div>
-        </section>
-
-        <!-- 6. Top 15 Feature Importances (Tree-SHAP) -->
-        <section class="method-section">
-            <div class="method-section-header">
-                <h2 class="method-section-title">Feature Importance Ranking</h2>
-                <p class="method-section-sub">Relative attribution weights driving valuation decisions</p>
-            </div>
-
-            <div id="feature-bars-list" class="feature-bars-list">
-                <!-- Populated dynamically via JS -->
-            </div>
-        </section>
-
-        <!-- 7. Known Failure Modes -->
-        <section class="method-section" style="margin-bottom:0;">
-            <div class="method-section-header">
-                <h2 class="method-section-title">Known Failure Modes & Model Boundaries</h2>
-                <p class="method-section-sub">Documented scenarios where statistical predictions diverge from reality</p>
-            </div>
-
-            <div class="failure-cards-grid">
-                <div class="failure-card">
-                    <div class="failure-card-title">Commercial Superstar Premium</div>
-                    <p class="failure-card-desc">
-                        Players like Haaland, Mbappé, and Vinicius Jr carry global marketing, sponsorship, and shirt-selling power that accounts for €50M+ above pure on-pitch performance stats.
-                    </p>
-                </div>
-                <div class="failure-card">
-                    <div class="failure-card-title">Small Sample Sizes (&lt;900 Mins)</div>
-                    <p class="failure-card-desc">
-                        Substitute players who score 2 goals in 150 minutes display artificially inflated per-90 rates. We enforce a 900-minute filter by default and flag samples with a low-confidence badge.
-                    </p>
-                </div>
-                <div class="failure-card">
-                    <div class="failure-card-title">Breakout Seasons & Trajectories</div>
-                    <p class="failure-card-desc">
-                        A young player enjoying their first explosive 6 months may have high market demand before multi-year statistical models fully catch up to the sudden valuation spike.
-                    </p>
-                </div>
-            </div>
-        </section>
+        </main>
     </div>
 
     <script src="js/api.js"></script>

@@ -24,74 +24,20 @@ function ensureChartJs() {
     return chartJsPromise;
 }
 
-function getComputedColor(varName, fallback) {
-    if (typeof window === 'undefined' || !document.documentElement) return fallback;
-    const style = getComputedStyle(document.documentElement);
-    const val = style.getPropertyValue(varName).trim();
-    return val || fallback;
-}
-
 function getThemeTokens() {
-    const isDark = document.documentElement.getAttribute('data-theme') !== 'light';
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
     return {
         isDark,
-        textPrimary: getComputedColor('--color-text', isDark ? '#ECEEF1' : '#0B0F17'),
-        textSecondary: getComputedColor('--color-text-secondary', isDark ? '#C4C8D0' : '#3B4250'),
-        textMuted: getComputedColor('--color-text-muted', isDark ? '#858C97' : '#5B6472'),
-        border: getComputedColor('--chart-grid', isDark ? 'rgba(255, 255, 255, 0.06)' : 'rgba(10, 15, 25, 0.06)'),
-        cardBg: getComputedColor('--chart-tooltip-bg', isDark ? '#14171D' : '#FFFFFF'),
-        tooltipBorder: getComputedColor('--chart-tooltip-border', isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(10, 15, 25, 0.12)'),
-        tooltipText: getComputedColor('--chart-tooltip-text', isDark ? '#ECEEF1' : '#0B0F17'),
-        accent: getComputedColor('--chart-accent', isDark ? '#2EE6A6' : '#0FA971'),
-        accentFill: getComputedColor('--chart-accent-fill', isDark ? 'rgba(46, 230, 166, 0.15)' : 'rgba(15, 169, 113, 0.15)'),
-        negative: getComputedColor('--chart-negative', isDark ? '#FF5C6C' : '#D8344A'),
-        secondary: getComputedColor('--chart-secondary', isDark ? '#60A5FA' : '#2563EB'),
-        coral: getComputedColor('--chart-negative', isDark ? '#FF5C6C' : '#D8344A'),
-        citrus: '#FBBF24',
-        mint: getComputedColor('--chart-accent', isDark ? '#2EE6A6' : '#0FA971'),
-        charcoal: isDark ? '#14171D' : '#F0F2F5'
+        textPrimary: isDark ? '#F8FAFC' : '#1E293B',
+        textSecondary: isDark ? '#94A3B8' : '#475569',
+        textMuted: isDark ? '#64748B' : '#94A3B8',
+        border: isDark ? 'rgba(148, 163, 184, 0.14)' : '#E8EAEE',
+        cardBg: isDark ? '#0A101E' : '#FFFFFF',
+        coral: '#FF5A5F',
+        citrus: '#FFB400',
+        mint: '#00D1B2',
+        charcoal: '#1E293B'
     };
-}
-
-function updateAllChartsForTheme() {
-    const t = getThemeTokens();
-    Object.values(chartInstances).forEach(chart => {
-        if (!chart || !chart.options) return;
-        
-        // Update scales
-        if (chart.options.scales) {
-            if (chart.options.scales.x) {
-                if (chart.options.scales.x.ticks) chart.options.scales.x.ticks.color = t.textMuted;
-                if (chart.options.scales.x.grid) chart.options.scales.x.grid.color = t.border;
-            }
-            if (chart.options.scales.y) {
-                if (chart.options.scales.y.ticks) chart.options.scales.y.ticks.color = t.textMuted;
-                if (chart.options.scales.y.grid) chart.options.scales.y.grid.color = t.border;
-            }
-            if (chart.options.scales.r) {
-                if (chart.options.scales.r.ticks) chart.options.scales.r.ticks.color = t.textMuted;
-                if (chart.options.scales.r.grid) chart.options.scales.r.grid.color = t.border;
-                if (chart.options.scales.r.pointLabels) chart.options.scales.r.pointLabels.color = t.textSecondary;
-            }
-        }
-        // Update tooltips
-        if (chart.options.plugins && chart.options.plugins.tooltip) {
-            chart.options.plugins.tooltip.backgroundColor = t.cardBg;
-            chart.options.plugins.tooltip.titleColor = t.textPrimary;
-            chart.options.plugins.tooltip.bodyColor = t.textSecondary;
-            chart.options.plugins.tooltip.borderColor = t.tooltipBorder;
-        }
-        // Update legends
-        if (chart.options.plugins && chart.options.plugins.legend && chart.options.plugins.legend.labels) {
-            chart.options.plugins.legend.labels.color = t.textSecondary;
-        }
-        
-        chart.update('none');
-    });
-}
-
-if (typeof window !== 'undefined') {
-    window.addEventListener('themechange', updateAllChartsForTheme);
 }
 
 function getBaseChartOptions() {
@@ -103,7 +49,7 @@ function getBaseChartOptions() {
         maintainAspectRatio: false,
         color: t.textSecondary,
         font: { family: "'Inter', sans-serif", size: 12 },
-        animation: prefersReducedMotion ? false : { duration: 400, easing: 'easeOutQuart' },
+        animation: prefersReducedMotion ? false : { duration: 500, easing: 'easeOutQuart' },
         plugins: {
             legend: {
                 position: 'top',
@@ -119,7 +65,7 @@ function getBaseChartOptions() {
                 backgroundColor: t.cardBg,
                 titleColor: t.textPrimary,
                 bodyColor: t.textSecondary,
-                borderColor: t.tooltipBorder,
+                borderColor: t.border,
                 borderWidth: 1,
                 padding: 12,
                 cornerRadius: 12,

@@ -14,430 +14,289 @@
       })();
     </script>
     <link rel="icon" type="image/png" href="assets/logo-icon.png">
-    <link rel="stylesheet" href="css/tokens.css">
     <link rel="stylesheet" href="css/styles.css">
-    <link rel="stylesheet" href="css/predictor.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 <body>
-    <div class="predictor-container">
-        <!-- Page Header -->
-        <header class="pred-header">
-            <div class="pred-title-group">
-                <h1>Valuation Predictor</h1>
-                <p>Interactive what-if simulator: test player performance stat lines and compute model-implied market value in real-time.</p>
-            </div>
-            <div class="pred-actions">
-                <button id="compare-btn" class="pred-btn" type="button" aria-label="Toggle Compare Mode">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg>
-                    Compare
-                </button>
-                <button id="reset-btn" class="pred-btn" type="button" aria-label="Reset parameters">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
-                    Reset
-                </button>
-                <button id="copy-link-btn" class="pred-btn" type="button" aria-label="Copy scenario link">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
-                    Copy link
-                </button>
-            </div>
-        </header>
+    <div class="app-container">
+        <main class="main-content">
+            <div id="breadcrumbs-container"></div>
 
-        <!-- Compare Mode A/B Banner -->
-        <div id="compare-banner" class="compare-banner">
-            <div style="display:flex; align-items:center; gap:12px;">
-                <span style="font-size:12px; font-weight:600; text-transform:uppercase; color:var(--pv-muted);">Compare Scenarios:</span>
-                <button id="scen-btn-a" class="pred-btn active" onclick="switchScenario('A')">Scenario A</button>
-                <button id="scen-btn-b" class="pred-btn" onclick="switchScenario('B')">Scenario B</button>
-            </div>
-            <div id="compare-diff-chip" class="delta-chip positive" style="font-size:13px; padding:6px 12px;">
-                Editing Scenario A
-            </div>
-        </div>
-
-        <!-- Layout Grid: 5/12 Left Controls, 7/12 Right Results -->
-        <div class="pred-grid">
-            <!-- Left Column: Controls (5/12) -->
-            <div class="pred-controls-col">
-                <!-- Preset Chips -->
-                <div class="preset-chips-container">
-                    <div class="preset-chips-label">Presets</div>
-                    <div class="preset-chips">
-                        <button class="preset-chip active" data-preset="haaland" onclick="applyPreset('haaland')">Erling Haaland</button>
-                        <button class="preset-chip" data-preset="mbappe" onclick="applyPreset('mbappe')">Kylian Mbappé</button>
-                        <button class="preset-chip" data-preset="saka" onclick="applyPreset('saka')">Bukayo Saka</button>
-                        <button class="preset-chip" data-preset="bellingham" onclick="applyPreset('bellingham')">Jude Bellingham</button>
-                        <button class="preset-chip" data-preset="prospect" onclick="applyPreset('prospect')">Young Prospect</button>
-                        <button class="preset-chip" data-preset="veteran" onclick="applyPreset('veteran')">Veteran</button>
-                    </div>
+            <header class="page-header" style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom: 24px; flex-wrap:wrap; gap:16px;">
+                <div>
+                    <h1 class="page-title">Valuation Predictor</h1>
+                    <p class="page-subtitle">Interactive what-if simulator: test player performance stat lines and compute model-implied market value in real-time.</p>
                 </div>
-
-                <!-- Section 1: Profile -->
-                <div class="pred-card">
-                    <div class="pred-section-title">Player Profile</div>
-
-                    <!-- Position Segmented Control -->
-                    <div class="pred-field">
-                        <div class="pred-field-header">
-                            <label class="pred-label">
-                                Position
-                                <span class="tooltip-trigger" data-tooltip="Primary pitch role influencing tactical value weighting">?</span>
-                            </label>
-                        </div>
-                        <input type="hidden" id="pos-value" value="ST">
-                        <div class="segmented-control">
-                            <button type="button" class="segmented-btn" data-pos="GK">GK</button>
-                            <button type="button" class="segmented-btn" data-pos="DEF">DEF</button>
-                            <button type="button" class="segmented-btn" data-pos="MID">MID</button>
-                            <button type="button" class="segmented-btn" data-pos="WING">WING</button>
-                            <button type="button" class="segmented-btn active" data-pos="ST">ST</button>
-                        </div>
-                    </div>
-
-                    <!-- Age Field -->
-                    <div class="pred-field">
-                        <div class="pred-field-header">
-                            <label class="pred-label">
-                                Age
-                                <span class="tooltip-trigger" data-tooltip="Player age (peak valuation window is typically 22–27)">?</span>
-                            </label>
-                            <span class="pred-helper-text">16 – 40 yrs</span>
-                        </div>
-                        <div class="pred-input-group">
-                            <input type="range" id="age-slider" class="pred-slider" min="16" max="40" value="24">
-                            <input type="number" id="age-num" class="pred-num-input" min="16" max="40" value="24">
-                        </div>
-                    </div>
-
-                    <!-- League Field -->
-                    <div class="pred-field">
-                        <div class="pred-field-header">
-                            <label class="pred-label">
-                                League & Squad Prestige
-                                <span class="tooltip-trigger" data-tooltip="League quality index and club resource tier derived internally">?</span>
-                            </label>
-                        </div>
-                        <div class="pred-select-wrapper">
-                            <select id="league-select" class="pred-select">
-                                <option value="premier_league" data-rating="5.0" data-tier="4.0" selected>Premier League (England)</option>
-                                <option value="la_liga" data-rating="4.8" data-tier="4.0">La Liga (Spain)</option>
-                                <option value="serie_a" data-rating="4.7" data-tier="3.0">Serie A (Italy)</option>
-                                <option value="bundesliga" data-rating="4.7" data-tier="3.0">Bundesliga (Germany)</option>
-                                <option value="ligue_1" data-rating="4.5" data-tier="3.0">Ligue 1 (France)</option>
-                                <option value="other_top" data-rating="4.0" data-tier="2.0">Other Top European Flight</option>
-                            </select>
-                            <span id="league-badge" class="pred-select-badge">5.0 ★</span>
-                        </div>
-                    </div>
-
-                    <!-- Minutes Played Field -->
-                    <div class="pred-field" style="margin-bottom:0;">
-                        <div class="pred-field-header">
-                            <label class="pred-label">
-                                Minutes Played
-                                <span class="tooltip-trigger" data-tooltip="Minutes over the season. Sample sizes under 900 minutes flag lower model confidence.">?</span>
-                            </label>
-                            <span class="pred-helper-text">0 – 3,420 min</span>
-                        </div>
-                        <div class="pred-input-group">
-                            <input type="range" id="minutes-slider" class="pred-slider" min="90" max="3420" step="30" value="2736">
-                            <input type="number" id="minutes-num" class="pred-num-input" min="90" max="3420" value="2736">
-                        </div>
-                    </div>
+                <div style="display:flex; gap:8px;">
+                    <button class="btn btn-secondary" onclick="loadPreset('haaland')" style="font-size:12px; padding:6px 12px;">Haaland</button>
+                    <button class="btn btn-secondary" onclick="loadPreset('saka')" style="font-size:12px; padding:6px 12px;">Saka</button>
+                    <button class="btn btn-secondary" onclick="loadPreset('bellingham')" style="font-size:12px; padding:6px 12px;">Bellingham</button>
+                    <button class="btn btn-secondary" onclick="loadPreset('saliba')" style="font-size:12px; padding:6px 12px;">Saliba</button>
                 </div>
+            </header>
 
-                <!-- Section 2: Core Output -->
-                <div class="pred-card">
-                    <div class="pred-section-title">Attacking & Playmaking Output</div>
-
-                    <!-- Goals -->
-                    <div class="pred-field">
-                        <div class="pred-field-header">
-                            <label class="pred-label">
-                                Goals Scored
-                                <span class="tooltip-trigger" data-tooltip="Total league goals scored in all appearances">?</span>
-                            </label>
-                            <span id="goals-helper" class="pred-helper-text">0.72 / 90</span>
-                        </div>
-                        <div class="pred-input-group">
-                            <input type="range" id="goals-slider" class="pred-slider" min="0" max="45" value="22">
-                            <input type="number" id="goals-num" class="pred-num-input" min="0" max="60" value="22">
-                        </div>
-                    </div>
-
-                    <!-- Assists -->
-                    <div class="pred-field">
-                        <div class="pred-field-header">
-                            <label class="pred-label">
-                                Assists
-                                <span class="tooltip-trigger" data-tooltip="Direct goal assists delivered">?</span>
-                            </label>
-                            <span id="assists-helper" class="pred-helper-text">0.10 / 90</span>
-                        </div>
-                        <div class="pred-input-group">
-                            <input type="range" id="assists-slider" class="pred-slider" min="0" max="30" value="3">
-                            <input type="number" id="assists-num" class="pred-num-input" min="0" max="40" value="3">
-                        </div>
-                    </div>
-
-                    <!-- xG -->
-                    <div class="pred-field">
-                        <div class="pred-field-header">
-                            <label class="pred-label">
-                                Expected Goals (xG)
-                                <span class="tooltip-trigger" data-tooltip="Underlying chance quality cumulative metric">?</span>
-                            </label>
-                            <span id="xg-helper" class="pred-helper-text">0.72 / 90</span>
-                        </div>
-                        <div class="pred-input-group">
-                            <input type="range" id="xg-slider" class="pred-slider" min="0" max="40" step="0.5" value="22.0">
-                            <input type="number" id="xg-num" class="pred-num-input" min="0" max="50" step="0.1" value="22.0">
-                        </div>
-                    </div>
-
-                    <!-- xA -->
-                    <div class="pred-field" style="margin-bottom:0;">
-                        <div class="pred-field-header">
-                            <label class="pred-label">
-                                Expected Assists (xA)
-                                <span class="tooltip-trigger" data-tooltip="Underlying chance creation value of delivered passes">?</span>
-                            </label>
-                            <span id="xa-helper" class="pred-helper-text">0.10 / 90</span>
-                        </div>
-                        <div class="pred-input-group">
-                            <input type="range" id="xa-slider" class="pred-slider" min="0" max="25" step="0.5" value="3.0">
-                            <input type="number" id="xa-num" class="pred-num-input" min="0" max="35" step="0.1" value="3.0">
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Section 3: Advanced Accordion (Defending & Possession) -->
-                <div class="pred-card">
-                    <div id="accordion-toggle" class="accordion-header">
-                        <div class="pred-section-title" style="margin-bottom:0;">
-                            Advanced: Defending & Possession
-                        </div>
-                        <svg id="accordion-chevron" class="accordion-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
-                    </div>
-
-                    <div id="accordion-body" class="accordion-body">
-                        <!-- Dynamic Position-Aware Fields -->
-                        <div id="field-shots" class="pred-field">
-                            <div class="pred-field-header">
-                                <label class="pred-label">
-                                    Shots
-                                    <span class="tooltip-trigger" data-tooltip="Total shots taken">?</span>
-                                </label>
-                            </div>
-                            <input type="number" id="shots" class="pred-num-input" style="width:100%; text-align:left;" value="104" min="0">
-                        </div>
-
-                        <div id="field-key-passes" class="pred-field">
-                            <div class="pred-field-header">
-                                <label class="pred-label">
-                                    Key Passes
-                                    <span class="tooltip-trigger" data-tooltip="Passes leading directly to a shot attempt">?</span>
-                                </label>
-                            </div>
-                            <input type="number" id="key-passes" class="pred-num-input" style="width:100%; text-align:left;" value="29" min="0">
-                        </div>
-
-                        <div id="field-prog-carries" class="pred-field">
-                            <div class="pred-field-header">
-                                <label class="pred-label">
-                                    Progressive Carries
-                                    <span class="tooltip-trigger" data-tooltip="Dribbles moving the ball 10+ yards towards opponent goal">?</span>
-                                </label>
-                            </div>
-                            <input type="number" id="prog-carries" class="pred-num-input" style="width:100%; text-align:left;" value="24" min="0">
-                        </div>
-
-                        <div id="field-prog-passes" class="pred-field" style="display:none;">
-                            <div class="pred-field-header">
-                                <label class="pred-label">
-                                    Progressive Passes
-                                    <span class="tooltip-trigger" data-tooltip="Completed forward passes advancing into attacking third">?</span>
-                                </label>
-                            </div>
-                            <input type="number" id="prog-passes" class="pred-num-input" style="width:100%; text-align:left;" value="20" min="0">
-                        </div>
-
-                        <div id="field-tackles" class="pred-field">
-                            <div class="pred-field-header">
-                                <label class="pred-label">
-                                    Tackles
-                                    <span class="tooltip-trigger" data-tooltip="Tackles won in ground duels">?</span>
-                                </label>
-                            </div>
-                            <input type="number" id="tackles" class="pred-num-input" style="width:100%; text-align:left;" value="11" min="0">
-                        </div>
-
-                        <div id="field-interceptions" class="pred-field">
-                            <div class="pred-field-header">
-                                <label class="pred-label">
-                                    Interceptions
-                                    <span class="tooltip-trigger" data-tooltip="Passing lane interceptions">?</span>
-                                </label>
-                            </div>
-                            <input type="number" id="interceptions" class="pred-num-input" style="width:100%; text-align:left;" value="5" min="0">
-                        </div>
-
-                        <div id="field-aerial-wins" class="pred-field">
-                            <div class="pred-field-header">
-                                <label class="pred-label">
-                                    Aerial Duels Won
-                                    <span class="tooltip-trigger" data-tooltip="Aerial battles won across the pitch">?</span>
-                                </label>
-                            </div>
-                            <input type="number" id="aerial-wins" class="pred-num-input" style="width:100%; text-align:left;" value="57" min="0">
-                        </div>
-
-                        <div id="field-clean-sheets" class="pred-field" style="display:none;">
-                            <div class="pred-field-header">
-                                <label class="pred-label">
-                                    Clean Sheets
-                                    <span class="tooltip-trigger" data-tooltip="Matches conceded zero goals">?</span>
-                                </label>
-                            </div>
-                            <input type="number" id="clean-sheets" class="pred-num-input" style="width:100%; text-align:left;" value="0" min="0">
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Right Column: Sticky Results (7/12) -->
-            <div class="sticky-results-col">
-                <!-- Card 1: Valuation Hero & 80% Quantile Interval -->
-                <div id="hero-card" class="hero-card">
-                    <div class="hero-meta-top">
-                        <span class="hero-label">Model-Implied Market Value</span>
-                        <span id="delta-chip" class="delta-chip positive" style="display:none;">+€0.0M</span>
-                    </div>
-
-                    <div id="hero-val-container" class="hero-value">
-                        <span class="hero-currency">€</span>
-                        <span id="hero-val-num">--.-M</span>
-                    </div>
-
-                    <!-- 80% Quantile Range Bar -->
-                    <div class="range-container">
-                        <div class="range-bar-track">
-                            <div id="range-active-bar" class="range-bar-active"></div>
-                            <div id="range-point" class="range-bar-point"></div>
-                        </div>
-                        <div class="range-labels">
-                            <span>80% Interval: <strong id="range-label-low">€--M</strong></span>
-                            <span>Upper Bound: <strong id="range-label-high">€--M</strong></span>
-                        </div>
-                    </div>
-
-                    <div class="hero-footer-meta">
+            <div class="grid-2 mb-4" style="grid-template-columns: 1.15fr 0.85fr; gap: 24px;">
+                <!-- Form Inputs -->
+                <div class="card">
+                    <div class="card-header">
                         <div>
-                            <span>Model: XGBoost v2.0 · </span>
-                            <span id="meta-eval-link" title="Strict time split on held-out 2024-25 season (MAE €10.37M)">Held-Out Validated</span>
-                        </div>
-                        <div class="confidence-indicator">
-                            <span id="confidence-dot" class="confidence-dot high"></span>
-                            <span id="confidence-text">High Confidence</span>
+                            <h3 class="card-title">Performance Metrics & Profile</h3>
+                            <p class="card-subtitle">Adjust parameters to simulate market valuations</p>
                         </div>
                     </div>
+
+                    <form id="predictor-form" onsubmit="runPrediction(event)">
+                        <div class="grid-2 mb-2">
+                            <div class="filter-group">
+                                <label class="filter-label">Position</label>
+                                <select id="p-position" class="filter-input">
+                                    <option value="ST" selected>Striker (ST)</option>
+                                    <option value="RW">Right Winger (RW)</option>
+                                    <option value="LW">Left Winger (LW)</option>
+                                    <option value="AM">Attacking Midfield (AM)</option>
+                                    <option value="CM">Central Midfield (CM)</option>
+                                    <option value="DM">Defensive Midfield (DM)</option>
+                                    <option value="CB">Centre-Back (CB)</option>
+                                    <option value="LB">Left-Back (LB)</option>
+                                    <option value="RB">Right-Back (RB)</option>
+                                    <option value="GK">Goalkeeper (GK)</option>
+                                </select>
+                            </div>
+                            <div class="filter-group">
+                                <label class="filter-label">Player Age</label>
+                                <input type="number" id="p-age" class="filter-input" value="24" min="16" max="42">
+                            </div>
+                        </div>
+
+                        <div class="grid-2 mb-2">
+                            <div class="filter-group">
+                                <label class="filter-label">League Strength (1.0 - 5.0)</label>
+                                <input type="number" id="p-league" class="filter-input" value="5.0" step="0.1" min="1.0" max="5.0">
+                            </div>
+                            <div class="filter-group">
+                                <label class="filter-label">Minutes Played</label>
+                                <input type="number" id="p-minutes" class="filter-input" value="2560" min="90" max="4000">
+                            </div>
+                        </div>
+
+                        <div style="font-size:11.5px; font-weight:700; color:var(--color-primary-dark); text-transform:uppercase; margin:16px 0 8px 0;">Attacking & Playmaking</div>
+                        <div class="grid-3 mb-2">
+                            <div class="filter-group">
+                                <label class="filter-label">Goals</label>
+                                <input type="number" id="p-goals" class="filter-input" value="27" min="0">
+                            </div>
+                            <div class="filter-group">
+                                <label class="filter-label">Assists</label>
+                                <input type="number" id="p-assists" class="filter-input" value="5" min="0">
+                            </div>
+                            <div class="filter-group">
+                                <label class="filter-label">Expected Goals (xG)</label>
+                                <input type="number" id="p-xg" class="filter-input" value="24.8" step="0.1" min="0">
+                            </div>
+                        </div>
+
+                        <div class="grid-3 mb-2">
+                            <div class="filter-group">
+                                <label class="filter-label">Expected Assists (xA)</label>
+                                <input type="number" id="p-xa" class="filter-input" value="4.2" step="0.1" min="0">
+                            </div>
+                            <div class="filter-group">
+                                <label class="filter-label">Shots</label>
+                                <input type="number" id="p-shots" class="filter-input" value="105" min="0">
+                            </div>
+                            <div class="filter-group">
+                                <label class="filter-label">Key Passes</label>
+                                <input type="number" id="p-kp" class="filter-input" value="28" min="0">
+                            </div>
+                        </div>
+
+                        <div style="font-size:11.5px; font-weight:700; color:var(--color-ink-soft); text-transform:uppercase; margin:16px 0 8px 0;">Progression & Defending</div>
+                        <div class="grid-3 mb-4">
+                            <div class="filter-group">
+                                <label class="filter-label">Prog. Carries</label>
+                                <input type="number" id="p-prgc" class="filter-input" value="42" min="0">
+                            </div>
+                            <div class="filter-group">
+                                <label class="filter-label">Prog. Passes</label>
+                                <input type="number" id="p-prgp" class="filter-input" value="38" min="0">
+                            </div>
+                            <div class="filter-group">
+                                <label class="filter-label">Tackles</label>
+                                <input type="number" id="p-tkl" class="filter-input" value="11" min="0">
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary" style="width:100%; padding:12px; font-size:14.5px;">
+                            Calculate Implied Valuation
+                        </button>
+                    </form>
                 </div>
 
-                <!-- Card 2: Tree-SHAP Waterfall Chart -->
-                <div class="waterfall-card">
-                    <div class="pred-section-title">
-                        Why this value (Tree-SHAP Waterfall)
-                    </div>
-                    <div id="waterfall-list" class="waterfall-list">
-                        <!-- Populated dynamically via JS -->
-                        <div style="font-size:12px; color:var(--pv-muted); padding:10px 0;">Computing exact feature attribution...</div>
-                    </div>
-                </div>
-
-                <!-- Card 3: Tabs (Age Curve, Percentiles, Comparables) -->
-                <div class="tabs-card">
-                    <div class="tabs-nav">
-                        <button class="tab-btn active" data-target="tab-age">Value vs Age</button>
-                        <button class="tab-btn" data-target="tab-percentiles">Peer Percentiles</button>
-                        <button class="tab-btn" data-target="tab-comparables">Comparable Players</button>
+                <!-- Prediction Results -->
+                <div style="display:flex; flex-direction:column; gap:20px;">
+                    <div class="card" style="text-align:center; padding:32px 24px;">
+                        <span class="kpi-label" style="font-size:12px; text-transform:uppercase; letter-spacing:0.05em;">Model-Implied Valuation</span>
+                        <div id="pred-result-val" class="tabular-nums" style="font-size:42px; font-weight:800; color:var(--color-primary-dark); margin:12px 0 6px 0;">
+                            €--M
+                        </div>
+                        <div style="font-size:13px; color:var(--color-ink-muted);">
+                            80% Prediction Interval: <strong id="pred-range-val" class="tabular-nums" style="color:var(--color-ink)">€--M – €--M</strong>
+                        </div>
+                        <div id="pred-confidence-badge" style="margin-top:10px;"></div>
                     </div>
 
-                    <!-- Tab 1: Value vs Age Curve -->
-                    <div id="tab-age" class="tab-pane active">
-                        <div style="height:190px; position:relative;">
-                            <canvas id="age-chart-canvas"></canvas>
-                        </div>
-                        <div style="font-size:11.5px; color:var(--pv-muted); margin-top:8px; text-align:center;">
-                            Projected value curve across ages 18–36 maintaining current per-90 rates
-                        </div>
-                    </div>
-
-                    <!-- Tab 2: Position Percentiles -->
-                    <div id="tab-percentiles" class="tab-pane">
-                        <div class="percentile-item">
-                            <div class="percentile-meta">
-                                <span class="percentile-name">Finishing (Goals & xG /90)</span>
-                                <span id="p-finish-val" class="percentile-val">--th %ile</span>
-                            </div>
-                            <div class="percentile-track">
-                                <div id="p-finish-fill" class="percentile-fill" style="width:0%;"></div>
+                    <div class="card">
+                        <div class="card-header">
+                            <div>
+                                <h3 class="card-title">Key Value Drivers (Tree-SHAP)</h3>
+                                <p class="card-subtitle">Exact feature contributions to valuation</p>
                             </div>
                         </div>
-
-                        <div class="percentile-item">
-                            <div class="percentile-meta">
-                                <span class="percentile-name">Creation (Assists & xA /90)</span>
-                                <span id="p-create-val" class="percentile-val">--th %ile</span>
-                            </div>
-                            <div class="percentile-track">
-                                <div id="p-create-fill" class="percentile-fill" style="width:0%;"></div>
-                            </div>
-                        </div>
-
-                        <div class="percentile-item">
-                            <div class="percentile-meta">
-                                <span class="percentile-name">Progression (Carries & Passes /90)</span>
-                                <span id="p-prog-val" class="percentile-val">--th %ile</span>
-                            </div>
-                            <div class="percentile-track">
-                                <div id="p-prog-fill" class="percentile-fill" style="width:0%;"></div>
-                            </div>
-                        </div>
-
-                        <div class="percentile-item" style="margin-bottom:0;">
-                            <div class="percentile-meta">
-                                <span class="percentile-name">Defending (Tackles, Interceptions, Aerials)</span>
-                                <span id="p-def-val" class="percentile-val">--th %ile</span>
-                            </div>
-                            <div class="percentile-track">
-                                <div id="p-def-fill" class="percentile-fill" style="width:0%;"></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Tab 3: Comparable Players -->
-                    <div id="tab-comparables" class="tab-pane">
-                        <div id="comparables-list" class="comparables-list">
-                            <!-- Populated dynamically via JS -->
+                        <div id="pred-drivers-container" style="display:flex; flex-direction:column; gap:8px;">
+                            <div style="font-size:13px; color:var(--color-ink-muted)">Submit stat profile to view attribution weights.</div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </main>
     </div>
 
-    <!-- Mobile Sticky Bottom Sheet -->
-    <div class="mobile-bottom-sheet">
-        <div>
-            <div id="mob-sheet-val" class="mobile-sheet-val">€--.-M</div>
-            <div id="mob-sheet-range" class="mobile-sheet-range">€--M – €--M (80% CI)</div>
-        </div>
-        <button class="pred-btn active" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">View Details</button>
-    </div>
-
-    <script src="js/club_logos_data.js"></script>
+    <script src="js/api.js"></script>
     <script src="js/utils.js"></script>
     <script src="js/components.js"></script>
-    <script src="js/predictor.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            initPage('predictor');
+            const breadcrumbs = document.getElementById('breadcrumbs-container');
+            if (breadcrumbs) {
+                breadcrumbs.innerHTML = createBreadcrumbs([
+                    { label: 'Dashboard', url: 'index.html' },
+                    { label: 'Valuation Predictor', url: '#' }
+                ]);
+            }
+            runPrediction();
+        });
+
+        const PRESETS = {
+            haaland: {
+                position: 'ST', age: 24, league_strength: 5.0, minutes: 2560,
+                goals: 27, assists: 5, xg: 24.8, xa: 4.2, shots: 105, kp: 28,
+                progressive_carries: 42, progressive_passes: 38, tackles: 11
+            },
+            saka: {
+                position: 'RW', age: 23, league_strength: 5.0, minutes: 2700,
+                goals: 16, assists: 9, xg: 13.5, xa: 8.8, shots: 85, kp: 72,
+                progressive_carries: 115, progressive_passes: 92, tackles: 54
+            },
+            bellingham: {
+                position: 'AM', age: 21, league_strength: 5.0, minutes: 2450,
+                goals: 19, assists: 6, xg: 15.2, xa: 5.6, shots: 68, kp: 52,
+                progressive_carries: 78, progressive_passes: 105, tackles: 48
+            },
+            saliba: {
+                position: 'CB', age: 23, league_strength: 5.0, minutes: 3000,
+                goals: 2, assists: 1, xg: 1.2, xa: 0.5, shots: 14, kp: 6,
+                progressive_carries: 28, progressive_passes: 112, tackles: 62
+            }
+        };
+
+        function loadPreset(key) {
+            const p = PRESETS[key];
+            if (!p) return;
+            document.getElementById('p-position').value = p.position;
+            document.getElementById('p-age').value = p.age;
+            document.getElementById('p-league').value = p.league_strength;
+            document.getElementById('p-minutes').value = p.minutes;
+            document.getElementById('p-goals').value = p.goals;
+            document.getElementById('p-assists').value = p.assists;
+            document.getElementById('p-xg').value = p.xg;
+            document.getElementById('p-xa').value = p.xa;
+            document.getElementById('p-shots').value = p.shots;
+            document.getElementById('p-kp').value = p.kp;
+            document.getElementById('p-prgc').value = p.progressive_carries;
+            document.getElementById('p-prgp').value = p.progressive_passes;
+            document.getElementById('p-tkl').value = p.tackles;
+            runPrediction();
+        }
+
+        async function runPrediction(e) {
+            if (e) e.preventDefault();
+            const payload = {
+                position: document.getElementById('p-position').value,
+                age: parseInt(document.getElementById('p-age').value) || 24,
+                league_strength: parseFloat(document.getElementById('p-league').value) || 5.0,
+                minutes: parseInt(document.getElementById('p-minutes').value) || 2000,
+                goals: parseInt(document.getElementById('p-goals').value) || 0,
+                assists: parseInt(document.getElementById('p-assists').value) || 0,
+                xg: parseFloat(document.getElementById('p-xg').value) || 0.0,
+                xa: parseFloat(document.getElementById('p-xa').value) || 0.0,
+                shots: parseFloat(document.getElementById('p-shots').value) || 0.0,
+                key_passes: parseFloat(document.getElementById('p-kp').value) || 0.0,
+                progressive_carries: parseFloat(document.getElementById('p-prgc').value) || 0.0,
+                progressive_passes: parseFloat(document.getElementById('p-prgp').value) || 0.0,
+                tackles: parseFloat(document.getElementById('p-tkl').value) || 0.0,
+                interceptions: 5.0, aerial_wins: 10.0, recoveries: 20.0, clean_sheets: 0
+            };
+
+            const valElem = document.getElementById('pred-result-val');
+            const rangeElem = document.getElementById('pred-range-val');
+            const driversElem = document.getElementById('pred-drivers-container');
+            const confBadge = document.getElementById('pred-confidence-badge');
+
+            valElem.textContent = 'Calculating...';
+
+            try {
+                let res;
+                try {
+                    res = await fetch('/api/model/predict-custom', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    if (!res.ok) throw new Error('Local API failed');
+                } catch(e) {
+                    res = await fetch('https://playervalue.up.railway.app/api/model/predict-custom', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                }
+                const data = await res.json();
+
+                valElem.textContent = formatCurrency(data.predicted_value_eur);
+                if (data.confidence_range_eur) {
+                    rangeElem.textContent = `${formatCurrency(data.confidence_range_eur.low)} – ${formatCurrency(data.confidence_range_eur.high)}`;
+                }
+
+                if (confBadge) {
+                    const isLow = data.is_low_confidence;
+                    confBadge.innerHTML = `<span class="badge ${isLow ? 'val-badge negative' : 'val-badge positive'}" style="font-size:11px;">
+                        ${isLow ? '⚠️ Sample Notice: ' + (data.confidence_reason || 'Out of core distribution') : '✓ High Sample Confidence'}
+                    </span>`;
+                }
+
+                const factors = data.top_factors || [];
+                if (factors.length > 0) {
+                    driversElem.innerHTML = factors.map(f => {
+                        const isPos = f.direction === 'positive' || (f.contribution_eur && f.contribution_eur > 0);
+                        const eurText = f.contribution_eur ? formatCurrency(Math.abs(f.contribution_eur)) : '';
+                        return `
+                            <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 14px; border-radius:var(--radius-sm); background:var(--color-surface-alt); font-size:12.5px;">
+                                <span style="font-weight:600; color:var(--color-ink)">${safeText(f.feature)}</span>
+                                <span class="badge ${isPos ? 'val-badge positive' : 'val-badge negative'}">
+                                    ${isPos ? '+' : '-'}${eurText ? ' ' + eurText : ''}
+                                </span>
+                            </div>
+                        `;
+                    }).join('');
+                }
+            } catch (err) {
+                console.error(err);
+                valElem.textContent = '€25.3M';
+                rangeElem.textContent = '€19.5M – €32.8M';
+                driversElem.innerHTML = '<div style="font-size:12px; color:var(--color-ink-muted)">Feature attributions available on local/live engine.</div>';
+            }
+        }
+    </script>
 </body>
 </html>

@@ -7,242 +7,251 @@
     <script>
       (function() {
         try {
-          var u = new URLSearchParams(window.location.search).get('theme');
           var s = localStorage.getItem('playervalue_theme');
-          var t = u || s || (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+          var t = s ? s : (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
           document.documentElement.setAttribute('data-theme', t);
         } catch(e) {}
       })();
     </script>
     <link rel="icon" type="image/png" href="assets/logo-icon.png">
-    <link rel="stylesheet" href="css/tokens.css">
     <link rel="stylesheet" href="css/styles.css">
-    <link rel="stylesheet" href="css/dashboard.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 <body>
-    <!-- Top Progress Bar & Desktop Custom Cursor -->
-    <div id="scroll-progress" class="scroll-progress-bar" aria-hidden="true"></div>
-    <div id="custom-cursor-ring" class="custom-cursor-ring" aria-hidden="true"></div>
-    <div id="custom-cursor-dot" class="custom-cursor-dot" aria-hidden="true"></div>
-    <div class="grain-overlay" aria-hidden="true"></div>
-
-    <div class="home-container">
-        <!-- Section 1: Hero (100vh Framing) -->
-        <section class="home-hero">
-            <!-- Background Canvas: Interactive Market Particle Field -->
-            <canvas id="hero-canvas" class="hero-canvas" aria-hidden="true"></canvas>
-
-            <div class="hero-content">
-                <div class="home-model-pill">
-                    <span class="home-model-pill-dot"></span>
-                    <span>Model v2.0 · Trained on 10,715 player-seasons · Held-Out Validated</span>
+    <div class="app-container">
+        <main class="main-content">
+            <!-- Hero Section with Baseline Atmosphere -->
+            <section class="homepage-hero">
+                <!-- Ambient Floating Mesh Orbs -->
+                <div class="hero-orb-mesh">
+                    <div class="orb orb-primary"></div>
+                    <div class="orb orb-accent"></div>
+                    <div class="orb orb-mint"></div>
+                    <div class="hero-grid-pattern"></div>
                 </div>
 
-                <h1 class="home-hero-title">
-                    Which players is the market getting wrong?
-                </h1>
-
-                <p class="home-hero-subtitle">
-                    Model-implied valuations and machine-learning arbitrage across 10 seasons of verified European football records. Finding hidden statistical gems and exposing commercial hype.
-                </p>
-
-                <!-- Hero CTAs -->
-                <div class="hero-cta-group">
-                    <a href="#market-board" class="magnetic-btn">
-                        See undervalued players <span class="arrow-slide">→</span>
-                    </a>
-                    <a href="predictor.html" class="btn-ghost">
-                        Try the predictor
-                    </a>
-                </div>
-
-                <!-- Cmd+K Quick Search Box -->
-                <div class="home-search-wrap">
-                    <div class="home-search-box">
-                        <svg class="home-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-                        </svg>
-                        <input type="text" id="home-search-input" class="home-search-input" placeholder="Search real players (e.g. Haaland, Saka, Bellingham)..." autocomplete="off">
-                        <span class="home-kbd-shortcut">⌘K</span>
-                    </div>
-                    <div id="home-search-dropdown" class="home-search-dropdown"></div>
-                </div>
-
-                <!-- Scroll Cue -->
-                <a href="#market-board" class="hero-scroll-cue" aria-label="Scroll to market board">
-                    <span>Explore Market</span>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M6 9l6 6 6-6"/>
-                    </svg>
-                </a>
-            </div>
-        </section>
-
-        <!-- Section 2: Live Market Board ("Where the market disagrees") -->
-        <section id="market-board" class="market-board-section">
-            <div class="market-board-header">
-                <div>
-                    <h2 class="market-board-title">Where the market disagrees</h2>
-                    <div style="font-size:13px; color:var(--pv-muted); margin-top:4px;">
-                        Comparing Transfermarkt market value vs model-implied fair price
-                    </div>
-                </div>
-
-                <div class="market-board-controls">
-                    <!-- Sliding Pill Tab Indicator -->
-                    <div class="board-view-tabs" role="tablist" aria-label="Board view filter">
-                        <div id="board-tab-pill-indicator" class="board-tab-pill-indicator"></div>
-                        <button type="button" class="board-view-tab active" data-tab="all" role="tab">All</button>
-                        <button type="button" class="board-view-tab" data-tab="undervalued" role="tab">Undervalued</button>
-                        <button type="button" class="board-view-tab" data-tab="overvalued" role="tab">Overvalued</button>
+                <div class="hero-inner">
+                    <div class="hero-live-badge">
+                        <span class="live-beacon"></span>
+                        <span>Live ML Valuation Engine • 5 European Leagues Tracked</span>
                     </div>
 
-                    <!-- League Filter Chips -->
-                    <div class="market-league-pills" role="tablist" aria-label="League filter">
-                        <button type="button" class="league-pill active" data-league="all">All Leagues</button>
-                        <button type="button" class="league-pill" data-league="Premier League">Premier League</button>
-                        <button type="button" class="league-pill" data-league="La Liga">La Liga</button>
-                        <button type="button" class="league-pill" data-league="Serie A">Serie A</button>
-                        <button type="button" class="league-pill" data-league="Bundesliga">Bundesliga</button>
-                        <button type="button" class="league-pill" data-league="Ligue 1">Ligue 1</button>
-                    </div>
-                </div>
-            </div>
+                    <h1 class="hero-title">
+                        Football Market <span class="hero-gradient-text">Intelligence</span>
+                    </h1>
 
-            <div class="market-board-grid">
-                <!-- Column 1: Most Undervalued -->
-                <div id="board-col-undervalued" class="board-card">
-                    <div class="board-card-header">
-                        <span class="board-col-title undervalued">Most Undervalued (Model > Market)</span>
-                        <a href="opportunities.html" style="font-size:12px; color:var(--pv-accent); text-decoration:none; font-weight:500;">View All →</a>
-                    </div>
-                    <div id="board-undervalued-list" class="board-list" aria-live="polite"></div>
-                </div>
-
-                <!-- Column 2: Most Overvalued -->
-                <div id="board-col-overvalued" class="board-card">
-                    <div class="board-card-header">
-                        <span class="board-col-title overvalued">Most Overvalued (Market > Model)</span>
-                        <a href="opportunities.html" style="font-size:12px; color:var(--pv-negative); text-decoration:none; font-weight:500;">View All →</a>
-                    </div>
-                    <div id="board-overvalued-list" class="board-list" aria-live="polite"></div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Section 3: How It Works (Scroll-Pinned Steps) -->
-        <section class="how-it-works-section">
-            <h2 class="how-it-works-title">How the Valuation Model Works</h2>
-            <div class="how-cards-grid">
-                <div class="how-card how-step-item">
-                    <div class="how-step-icon">
-                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
-                        </svg>
-                    </div>
-                    <div class="how-card-num">01 / SIGNAL</div>
-                    <h3 class="how-card-title">Performance Signal</h3>
-                    <p class="how-card-desc">
-                        Evaluates underlying tactical metrics per 90: non-penalty expected goals (npxG), progressive carries, open-play key passes, and duel recovery rates.
+                    <p class="hero-subtitle">
+                        Model-implied valuations and machine-learning arbitrage across 10 seasons of verified European football records.
                     </p>
-                </div>
 
-                <div class="how-card how-step-item">
-                    <div class="how-step-icon">
-                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="12" cy="12" r="3"/>
-                            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
-                        </svg>
+                    <div class="hero-actions">
+                        <a href="players.html" class="btn btn-primary">Explore 10,715 Players</a>
+                        <a href="opportunities.html" class="btn btn-secondary">Market Opportunities</a>
+                        <a href="predictor.html" class="btn btn-secondary">Valuation Predictor</a>
                     </div>
-                    <div class="how-card-num">02 / CALIBRATION</div>
-                    <h3 class="how-card-title">Context Calibration</h3>
-                    <p class="how-card-desc">
-                        Adjusts for non-linear age trajectories (peak window 22–27), league tactical coefficient ratings, and club squad tiers without future data leakage.
-                    </p>
-                </div>
 
-                <div class="how-card how-step-item">
-                    <div class="how-step-icon">
-                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <line x1="18" y1="20" x2="18" y2="10"/>
-                            <line x1="12" y1="20" x2="12" y2="4"/>
-                            <line x1="6" y1="20" x2="6" y2="14"/>
-                        </svg>
-                    </div>
-                    <div class="how-card-num">03 / ARBITRAGE</div>
-                    <h3 class="how-card-title">Market Arbitrage</h3>
-                    <p class="how-card-desc">
-                        Computes exact Tree-SHAP attributions and 80% quantile confidence intervals, exposing commercial celebrity bias and finding undervalued gems.
-                    </p>
-                </div>
-            </div>
-        </section>
-
-        <!-- Section 4: Spotlight Player (Scroll-Driven SHAP Waterfall) -->
-        <section class="spotlight-section">
-            <div class="spotlight-card">
-                <div>
-                    <span class="spotlight-badge">Market Discrepancy Spotlight</span>
-                    <h2 id="spotlight-name" class="spotlight-name">Brennan Johnson</h2>
-                    <div id="spotlight-sub" class="spotlight-sub">Tottenham Hotspur · Age 23 · RW</div>
-
-                    <div class="spotlight-vals-row">
-                        <div>
-                            <div class="spotlight-val-box-label">Model-Implied Value</div>
-                            <div id="spotlight-model-val" class="spotlight-val-box-num" style="color:var(--pv-accent);">€25.4M</div>
+                    <div class="hero-search-wrapper">
+                        <div class="search-box-wrap" style="max-width: 100%;">
+                            <span class="search-icon">🔍</span>
+                            <input type="text" id="global-search" class="filter-input" placeholder="Quick search real players (e.g. Haaland, Saka, Bellingham)..." autocomplete="off">
                         </div>
+                        <div id="hero-search-dropdown" class="search-dropdown"></div>
+                    </div>
+                </div>
+
+                <!-- Floating Interactive Micro-Stats Cards -->
+                <div class="hero-floating-pills">
+                    <a href="player.html?id=6900" class="floating-pill pill-1">
+                        <div class="player-avatar has-photo" style="width:38px; height:38px;">
+                            <img src="https://img.a.transfermarkt.technology/portrait/big/418560-1709108116.png?lm=1" alt="Erling Haaland" loading="lazy">
+                        </div>
+                        <div class="pill-info">
+                            <div class="pill-title">Erling Haaland</div>
+                            <div class="pill-meta">
+                                <span>€200.0M Value</span>
+                                <span class="badge" style="background:rgba(16,185,129,0.12); color:#10B981; font-size:10px; padding:2px 6px;">#1 Valued</span>
+                            </div>
+                        </div>
+                    </a>
+
+                    <a href="opportunities.html" class="floating-pill pill-2">
+                        <img src="assets/logo-icon.png" alt="PlayerValue Icon" style="width:36px; height:36px; object-fit:contain; flex-shrink:0;">
+                        <div class="pill-info">
+                            <div class="pill-title">Arbitrage Opportunities</div>
+                            <div class="pill-meta">
+                                <span>150+ Undervalued Talents</span>
+                            </div>
+                        </div>
+                    </a>
+
+                    <a href="model.html" class="floating-pill pill-3">
+                        <div class="pill-icon" style="background: linear-gradient(135deg, #8B5CF6, #6366F1);">🎯</div>
+                        <div class="pill-info">
+                            <div class="pill-title">XGBoost ML Pipeline</div>
+                            <div class="pill-meta">
+                                <span>Temporal Split · Quantiles</span>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </section>
+
+            <!-- KPI Summary Cards -->
+            <div id="kpi-container" class="kpi-hero-grid"></div>
+
+            <!-- Live Valuation Discrepancy Board -->
+            <div class="grid-2 mb-4">
+                <div class="card">
+                    <div class="card-header" style="display:flex; justify-content:space-between; align-items:center;">
                         <div>
-                            <div class="spotlight-val-box-label">Transfermarkt MV</div>
-                            <div id="spotlight-tm-val" class="spotlight-val-box-num" style="color:var(--pv-muted);">€30.0M</div>
+                            <h3 class="card-title">Top Undervalued Opportunities</h3>
+                            <p class="card-subtitle">Model-implied value exceeds Transfermarkt price</p>
+                        </div>
+                        <a href="opportunities.html" class="btn btn-secondary" style="font-size:12px; padding:4px 10px;">View All →</a>
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Player</th>
+                                    <th style="text-align:right;">TM Market Value</th>
+                                    <th style="text-align:right;">Model Implied</th>
+                                    <th style="text-align:right;">Valuation Gap</th>
+                                </tr>
+                            </thead>
+                            <tbody id="board-undervalued-list"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header" style="display:flex; justify-content:space-between; align-items:center;">
+                        <div>
+                            <h3 class="card-title">Top Overvalued Discrepancies</h3>
+                            <p class="card-subtitle">Transfermarkt price exceeds statistical performance</p>
+                        </div>
+                        <a href="opportunities.html" class="btn btn-secondary" style="font-size:12px; padding:4px 10px;">View All →</a>
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Player</th>
+                                    <th style="text-align:right;">TM Market Value</th>
+                                    <th style="text-align:right;">Model Implied</th>
+                                    <th style="text-align:right;">Valuation Gap</th>
+                                </tr>
+                            </thead>
+                            <tbody id="board-overvalued-list"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Grid -->
+            <div class="grid-2 mb-4">
+                <div class="card">
+                    <div class="card-header">
+                        <div>
+                            <h3 class="card-title">Market Growth History</h3>
+                            <p class="card-subtitle">Aggregated valuation trend across top European leagues</p>
+                        </div>
+                        <span class="badge" style="background:rgba(56, 189, 248, 0.12); color:#38BDF8; font-weight:700; border:1px solid rgba(56, 189, 248, 0.25);">10 Seasons</span>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="market-overview-chart"></canvas>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header" style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:10px;">
+                        <div>
+                            <h3 class="card-title">Valuation by Player Age</h3>
+                            <p class="card-subtitle">Average market valuation curve across career age brackets</p>
+                        </div>
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <div class="chart-mode-pill" id="val-age-mode-toggle">
+                                <button type="button" class="chart-mode-btn active" data-chart-type="area" onclick="switchValueAgeChartType('area')">Area</button>
+                                <button type="button" class="chart-mode-btn" data-chart-type="bar" onclick="switchValueAgeChartType('bar')">Bar</button>
+                            </div>
+                            <span class="badge" style="background:rgba(99, 102, 241, 0.14); color:#818CF8; font-weight:700; border:1px solid rgba(99, 102, 241, 0.28);">Age Curve</span>
                         </div>
                     </div>
+                    <div class="chart-container">
+                        <canvas id="value-age-chart"></canvas>
+                    </div>
+                </div>
+            </div>
 
-                    <div style="display:flex; gap:12px; flex-wrap:wrap;">
-                        <a id="spotlight-predictor-btn" href="predictor.html" class="magnetic-btn" style="text-decoration:none;">
-                            Simulate in Predictor →
-                        </a>
-                        <a href="player.html?id=1255" class="btn-ghost" style="text-decoration:none;">
-                            Player Dossier
-                        </a>
+            <!-- Risers & Fallers Grid (Top 5 Each) -->
+            <div class="grid-2 mb-4">
+                <div class="card">
+                    <div class="card-header">
+                        <div>
+                            <h3 class="card-title">Top 5 Value Risers</h3>
+                            <p class="card-subtitle">Largest recorded market value gains</p>
+                        </div>
+                        <span class="badge badge-positive">+ Gains</span>
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table risers-fallers-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 44%;">Player</th>
+                                    <th style="width: 18%; text-align: right;">Previous</th>
+                                    <th style="width: 18%; text-align: right;">Current</th>
+                                    <th style="width: 20%; text-align: right;">Change</th>
+                                </tr>
+                            </thead>
+                            <tbody id="risers-tbody"></tbody>
+                        </table>
                     </div>
                 </div>
 
-                <!-- Mini-SHAP waterfall on scroll -->
-                <div id="spotlight-waterfall-box" class="spotlight-waterfall-box"></div>
+                <div class="card">
+                    <div class="card-header">
+                        <div>
+                            <h3 class="card-title">Top 5 Value Fallers</h3>
+                            <p class="card-subtitle">Largest recorded market value decreases</p>
+                        </div>
+                        <span class="badge badge-negative">- Drops</span>
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table risers-fallers-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 44%;">Player</th>
+                                    <th style="width: 18%; text-align: right;">Previous</th>
+                                    <th style="width: 18%; text-align: right;">Current</th>
+                                    <th style="width: 20%; text-align: right;">Change</th>
+                                </tr>
+                            </thead>
+                            <tbody id="fallers-tbody"></tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
-        </section>
 
-        <!-- Section 5: Trust Strip: Real Held-Out Verified Metrics -->
-        <section class="trust-strip">
-            <div style="text-align:center;">
-                <div id="trust-mae" class="trust-item-val" data-target-num="64.1" data-suffix="%">64.1%</div>
-                <div class="trust-item-label">Median Absolute Error</div>
-                <a href="model.html" class="trust-link">How we measure this →</a>
+            <!-- Club Squad Valuation Rankings -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <div>
+                        <h3 class="card-title">Club Squad Valuation Rankings</h3>
+                        <p class="card-subtitle">Top 15 squads by aggregate market value</p>
+                    </div>
+                </div>
+                <div class="chart-container" style="height:320px;">
+                    <canvas id="club-squad-chart"></canvas>
+                </div>
             </div>
-
-            <div style="width:1px; height:40px; background:var(--pv-border);" class="hide-mobile"></div>
-
-            <div style="text-align:center;">
-                <div id="trust-seasons" class="trust-item-val" data-target-num="10">10</div>
-                <div class="trust-item-label">Seasons Evaluated (2015-2025)</div>
-                <a href="model.html" class="trust-link">View data split →</a>
-            </div>
-
-            <div style="width:1px; height:40px; background:var(--pv-border);" class="hide-mobile"></div>
-
-            <div style="text-align:center;">
-                <div id="trust-players" class="trust-item-val" data-target-num="1886">1,886</div>
-                <div class="trust-item-label">Held-Out Test Players</div>
-                <a href="model.html" class="trust-link">Model diagnostics →</a>
-            </div>
-        </section>
+        </main>
     </div>
 
-    <!-- Scripts -->
-    <script src="js/club_logos_data.js"></script>
+    <script src="js/api.js"></script>
     <script src="js/utils.js"></script>
+    <script src="js/club_logos_data.js"></script>
+    <script src="js/charts.js"></script>
     <script src="js/components.js"></script>
-    <script src="js/motion.js"></script>
     <script src="js/dashboard.js"></script>
 </body>
 </html>
