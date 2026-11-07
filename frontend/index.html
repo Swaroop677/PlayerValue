@@ -7,8 +7,9 @@
     <script>
       (function() {
         try {
+          var u = new URLSearchParams(window.location.search).get('theme');
           var s = localStorage.getItem('playervalue_theme');
-          var t = s ? s : (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+          var t = u || s || (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
           document.documentElement.setAttribute('data-theme', t);
         } catch(e) {}
       })();
@@ -19,75 +20,165 @@
     <link rel="stylesheet" href="css/dashboard.css">
 </head>
 <body>
+    <!-- Top Progress Bar & Desktop Custom Cursor -->
+    <div id="scroll-progress" class="scroll-progress-bar" aria-hidden="true"></div>
+    <div id="custom-cursor-ring" class="custom-cursor-ring" aria-hidden="true"></div>
+    <div id="custom-cursor-dot" class="custom-cursor-dot" aria-hidden="true"></div>
+    <div class="grain-overlay" aria-hidden="true"></div>
+
     <div class="home-container">
-        <!-- Hero Section -->
+        <!-- Section 1: Hero (100vh Framing) -->
         <section class="home-hero">
-            <div class="home-model-pill">
-                <span class="home-model-pill-dot"></span>
-                <span>Model v2.0 · Trained on 10,715 player-seasons · Held-Out Validated</span>
-            </div>
+            <!-- Background Canvas: Interactive Market Particle Field -->
+            <canvas id="hero-canvas" class="hero-canvas" aria-hidden="true"></canvas>
 
-            <h1 class="home-hero-title">
-                Which players is the market getting wrong?
-            </h1>
-
-            <p class="home-hero-subtitle">
-                Model-implied valuations and machine-learning arbitrage across 10 seasons of verified European football records. Finding hidden statistical gems and exposing commercial hype.
-            </p>
-
-            <!-- Cmd+K Quick Search Box -->
-            <div class="home-search-wrap">
-                <div class="home-search-box">
-                    <svg class="home-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-                    </svg>
-                    <input type="text" id="home-search-input" class="home-search-input" placeholder="Search real players (e.g. Haaland, Saka, Bellingham)..." autocomplete="off">
-                    <span class="home-kbd-shortcut">⌘K</span>
+            <div class="hero-content">
+                <div class="home-model-pill">
+                    <span class="home-model-pill-dot"></span>
+                    <span>Model v2.0 · Trained on 10,715 player-seasons · Held-Out Validated</span>
                 </div>
-                <div id="home-search-dropdown" class="home-search-dropdown"></div>
+
+                <h1 class="home-hero-title">
+                    Which players is the market getting wrong?
+                </h1>
+
+                <p class="home-hero-subtitle">
+                    Model-implied valuations and machine-learning arbitrage across 10 seasons of verified European football records. Finding hidden statistical gems and exposing commercial hype.
+                </p>
+
+                <!-- Hero CTAs -->
+                <div class="hero-cta-group">
+                    <a href="#market-board" class="magnetic-btn">
+                        See undervalued players <span class="arrow-slide">→</span>
+                    </a>
+                    <a href="predictor.html" class="btn-ghost">
+                        Try the predictor
+                    </a>
+                </div>
+
+                <!-- Cmd+K Quick Search Box -->
+                <div class="home-search-wrap">
+                    <div class="home-search-box">
+                        <svg class="home-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                        </svg>
+                        <input type="text" id="home-search-input" class="home-search-input" placeholder="Search real players (e.g. Haaland, Saka, Bellingham)..." autocomplete="off">
+                        <span class="home-kbd-shortcut">⌘K</span>
+                    </div>
+                    <div id="home-search-dropdown" class="home-search-dropdown"></div>
+                </div>
+
+                <!-- Scroll Cue -->
+                <a href="#market-board" class="hero-scroll-cue" aria-label="Scroll to market board">
+                    <span>Explore Market</span>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M6 9l6 6 6-6"/>
+                    </svg>
+                </a>
             </div>
         </section>
 
-        <!-- Live Market Board: Undervalued vs Overvalued -->
-        <section class="market-board-section">
+        <!-- Section 2: Live Market Board ("Where the market disagrees") -->
+        <section id="market-board" class="market-board-section">
             <div class="market-board-header">
                 <div>
-                    <div class="market-board-title">Live Valuation Discrepancy Board</div>
-                    <div style="font-size:12.5px; color:var(--pv-muted); margin-top:2px;">Comparing Transfermarkt market value vs model-implied fair price</div>
+                    <h2 class="market-board-title">Where the market disagrees</h2>
+                    <div style="font-size:13px; color:var(--pv-muted); margin-top:4px;">
+                        Comparing Transfermarkt market value vs model-implied fair price
+                    </div>
                 </div>
-                <!-- League Filter Pills -->
-                <div class="market-league-pills">
-                    <button type="button" class="league-pill active" data-league="all">All Leagues</button>
-                    <button type="button" class="league-pill" data-league="Premier League">Premier League</button>
-                    <button type="button" class="league-pill" data-league="La Liga">La Liga</button>
-                    <button type="button" class="league-pill" data-league="Serie A">Serie A</button>
-                    <button type="button" class="league-pill" data-league="Bundesliga">Bundesliga</button>
-                    <button type="button" class="league-pill" data-league="Ligue 1">Ligue 1</button>
+
+                <div class="market-board-controls">
+                    <!-- Sliding Pill Tab Indicator -->
+                    <div class="board-view-tabs" role="tablist" aria-label="Board view filter">
+                        <div id="board-tab-pill-indicator" class="board-tab-pill-indicator"></div>
+                        <button type="button" class="board-view-tab active" data-tab="all" role="tab">All</button>
+                        <button type="button" class="board-view-tab" data-tab="undervalued" role="tab">Undervalued</button>
+                        <button type="button" class="board-view-tab" data-tab="overvalued" role="tab">Overvalued</button>
+                    </div>
+
+                    <!-- League Filter Chips -->
+                    <div class="market-league-pills" role="tablist" aria-label="League filter">
+                        <button type="button" class="league-pill active" data-league="all">All Leagues</button>
+                        <button type="button" class="league-pill" data-league="Premier League">Premier League</button>
+                        <button type="button" class="league-pill" data-league="La Liga">La Liga</button>
+                        <button type="button" class="league-pill" data-league="Serie A">Serie A</button>
+                        <button type="button" class="league-pill" data-league="Bundesliga">Bundesliga</button>
+                        <button type="button" class="league-pill" data-league="Ligue 1">Ligue 1</button>
+                    </div>
                 </div>
             </div>
 
             <div class="market-board-grid">
                 <!-- Column 1: Most Undervalued -->
-                <div class="board-card">
+                <div id="board-col-undervalued" class="board-card">
                     <div class="board-card-header">
                         <span class="board-col-title undervalued">Most Undervalued (Model > Market)</span>
                         <a href="opportunities.html" style="font-size:12px; color:var(--pv-accent); text-decoration:none; font-weight:500;">View All →</a>
                     </div>
-                    <div id="board-undervalued-list" class="board-list"></div>
+                    <div id="board-undervalued-list" class="board-list" aria-live="polite"></div>
                 </div>
 
                 <!-- Column 2: Most Overvalued -->
-                <div class="board-card">
+                <div id="board-col-overvalued" class="board-card">
                     <div class="board-card-header">
                         <span class="board-col-title overvalued">Most Overvalued (Market > Model)</span>
-                        <a href="opportunities.html" style="font-size:12px; color:#F87171; text-decoration:none; font-weight:500;">View All →</a>
+                        <a href="opportunities.html" style="font-size:12px; color:var(--pv-negative); text-decoration:none; font-weight:500;">View All →</a>
                     </div>
-                    <div id="board-overvalued-list" class="board-list"></div>
+                    <div id="board-overvalued-list" class="board-list" aria-live="polite"></div>
                 </div>
             </div>
         </section>
 
-        <!-- Spotlight Player of the Week -->
+        <!-- Section 3: How It Works (Scroll-Pinned Steps) -->
+        <section class="how-it-works-section">
+            <h2 class="how-it-works-title">How the Valuation Model Works</h2>
+            <div class="how-cards-grid">
+                <div class="how-card how-step-item">
+                    <div class="how-step-icon">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                        </svg>
+                    </div>
+                    <div class="how-card-num">01 / SIGNAL</div>
+                    <h3 class="how-card-title">Performance Signal</h3>
+                    <p class="how-card-desc">
+                        Evaluates underlying tactical metrics per 90: non-penalty expected goals (npxG), progressive carries, open-play key passes, and duel recovery rates.
+                    </p>
+                </div>
+
+                <div class="how-card how-step-item">
+                    <div class="how-step-icon">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="3"/>
+                            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                        </svg>
+                    </div>
+                    <div class="how-card-num">02 / CALIBRATION</div>
+                    <h3 class="how-card-title">Context Calibration</h3>
+                    <p class="how-card-desc">
+                        Adjusts for non-linear age trajectories (peak window 22–27), league tactical coefficient ratings, and club squad tiers without future data leakage.
+                    </p>
+                </div>
+
+                <div class="how-card how-step-item">
+                    <div class="how-step-icon">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="20" x2="18" y2="10"/>
+                            <line x1="12" y1="20" x2="12" y2="4"/>
+                            <line x1="6" y1="20" x2="6" y2="14"/>
+                        </svg>
+                    </div>
+                    <div class="how-card-num">03 / ARBITRAGE</div>
+                    <h3 class="how-card-title">Market Arbitrage</h3>
+                    <p class="how-card-desc">
+                        Computes exact Tree-SHAP attributions and 80% quantile confidence intervals, exposing commercial celebrity bias and finding undervalued gems.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 4: Spotlight Player (Scroll-Driven SHAP Waterfall) -->
         <section class="spotlight-section">
             <div class="spotlight-card">
                 <div>
@@ -106,11 +197,11 @@
                         </div>
                     </div>
 
-                    <div style="display:flex; gap:12px;">
-                        <a id="spotlight-predictor-btn" href="predictor.html" class="pred-btn active" style="text-decoration:none;">
+                    <div style="display:flex; gap:12px; flex-wrap:wrap;">
+                        <a id="spotlight-predictor-btn" href="predictor.html" class="magnetic-btn" style="text-decoration:none;">
                             Simulate in Predictor →
                         </a>
-                        <a href="player.html?id=1255" class="pred-btn" style="text-decoration:none;">
+                        <a href="player.html?id=1255" class="btn-ghost" style="text-decoration:none;">
                             Player Dossier
                         </a>
                     </div>
@@ -121,61 +212,37 @@
             </div>
         </section>
 
-        <!-- How It Works Section -->
-        <section class="how-it-works-section">
-            <div class="how-it-works-title">How the Valuation Model Works</div>
-            <div class="how-cards-grid">
-                <div class="how-card">
-                    <div class="how-card-num">01 / SIGNAL</div>
-                    <div class="how-card-title">Performance Signal</div>
-                    <p class="how-card-desc">
-                        Evaluates underlying tactical metrics per 90: non-penalty expected goals (npxG), progressive carries, open-play key passes, and duel recovery rates.
-                    </p>
-                </div>
-                <div class="how-card">
-                    <div class="how-card-num">02 / CALIBRATION</div>
-                    <div class="how-card-title">Context Calibration</div>
-                    <p class="how-card-desc">
-                        Adjusts for non-linear age trajectories (peak window 22–27), league tactical coefficient ratings, and club squad tiers without future data leakage.
-                    </p>
-                </div>
-                <div class="how-card">
-                    <div class="how-card-num">03 / ARBITRAGE</div>
-                    <div class="how-card-title">Market Arbitrage</div>
-                    <p class="how-card-desc">
-                        Computes exact Tree-SHAP attributions and 80% quantile confidence intervals, exposing commercial celebrity bias and finding undervalued gems.
-                    </p>
-                </div>
-            </div>
-        </section>
-
-        <!-- Trust Strip: Real Verified Held-Out Metrics -->
+        <!-- Section 5: Trust Strip: Real Held-Out Verified Metrics -->
         <section class="trust-strip">
-            <div>
-                <div id="trust-players" class="trust-item-val">1,886</div>
-                <div class="trust-item-label">Held-Out Players Evaluated</div>
+            <div style="text-align:center;">
+                <div id="trust-mae" class="trust-item-val" data-target-num="64.1" data-suffix="%">64.1%</div>
+                <div class="trust-item-label">Median Absolute Error</div>
+                <a href="model.html" class="trust-link">How we measure this →</a>
             </div>
-            <div style="width:1px; height:32px; background:var(--pv-border);"></div>
-            <div>
-                <div id="trust-mae" class="trust-item-val">€10.37M</div>
-                <div class="trust-item-label">Held-Out Test MAE</div>
+
+            <div style="width:1px; height:40px; background:var(--pv-border);" class="hide-mobile"></div>
+
+            <div style="text-align:center;">
+                <div id="trust-seasons" class="trust-item-val" data-target-num="10">10</div>
+                <div class="trust-item-label">Seasons Evaluated (2015-2025)</div>
+                <a href="model.html" class="trust-link">View data split →</a>
             </div>
-            <div style="width:1px; height:32px; background:var(--pv-border);"></div>
-            <div>
-                <div id="trust-ci" class="trust-item-val">73.4%</div>
-                <div class="trust-item-label">Within 80% Quantile CI</div>
-            </div>
-            <div style="width:1px; height:32px; background:var(--pv-border);"></div>
-            <div>
-                <div id="trust-r2" class="trust-item-val">0.2488</div>
-                <div class="trust-item-label">Held-Out Test R² (Log)</div>
+
+            <div style="width:1px; height:40px; background:var(--pv-border);" class="hide-mobile"></div>
+
+            <div style="text-align:center;">
+                <div id="trust-players" class="trust-item-val" data-target-num="1886">1,886</div>
+                <div class="trust-item-label">Held-Out Test Players</div>
+                <a href="model.html" class="trust-link">Model diagnostics →</a>
             </div>
         </section>
     </div>
 
+    <!-- Scripts -->
     <script src="js/club_logos_data.js"></script>
     <script src="js/utils.js"></script>
     <script src="js/components.js"></script>
+    <script src="js/motion.js"></script>
     <script src="js/dashboard.js"></script>
 </body>
 </html>

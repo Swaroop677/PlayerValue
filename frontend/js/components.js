@@ -159,7 +159,7 @@ function createFooter() {
                             <img src="assets/logo-full-dark.png" alt="PlayerValue" class="footer-logo-full logo-dark-only">
                         </div>
                         <p class="footer-desc">
-                            Real football intelligence and ML-powered player market valuations built on 10 seasons of verified top-5 European league data.
+                            Model-implied valuations and machine-learning arbitrage across 10 seasons of verified European football records. Exposing commercial hype, finding hidden gems.
                         </p>
                     </div>
 
@@ -174,7 +174,7 @@ function createFooter() {
                         <span class="footer-col-title">Intelligence</span>
                         <a href="opportunities.html" class="footer-link">Market Opportunities</a>
                         <a href="scouting.html" class="footer-link">Scouting Matrix</a>
-                        <a href="model.html" class="footer-link">Model Diagnostics</a>
+                        <a href="model.html" class="footer-link">Methodology & Diagnostics</a>
                     </div>
 
                     <div class="footer-col">
@@ -185,19 +185,30 @@ function createFooter() {
                     </div>
                 </div>
 
+                <div class="footer-wordmark-wrap" aria-hidden="true">
+                    <span class="footer-faint-wordmark">PLAYERVALUE</span>
+                </div>
+
                 <div class="footer-bottom">
                     <div>
                         © 2026 PlayerValue. Statistical valuations for intelligence, not commercial guarantees.
                     </div>
-                    <div>
-                        Data refreshed: 2024-25 Season (Latest verified)
+                    <div class="footer-back-to-top">
+                        <button type="button" class="back-to-top-btn" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
+                            <span>Back to top</span>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M18 15l-6-6-6 6"/>
+                            </svg>
+                        </button>
                     </div>
                     <div class="footer-signature">
-                        Made by Swaroop Mane
+                        Built for football intelligence
                     </div>
                 </div>
             </div>
         </footer>
+    `;
+}
     `;
 }
 

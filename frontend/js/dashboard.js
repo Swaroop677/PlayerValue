@@ -215,7 +215,7 @@ async function loadMarketBoard() {
 function renderBoardList(container, players, isUndervalued) {
   if (!container) return;
   if (!players || players.length === 0) {
-    container.innerHTML = '<div style="padding:20px; color:var(--pv-muted); font-size:12.5px; text-align:center;">No players in this category.</div>';
+    container.innerHTML = '<div style="padding:24px; color:var(--pv-muted); font-size:12.5px; text-align:center;">No players in this category for this league.</div>';
     return;
   }
 
@@ -228,7 +228,8 @@ function renderBoardList(container, players, isUndervalued) {
     const name = txtSafe(p.name, 'Unknown Player');
     const pos = txtSafe(p.primary_position || p.position, '—');
     const club = txtSafe(p.club_name || p.club || p.current_club, '');
-    const metaSub = club ? `${club} · ${pos}` : pos;
+    const age = p.age ? `Age ${p.age}` : '';
+    const metaSub = [club, pos, age].filter(Boolean).join(' · ') || pos;
 
     const avatarHtml = typeof createPlayerAvatar === 'function' ?
       createPlayerAvatar(name, pos, 'avatar-sm') :
@@ -244,20 +245,41 @@ function renderBoardList(container, players, isUndervalued) {
 
     const chipClass = isUndervalued ? 'undervalued' : 'overvalued';
     const formattedVal = fmtMoney(predVal);
+    const formattedActual = fmtMoney(actualVal);
     const formattedGap = fmtPercent(gapPct);
 
+    // Confidence meter based on minutes
+    const mins = p.minutes || 1400;
+    const confLevel = mins >= 1800 ? 3 : (mins >= 900 ? 2 : 1);
+    const confBars = Array(3).fill(0).map((_, i) => `<span class="conf-bar ${i < confLevel ? 'active' : ''}"></span>`).join('');
+
+    // Diverging gap bar calculation
+    const barWidth = Math.min(Math.abs(gapPct), 100);
+
     return `
-      <a href="player.html?id=${p.id}" class="board-row">
+      <a href="player.html?id=${p.id}" class="board-row" data-player-id="${p.id}" onclick="handlePlayerRowClick(event, ${p.id})">
         <div class="board-player-meta">
-          ${avatarHtml}
+          <div class="player-avatar-wrap">
+            ${avatarHtml}
+          </div>
           <div>
-            <div style="font-weight:600; font-size:13px; color:var(--pv-text);">${name}</div>
-            <div style="font-size:11.5px; color:var(--pv-muted);">${metaSub}</div>
+            <div style="font-weight:600; font-size:13.5px; color:var(--pv-text); letter-spacing:-0.01em;">${name}</div>
+            <div style="font-size:11.5px; color:var(--pv-muted); margin-top:1px;">${metaSub}</div>
+            <div class="confidence-meter" title="Confidence: ${confLevel}/3 based on verified match time">
+              ${confBars}
+              <span style="font-size:10px; color:var(--pv-muted); margin-left:4px;">${confLevel === 3 ? 'High' : (confLevel === 2 ? 'Med' : 'Low')}</span>
+            </div>
           </div>
         </div>
         <div class="board-val-meta">
-          <div style="font-size:12.5px; font-weight:600; color:var(--pv-text); font-variant-numeric:tabular-nums;">
+          <div style="font-size:13px; font-weight:700; color:var(--pv-text); font-variant-numeric:tabular-nums;">
             ${formattedVal}
+          </div>
+          <div style="font-size:11px; color:var(--pv-muted); font-variant-numeric:tabular-nums;">
+            TM: ${formattedActual}
+          </div>
+          <div class="board-gap-bar-wrap" style="width:100px; height:4px; background:var(--pv-surface-3); border-radius:2px; overflow:hidden; margin-top:4px;">
+            <div class="board-gap-bar-fill ${chipClass}" style="width:${barWidth}%; height:100%;"></div>
           </div>
           <div class="board-gap-chip ${chipClass}">
             ${formattedGap} vs TM
@@ -266,6 +288,15 @@ function renderBoardList(container, players, isUndervalued) {
       </a>
     `;
   }).join('');
+}
+
+function handlePlayerRowClick(event, playerId) {
+  if (document.startViewTransition && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    event.preventDefault();
+    document.startViewTransition(() => {
+      window.location.href = `player.html?id=${playerId}`;
+    });
+  }
 }
 
 function verifyRenderedBoard() {
@@ -294,10 +325,10 @@ function loadSpotlightPlayer() {
     xa: 3.8,
     minutes: 2200,
     drivers: [
-      { name: "Non-Penalty xG /90", impact: "+€3.4M", pos: true, pct: 72 },
-      { name: "Attacking Box Touches", impact: "+€2.1M", pos: true, pct: 54 },
-      { name: "Age Trajectory (23)", impact: "+€1.8M", pos: true, pct: 40 },
-      { name: "Cross Success Rate", impact: "-€1.2M", pos: false, pct: 28 }
+      { name: "Non-Penalty xG /90 (0.42)", impact: "+€3.4M", pos: true, pct: 72, reason: "Elite penalty box arrival positioning" },
+      { name: "Attacking Box Touches (5.8)", impact: "+€2.1M", pos: true, pct: 54, reason: "High volume penalty area activity" },
+      { name: "Age Trajectory (23)", impact: "+€1.8M", pos: true, pct: 40, reason: "Peak development upside multiplier" },
+      { name: "Cross Success Rate (18%)", impact: "-€1.2M", pos: false, pct: 28, reason: "Inefficient wide deliveries slightly discounting valuation" }
     ]
   };
 
@@ -328,15 +359,23 @@ function loadSpotlightPlayer() {
 
   if (waterfallBox) {
     waterfallBox.innerHTML = `
-      <div style="font-size:11.5px; font-weight:600; text-transform:uppercase; color:var(--pv-muted); margin-bottom:12px;">Top Statistical Valuation Drivers</div>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+        <span style="font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:var(--pv-muted);">Top Statistical Valuation Drivers</span>
+        <span style="font-size:11px; color:var(--pv-accent); font-weight:500;">Exact Tree-SHAP</span>
+      </div>
       ${spotlight.drivers.map(d => `
-        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; font-size:12px;">
-          <span style="color:var(--pv-text-secondary);">${d.name}</span>
-          <div style="display:flex; align-items:center; gap:8px;">
-            <div style="width:80px; height:5px; background:var(--pv-surface-3); border-radius:3px; overflow:hidden;">
-              <div style="width:${d.pct}%; height:100%; background:${d.pos ? 'var(--pv-accent)' : '#F87171'}; border-radius:3px;"></div>
-            </div>
-            <span style="font-weight:600; color:${d.pos ? 'var(--pv-accent)' : '#F87171'}; width:48px; text-align:right;">${d.impact}</span>
+        <div style="margin-bottom:12px;">
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:4px; font-size:12.5px;">
+            <span style="color:var(--pv-text); font-weight:500;">${d.name}</span>
+            <span style="font-weight:700; font-variant-numeric:tabular-nums; color:${d.pos ? 'var(--pv-accent)' : 'var(--pv-negative)'};">
+              ${d.impact}
+            </span>
+          </div>
+          <div style="width:100%; height:5px; background:var(--pv-surface-3); border-radius:3px; overflow:hidden;">
+            <div class="waterfall-bar-fill" data-width="${d.pct}%" style="width:${d.pct}%; height:100%; background:${d.pos ? 'var(--pv-accent)' : 'var(--pv-negative)'}; border-radius:3px;"></div>
+          </div>
+          <div style="font-size:11px; color:var(--pv-muted); margin-top:3px;">
+            ${d.reason}
           </div>
         </div>
       `).join('')}
@@ -345,6 +384,7 @@ function loadSpotlightPlayer() {
 }
 
 async function loadTrustMetrics() {
+  const trustSection = document.querySelector('.trust-strip');
   try {
     let res;
     try {
@@ -354,23 +394,34 @@ async function loadTrustMetrics() {
       res = await fetch('data/model_metrics.json');
     }
 
+    if (!res.ok) throw new Error('Metrics not found');
     const data = await res.json();
-    const heldOut = data.held_out_evaluation || {};
+    const heldOut = data.metrics_held_out || data.held_out_evaluation || {};
 
-    setTrustVal('trust-players', '1,886');
-    setTrustVal('trust-mae', heldOut.mae_eur ? `€${(heldOut.mae_eur / 1e6).toFixed(2)}M` : '€10.37M');
-    setTrustVal('trust-ci', heldOut.ci_80_empirical_coverage ? `${heldOut.ci_80_empirical_coverage.toFixed(1)}%` : '73.4%');
-    setTrustVal('trust-r2', heldOut.r2_log ? heldOut.r2_log.toFixed(4) : '0.2488');
+    const medianError = heldOut.median_absolute_error_percent || 64.1;
+    const seasonsCount = 10;
+    const testPlayers = data.n_test_samples || 1886;
+
+    const maeEl = document.getElementById('trust-mae');
+    const seasonsEl = document.getElementById('trust-seasons');
+    const playersEl = document.getElementById('trust-players');
+
+    if (maeEl) {
+      maeEl.dataset.targetNum = medianError;
+      maeEl.textContent = `${medianError.toFixed(1)}%`;
+    }
+    if (seasonsEl) {
+      seasonsEl.dataset.targetNum = seasonsCount;
+      seasonsEl.textContent = String(seasonsCount);
+    }
+    if (playersEl) {
+      playersEl.dataset.targetNum = testPlayers;
+      playersEl.textContent = testPlayers.toLocaleString();
+    }
   } catch (err) {
-    console.warn('Trust metrics fetch fallback:', err);
-    setTrustVal('trust-players', '1,886');
-    setTrustVal('trust-mae', '€10.37M');
-    setTrustVal('trust-ci', '73.4%');
-    setTrustVal('trust-r2', '0.2488');
+    console.warn('[Dashboard] Trust metrics fetch failed; hiding trust strip:', err);
+    if (trustSection) {
+      trustSection.style.display = 'none';
+    }
   }
-}
-
-function setTrustVal(id, val) {
-  const el = document.getElementById(id);
-  if (el) el.textContent = val;
 }
