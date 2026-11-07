@@ -4,6 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PlayerValue | Players Database</title>
+    <script>
+      (function() {
+        try {
+          var s = localStorage.getItem('playervalue_theme');
+          var t = s ? s : (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+          document.documentElement.setAttribute('data-theme', t);
+        } catch(e) {}
+      })();
+    </script>
+    <link rel="icon" type="image/png" href="assets/logo-icon.png">
+    <link rel="stylesheet" href="css/tokens.css">
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>

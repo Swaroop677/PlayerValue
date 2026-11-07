@@ -1,3 +1,5 @@
+@import './tokens.css';
+
 /* ========================================================
    HOMEPAGE DASHBOARD - DESIGN SYSTEM
    Linear / Vercel Aesthetic: Calm, High Contrast, Hairline Borders
@@ -409,14 +411,19 @@
 }
 
 .spotlight-card {
-  background: linear-gradient(135deg, #13171F 0%, #0D1016 100%);
-  border: 1px solid var(--pv-border, rgba(255, 255, 255, 0.08));
+  background: var(--pv-surface);
+  border: 1px solid var(--pv-border);
   border-radius: 20px;
   padding: 32px;
   display: grid;
   grid-template-columns: 1fr 1.2fr;
   gap: 32px;
   align-items: center;
+  box-shadow: var(--shadow-md);
+}
+
+[data-theme="dark"] .spotlight-card {
+  background: linear-gradient(135deg, #13171F 0%, #0D1016 100%);
 }
 
 @media (max-width: 900px) {

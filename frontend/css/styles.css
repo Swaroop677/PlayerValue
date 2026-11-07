@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import './tokens.css';
 
 /* ========================================================
    MINIMAL, CASUAL, VIBRANT DESIGN SYSTEM
@@ -377,24 +378,79 @@ input, button, select, textarea {
 }
 
 .theme-toggle-btn {
-  background: var(--color-surface);
+  background: var(--color-surface-2, var(--color-surface));
   border: 1px solid var(--color-border);
-  color: var(--color-ink-soft);
+  color: var(--color-ink);
   font-weight: 500;
   font-size: 13px;
-  padding: 7px 14px;
+  padding: 6px 14px;
   border-radius: var(--radius-pill);
   cursor: pointer;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   transition: all var(--dur-micro) var(--ease-out);
+  box-shadow: var(--shadow-sm);
 }
 
 .theme-toggle-btn:hover {
-  background: var(--color-surface-alt);
+  background: var(--color-surface-3, var(--color-surface-alt));
   color: var(--color-ink);
+  border-color: var(--color-border-hover, var(--color-border));
   transform: translateY(-1px);
+}
+
+.theme-icon-wrap {
+  position: relative;
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.theme-icon {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  stroke: currentColor;
+  transition: transform 320ms cubic-bezier(0.22, 1, 0.36, 1), opacity 220ms ease;
+}
+
+[data-theme="dark"] .sun-icon {
+  transform: rotate(0deg) scale(1);
+  opacity: 1;
+}
+[data-theme="dark"] .moon-icon {
+  transform: rotate(-90deg) scale(0);
+  opacity: 0;
+}
+[data-theme="light"] .sun-icon {
+  transform: rotate(90deg) scale(0);
+  opacity: 0;
+}
+[data-theme="light"] .moon-icon {
+  transform: rotate(0deg) scale(1);
+  opacity: 1;
+}
+
+/* View Transitions Circular Reveal */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+::view-transition-old(root) {
+  z-index: 1;
+}
+::view-transition-new(root) {
+  z-index: 9999;
+}
+[data-theme="dark"]::view-transition-old(root) {
+  z-index: 9999;
+}
+[data-theme="dark"]::view-transition-new(root) {
+  z-index: 1;
 }
 
 /* ========================================================

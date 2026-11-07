@@ -1,25 +1,13 @@
+@import './tokens.css';
+
 /* ========================================================
    VALUATION PREDICTOR - LINEAR / VERCEL DESIGN SYSTEM
    Aesthetic: Minimal, calm, high-contrast, emerald accent
    ======================================================== */
 
 :root {
-  --pv-bg: #0A0B0D;
-  --pv-surface: #111317;
-  --pv-surface-2: #16191E;
-  --pv-surface-3: #1E232B;
-  --pv-border: rgba(255, 255, 255, 0.07);
-  --pv-border-hover: rgba(255, 255, 255, 0.14);
-  --pv-border-focus: rgba(52, 211, 153, 0.4);
-  --pv-text: #E8EAED;
-  --pv-text-secondary: #C4C8D0;
-  --pv-muted: #8B919A;
-  --pv-accent: #34D399;
-  --pv-accent-hover: #2ee6a6;
-  --pv-accent-soft: rgba(52, 211, 153, 0.12);
-  --pv-accent-glow: rgba(52, 211, 153, 0.25);
-  --pv-negative: #F87171;
-  --pv-negative-soft: rgba(248, 113, 113, 0.12);
+  --pv-border-focus: rgba(46, 230, 166, 0.4);
+  --pv-accent-glow: rgba(46, 230, 166, 0.25);
   --pv-radius-card: 16px;
   --pv-radius-input: 10px;
   --pv-radius-pill: 9999px;
@@ -28,23 +16,9 @@
 
 /* Light mode overrides if user toggles theme */
 [data-theme="light"] {
-  --pv-bg: #F8F9FA;
-  --pv-surface: #FFFFFF;
-  --pv-surface-2: #F1F3F5;
-  --pv-surface-3: #E9ECEF;
-  --pv-border: rgba(0, 0, 0, 0.08);
-  --pv-border-hover: rgba(0, 0, 0, 0.16);
-  --pv-border-focus: rgba(16, 185, 129, 0.5);
-  --pv-text: #111827;
-  --pv-text-secondary: #374151;
-  --pv-muted: #6B7280;
-  --pv-accent: #059669;
-  --pv-accent-hover: #047857;
-  --pv-accent-soft: rgba(5, 150, 105, 0.12);
-  --pv-accent-glow: rgba(5, 150, 105, 0.2);
-  --pv-negative: #DC2626;
-  --pv-negative-soft: rgba(220, 38, 38, 0.1);
-  --pv-shadow-sticky: 0 12px 30px -8px rgba(0, 0, 0, 0.1), 0 0 0 1px var(--pv-border);
+  --pv-border-focus: rgba(15, 169, 113, 0.5);
+  --pv-accent-glow: rgba(15, 169, 113, 0.2);
+  --pv-shadow-sticky: 0 12px 30px -8px rgba(10, 15, 25, 0.08), 0 0 0 1px var(--pv-border);
 }
 
 body {
@@ -285,8 +259,9 @@ body {
   bottom: 22px;
   left: 50%;
   transform: translateX(-50%);
-  background: #000000;
-  color: #FFFFFF;
+  background: var(--pv-surface-3);
+  color: var(--pv-text);
+  border: 1px solid var(--pv-border);
   padding: 6px 10px;
   border-radius: 6px;
   font-size: 11px;
@@ -864,8 +839,9 @@ body {
   position: fixed;
   bottom: 24px;
   right: 24px;
-  background: #000000;
-  color: #FFFFFF;
+  background: var(--pv-surface-3);
+  color: var(--pv-text);
+  border: 1px solid var(--pv-border);
   border: 1px solid rgba(255, 255, 255, 0.15);
   padding: 10px 16px;
   border-radius: var(--pv-radius-input);
