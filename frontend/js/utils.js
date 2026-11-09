@@ -489,22 +489,61 @@ const TOP_PLAYER_PHOTOS = {
     "Loïs Openda": "https://img.a.transfermarkt.technology/portrait/big/368887-1713944805.jpg?lm=1"
 };
 
-function getPlayerPhotoUrl(name) {
-    if (!name) return null;
-    return TOP_PLAYER_PHOTOS[name] || null;
+function getPlayerPhotoUrl(nameOrPlayer, maybeId = null) {
+    if (!nameOrPlayer && !maybeId) return null;
+
+    let id = maybeId;
+    let name = '';
+    let directImg = null;
+
+    if (typeof nameOrPlayer === 'object' && nameOrPlayer !== null) {
+        id = nameOrPlayer.id || id;
+        name = nameOrPlayer.name || '';
+        directImg = nameOrPlayer.image_url || nameOrPlayer.photo_url || null;
+    } else {
+        name = String(nameOrPlayer || '').trim();
+    }
+
+    if (directImg && typeof directImg === 'string' && directImg.startsWith('http')) {
+        return directImg;
+    }
+
+    if (typeof PLAYER_PHOTOS_DATA !== 'undefined' && PLAYER_PHOTOS_DATA) {
+        if (id && PLAYER_PHOTOS_DATA[id]) return PLAYER_PHOTOS_DATA[id];
+        if (id && PLAYER_PHOTOS_DATA[String(id)]) return PLAYER_PHOTOS_DATA[String(id)];
+        if (name && PLAYER_PHOTOS_DATA[name]) return PLAYER_PHOTOS_DATA[name];
+        if (name && PLAYER_PHOTOS_DATA[name.toLowerCase()]) return PLAYER_PHOTOS_DATA[name.toLowerCase()];
+    }
+
+    if (typeof TOP_PLAYER_PHOTOS !== 'undefined' && TOP_PLAYER_PHOTOS) {
+        if (name && TOP_PLAYER_PHOTOS[name]) return TOP_PLAYER_PHOTOS[name];
+        if (name && TOP_PLAYER_PHOTOS[name.toLowerCase()]) return TOP_PLAYER_PHOTOS[name.toLowerCase()];
+    }
+
+    return null;
 }
 
-function createPlayerAvatar(name, position, sizeClass = '') {
+function createPlayerAvatar(nameOrPlayer, position = '', sizeClass = '', maybeId = null) {
+    let name = '';
+    let id = maybeId;
+    if (typeof nameOrPlayer === 'object' && nameOrPlayer !== null) {
+        name = nameOrPlayer.name || '';
+        id = nameOrPlayer.id || id;
+    } else {
+        name = String(nameOrPlayer || '').trim();
+    }
+
     const initials = getInitials(name);
-    const photoUrl = getPlayerPhotoUrl(name);
+    const photoUrl = getPlayerPhotoUrl(nameOrPlayer, id);
+    const safeName = (name || '').replace(/"/g, '&quot;');
+
     if (photoUrl) {
-        const safeName = (name || '').replace(/"/g, '&quot;');
         return `<div class="player-avatar has-photo ${sizeClass}" title="${safeName}">
             <img src="${photoUrl}" alt="${safeName}" loading="lazy" decoding="async"
-                 onerror="if(this.src.includes('/big/')){this.src=this.src.replace('/big/','/header/');}else{this.parentElement.classList.remove('has-photo');this.parentElement.innerHTML='${initials}';}">
+                 onerror="if(this.src.includes('/big/')){this.src=this.src.replace('/big/','/header/');}else if(this.src.includes('/header/')){this.src=this.src.replace('/header/','/medium/');}else{this.parentElement.classList.remove('has-photo');this.parentElement.innerHTML='${initials}';}">
         </div>`;
     }
-    return `<div class="player-avatar ${sizeClass}">${initials}</div>`;
+    return `<div class="player-avatar ${sizeClass}" title="${safeName}">${initials}</div>`;
 }
 
 function getClubLogoUrl(clubId, clubName) {

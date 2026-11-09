@@ -56,6 +56,7 @@ def get_dashboard_data(db: Session) -> Dict[str, Any]:
         return {
             "id": player.id,
             "name": player.name,
+            "image_url": getattr(player, "image_url", None),
             "age": player.age,
             "primary_position": player.primary_position,
             "club_name": club_name,

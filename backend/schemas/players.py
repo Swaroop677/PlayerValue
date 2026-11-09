@@ -7,6 +7,7 @@ class PlayerListItem(BaseModel):
     name: str
     age: Optional[int]
     primary_position: Optional[str]
+    image_url: Optional[str] = None
     club_name: Optional[str]
     league_name: Optional[str]
     nationality: Optional[str]
@@ -91,6 +92,7 @@ class SimilarPlayerItem(BaseModel):
     name: str
     age: Optional[int]
     primary_position: Optional[str]
+    image_url: Optional[str] = None
     club_name: Optional[str]
     market_value_eur: Optional[float]
     similarity_percent: float

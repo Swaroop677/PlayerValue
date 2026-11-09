@@ -233,18 +233,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                 createValueAgeChart('value-age-chart', fallback, initialType);
             });
 
-        // 7. Fetch Club Squad Values
-        fetchAPI('/analytics/club-squad-values')
-            .then(clubs => {
-                if (clubs && clubs.length > 0) {
-                    createBarChart(
-                        'club-squad-chart',
-                        clubs.map(c => c.club_name),
-                        clubs.map(c => c.total_market_value_eur)
-                    );
-                }
-            })
-            .catch(err => console.warn('Club squad chart skip:', err));
 
     } catch (error) {
         console.error('Error loading dashboard:', error);

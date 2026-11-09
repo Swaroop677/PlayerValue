@@ -87,6 +87,7 @@ class Player(Base):
     height_cm = Column(Integer, nullable=True)
     preferred_foot = Column(String(10), nullable=True)  # "Left", "Right", "Both"
     primary_position = Column(String(5), nullable=False)  # GK, CB, LB, RB, CM, AM, LW, RW, ST
+    image_url = Column(String(500), nullable=True)
 
     # Relationships
     club_histories = relationship("PlayerClubHistory", back_populates="player", order_by="PlayerClubHistory.season")

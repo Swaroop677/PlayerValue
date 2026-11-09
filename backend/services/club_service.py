@@ -134,6 +134,7 @@ def get_club_detail(db: Session, club_id: int) -> Optional[ClubDetail]:
             name=p.name,
             age=p.age,
             primary_position=p.primary_position,
+            image_url=getattr(p, 'image_url', None),
             club_name=club.name,
             league_name=league_name,
             nationality=p.nationality,

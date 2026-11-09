@@ -118,6 +118,7 @@ def api_get_top_discrepancies(
             ModelPrediction.predicted_value_eur,
             ModelPrediction.difference_percent,
             SeasonStats.minutes,
+            Player.image_url,
         )
         .join(latest_pred_sub, Player.id == latest_pred_sub.c.player_id)
         .join(
@@ -181,6 +182,7 @@ def api_get_top_discrepancies(
             "value_gap_percent": round(float(r[8] or 0), 1),
             "difference_percent": round(float(r[8] or 0), 1),
             "minutes": int(r[9] or 0),
+            "image_url": r[10] or "",
         }
 
     data = {

@@ -43,11 +43,16 @@ function renderClub(club) {
             ${createStatCard('Average Age', formatNumber(club.avg_age, 1) + ' yrs')}
         </div>
 
-        <div class="grid-2 mb-4" style="grid-template-columns: 2fr 1fr;">
-            <div class="card">
-                <h3 class="card-title">Squad Roster</h3>
-                <div class="table-container" style="max-height: 500px; overflow-y: auto;">
-                    <table class="data-table">
+        <div class="club-layout-grid mb-4">
+            <div class="card" style="display:flex; flex-direction:column; min-width:0;">
+                <div class="card-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                    <div>
+                        <h3 class="card-title">Squad Roster</h3>
+                        <p class="card-subtitle">${(club.roster || []).length} active squad members</p>
+                    </div>
+                </div>
+                <div class="table-container club-squad-table-container">
+                    <table class="data-table" style="width:100%; min-width:600px;">
                         <thead>
                             <tr>
                                 <th>Player</th>
@@ -65,11 +70,11 @@ function renderClub(club) {
                                 <tr onmouseenter="prefetchPlayer(${p.id})" style="cursor:pointer" onclick="window.location.href='player.html?id=${p.id}'">
                                     <td>
                                         <div style="display:flex; align-items:center; gap:10px;">
-                                            ${createPlayerAvatar(p.name, p.primary_position)}
+                                            ${createPlayerAvatar(p.name, p.primary_position, '', p.id)}
                                             <span style="font-weight:600; color:var(--color-ink);">${p.name}</span>
                                         </div>
                                     </td>
-                                    <td class="tabular-nums">${p.age}</td>
+                                    <td class="tabular-nums">${p.age || '—'}</td>
                                     <td><span class="${getPositionBadgeClass(p.primary_position)}">${p.primary_position}</span></td>
                                     <td class="tabular-nums"><strong>${formatCurrency(p.market_value_eur)}</strong></td>
                                     <td class="tabular-nums" style="color: var(--color-primary-dark); font-weight:600;">${formatCurrency(p.predicted_value_eur)}</td>
@@ -82,7 +87,7 @@ function renderClub(club) {
                 </div>
             </div>
             
-            <div class="card">
+            <div class="card" style="min-width:0;">
                 <h3 class="card-title">Value Distribution by Position</h3>
                 <div class="chart-container" style="height: 300px;">
                     <canvas id="dist-chart"></canvas>
