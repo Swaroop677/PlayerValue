@@ -4,7 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PlayerValue | Valuation Predictor</title>
+    <link rel="icon" type="image/png" href="assets/logo-icon.png">
     <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/predictor_redesign.css">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 <body>
@@ -12,133 +15,360 @@
         <main class="main-content">
             <div id="breadcrumbs-container"></div>
 
-            <header class="page-header">
+            <header class="page-header" style="margin-bottom: 20px;">
                 <div>
                     <h1 class="page-title">Valuation Predictor</h1>
-                    <p class="page-subtitle">Interactive what-if simulator: test player performance stat lines and compute model-implied market value in real-time.</p>
+                    <p class="page-subtitle">Interactive ML simulator: customize performance stat lines or load real superstar presets to compute live AI-implied valuations with Tree-SHAP attribution.</p>
                 </div>
             </header>
 
-            <div class="grid-2 mb-4" style="grid-template-columns: 1.15fr 0.85fr; gap: 24px;">
-                <!-- Form Inputs -->
-                <div class="card">
-                    <div class="card-header">
-                        <div>
-                            <h3 class="card-title">Performance Metrics & Profile</h3>
-                            <p class="card-subtitle">Adjust parameters to simulate market valuations</p>
+            <div class="predictor-container">
+                <!-- PRESET GALLERY CARD -->
+                <div class="preset-gallery-card">
+                    <div class="preset-gallery-header">
+                        <div class="preset-title-group">
+                            <h2>Superstar Preset Gallery</h2>
+                            <p>Select a benchmark player across 7 tactical positions to load realistic full-season metrics</p>
                         </div>
-                        <button class="btn btn-secondary" onclick="loadPreset('haaland')" style="font-size:12px; padding:6px 12px;">Haaland Preset</button>
+                        <div class="preset-tabs" id="preset-tabs-bar"></div>
                     </div>
-
-                    <form id="predictor-form" onsubmit="runPrediction(event)">
-                        <div class="grid-2 mb-2">
-                            <div class="filter-group">
-                                <label class="filter-label">Position</label>
-                                <select id="p-position" class="filter-input">
-                                    <option value="ST" selected>Striker (ST)</option>
-                                    <option value="RW">Right Winger (RW)</option>
-                                    <option value="LW">Left Winger (LW)</option>
-                                    <option value="AM">Attacking Midfield (AM)</option>
-                                    <option value="CM">Central Midfield (CM)</option>
-                                    <option value="DM">Defensive Midfield (DM)</option>
-                                    <option value="CB">Centre-Back (CB)</option>
-                                    <option value="LB">Left-Back (LB)</option>
-                                    <option value="RB">Right-Back (RB)</option>
-                                    <option value="GK">Goalkeeper (GK)</option>
-                                </select>
-                            </div>
-                            <div class="filter-group">
-                                <label class="filter-label">Player Age</label>
-                                <input type="number" id="p-age" class="filter-input" value="23" min="16" max="42">
-                            </div>
-                        </div>
-
-                        <div class="grid-2 mb-2">
-                            <div class="filter-group">
-                                <label class="filter-label">League Strength (1.0 - 5.0)</label>
-                                <input type="number" id="p-league" class="filter-input" value="5.0" step="0.1" min="1.0" max="5.0">
-                            </div>
-                            <div class="filter-group">
-                                <label class="filter-label">Minutes Played</label>
-                                <input type="number" id="p-minutes" class="filter-input" value="2400" min="90" max="4000">
-                            </div>
-                        </div>
-
-                        <div style="font-size:11.5px; font-weight:700; color:var(--color-primary-dark); text-transform:uppercase; margin:16px 0 8px 0;">Attacking & Playmaking</div>
-                        <div class="grid-3 mb-2">
-                            <div class="filter-group">
-                                <label class="filter-label">Goals</label>
-                                <input type="number" id="p-goals" class="filter-input" value="25" min="0">
-                            </div>
-                            <div class="filter-group">
-                                <label class="filter-label">Assists</label>
-                                <input type="number" id="p-assists" class="filter-input" value="7" min="0">
-                            </div>
-                            <div class="filter-group">
-                                <label class="filter-label">Expected Goals (xG)</label>
-                                <input type="number" id="p-xg" class="filter-input" value="22.4" step="0.1" min="0">
-                            </div>
-                        </div>
-
-                        <div class="grid-3 mb-2">
-                            <div class="filter-group">
-                                <label class="filter-label">Expected Assists (xA)</label>
-                                <input type="number" id="p-xa" class="filter-input" value="6.1" step="0.1" min="0">
-                            </div>
-                            <div class="filter-group">
-                                <label class="filter-label">Shots</label>
-                                <input type="number" id="p-shots" class="filter-input" value="95" min="0">
-                            </div>
-                            <div class="filter-group">
-                                <label class="filter-label">Key Passes</label>
-                                <input type="number" id="p-kp" class="filter-input" value="38" min="0">
-                            </div>
-                        </div>
-
-                        <div style="font-size:11.5px; font-weight:700; color:var(--color-ink-soft); text-transform:uppercase; margin:16px 0 8px 0;">Progression & Defending</div>
-                        <div class="grid-3 mb-4">
-                            <div class="filter-group">
-                                <label class="filter-label">Prog. Carries</label>
-                                <input type="number" id="p-prgc" class="filter-input" value="65" min="0">
-                            </div>
-                            <div class="filter-group">
-                                <label class="filter-label">Prog. Passes</label>
-                                <input type="number" id="p-prgp" class="filter-input" value="70" min="0">
-                            </div>
-                            <div class="filter-group">
-                                <label class="filter-label">Tackles</label>
-                                <input type="number" id="p-tkl" class="filter-input" value="18" min="0">
-                            </div>
-                        </div>
-
-                        <button type="submit" class="btn btn-primary" style="width:100%; padding:12px; font-size:14.5px;">
-                            Calculate Implied Valuation
-                        </button>
-                    </form>
+                    <div class="preset-cards-carousel" id="preset-cards-carousel"></div>
                 </div>
 
-                <!-- Prediction Results -->
-                <div style="display:flex; flex-direction:column; gap:20px;">
-                    <div class="card" style="border: 1px solid var(--color-border);">
-                        <span class="badge" style="background:var(--color-primary-tint); color:var(--color-primary-dark); font-weight:700; margin-bottom:10px;">XGBoost Regressor</span>
-                        <div class="kpi-label">Model-Implied Valuation</div>
-                        <div id="pred-result-val" class="tabular-nums" style="font-size:42px; font-weight:800; color:var(--color-primary-dark); line-height:1.1; margin:6px 0 10px 0;">
-                            €--.-M
+                <!-- MAIN 2-COLUMN SIMULATOR LAYOUT -->
+                <div class="predictor-main-grid">
+                    <!-- LEFT COLUMN: INPUT CONTROLS -->
+                    <div class="form-card">
+                        <div class="form-header">
+                            <div>
+                                <h3 class="form-title">Performance Metrics & Profile</h3>
+                                <p class="form-subtitle">Fine-tune stats with synced sliders & numeric steppers</p>
+                            </div>
+                            <div class="form-actions">
+                                <button type="button" class="form-btn-secondary" onclick="resetForm()">
+                                    <i class="ph ph-arrow-counter-clockwise"></i> Reset
+                                </button>
+                                <button type="button" class="form-btn-secondary" onclick="copyShareLink()">
+                                    <i class="ph ph-share-network"></i> Share
+                                </button>
+                            </div>
                         </div>
-                        <div style="font-size:13px; color:var(--color-ink-soft);">
-                            Confidence Range: <strong id="pred-range-val" class="tabular-nums" style="color:var(--color-ink)">€--M – €--M</strong>
+
+                        <div class="form-body">
+                            <!-- Visual Position Selector -->
+                            <div class="input-field-group">
+                                <div class="field-label-row">
+                                    <span class="field-label">Tactical Position</span>
+                                    <span class="field-hint">Defines model role encoding</span>
+                                </div>
+                                <div class="position-picker" id="position-picker"></div>
+                            </div>
+
+                            <!-- Club Tier Selector -->
+                            <div class="input-field-group">
+                                <div class="field-label-row">
+                                    <span class="field-label">Club Prestige & Resource Tier</span>
+                                    <span class="field-hint">Drives European market multiplier</span>
+                                </div>
+                                <div class="tier-selector-grid" id="tier-selector"></div>
+                            </div>
+
+                            <!-- Core Profile Grid -->
+                            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px;">
+                                <!-- Age -->
+                                <div class="input-field-group">
+                                    <div class="field-label-row">
+                                        <span class="field-label">Player Age</span>
+                                        <span class="field-hint">16 – 42 yrs</span>
+                                    </div>
+                                    <div class="field-controls-row">
+                                        <input type="range" class="field-slider" id="sl-age" min="16" max="40" step="1" value="24">
+                                        <div class="field-num-stepper">
+                                            <button type="button" class="stepper-btn" onclick="stepField('age', -1)">-</button>
+                                            <input type="number" id="in-age" value="24" min="16" max="40">
+                                            <button type="button" class="stepper-btn" onclick="stepField('age', 1)">+</button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Minutes -->
+                                <div class="input-field-group">
+                                    <div class="field-label-row">
+                                        <span class="field-label">Season Minutes</span>
+                                        <span class="field-hint">Starting volume</span>
+                                    </div>
+                                    <div class="field-controls-row">
+                                        <input type="range" class="field-slider" id="sl-minutes" min="450" max="4000" step="50" value="3100">
+                                        <div class="field-num-stepper">
+                                            <button type="button" class="stepper-btn" onclick="stepField('minutes', -90)">-</button>
+                                            <input type="number" id="in-minutes" value="3100" min="450" max="4000">
+                                            <button type="button" class="stepper-btn" onclick="stepField('minutes', 90)">+</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- League Strength -->
+                            <div class="input-field-group">
+                                <div class="field-label-row">
+                                    <span class="field-label">League Quality Rating</span>
+                                    <span class="field-hint">5.0 (EPL / La Liga) – 3.0 (Mid-tier Europe)</span>
+                                </div>
+                                <div class="field-controls-row">
+                                    <input type="range" class="field-slider" id="sl-league_strength" min="1.0" max="5.0" step="0.1" value="5.0">
+                                    <div class="field-num-stepper">
+                                        <button type="button" class="stepper-btn" onclick="stepField('league_strength', -0.1)">-</button>
+                                        <input type="number" id="in-league_strength" value="5.0" step="0.1" min="1.0" max="5.0">
+                                        <button type="button" class="stepper-btn" onclick="stepField('league_strength', 0.1)">+</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- SECTION: ATTACKING & PRODUCTION -->
+                            <div id="section-attacking" style="display:flex; flex-direction:column; gap:16px; border-top:1px solid var(--color-border); padding-top:16px;">
+                                <div style="font-size:12px; font-weight:800; color:var(--color-primary-dark); text-transform:uppercase; letter-spacing:0.04em;">
+                                    Attacking & Playmaking Output
+                                </div>
+
+                                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px;">
+                                    <!-- Goals -->
+                                    <div class="input-field-group">
+                                        <div class="field-label-row">
+                                            <span class="field-label">Goals</span>
+                                            <span class="field-hint">Full season count</span>
+                                        </div>
+                                        <div class="field-controls-row">
+                                            <input type="range" class="field-slider" id="sl-goals" min="0" max="55" step="1" value="32">
+                                            <div class="field-num-stepper">
+                                                <button type="button" class="stepper-btn" onclick="stepField('goals', -1)">-</button>
+                                                <input type="number" id="in-goals" value="32" min="0" max="60">
+                                                <button type="button" class="stepper-btn" onclick="stepField('goals', 1)">+</button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Assists -->
+                                    <div class="input-field-group">
+                                        <div class="field-label-row">
+                                            <span class="field-label">Assists</span>
+                                            <span class="field-hint">Direct setups</span>
+                                        </div>
+                                        <div class="field-controls-row">
+                                            <input type="range" class="field-slider" id="sl-assists" min="0" max="30" step="1" value="6">
+                                            <div class="field-num-stepper">
+                                                <button type="button" class="stepper-btn" onclick="stepField('assists', -1)">-</button>
+                                                <input type="number" id="in-assists" value="6" min="0" max="35">
+                                                <button type="button" class="stepper-btn" onclick="stepField('assists', 1)">+</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px;">
+                                    <!-- xG -->
+                                    <div class="input-field-group">
+                                        <div class="field-label-row">
+                                            <span class="field-label">Expected Goals (xG)</span>
+                                            <span class="field-hint">Underlying quality</span>
+                                        </div>
+                                        <div class="field-controls-row">
+                                            <input type="range" class="field-slider" id="sl-xg" min="0" max="45" step="0.5" value="29.5">
+                                            <div class="field-num-stepper">
+                                                <button type="button" class="stepper-btn" onclick="stepField('xg', -0.5)">-</button>
+                                                <input type="number" id="in-xg" value="29.5" step="0.1" min="0" max="50">
+                                                <button type="button" class="stepper-btn" onclick="stepField('xg', 0.5)">+</button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- xA -->
+                                    <div class="input-field-group">
+                                        <div class="field-label-row">
+                                            <span class="field-label">Expected Assists (xA)</span>
+                                            <span class="field-hint">Shot creation value</span>
+                                        </div>
+                                        <div class="field-controls-row">
+                                            <input type="range" class="field-slider" id="sl-xa" min="0" max="25" step="0.5" value="5.2">
+                                            <div class="field-num-stepper">
+                                                <button type="button" class="stepper-btn" onclick="stepField('xa', -0.5)">-</button>
+                                                <input type="number" id="in-xa" value="5.2" step="0.1" min="0" max="30">
+                                                <button type="button" class="stepper-btn" onclick="stepField('xa', 0.5)">+</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px;">
+                                    <!-- Shots -->
+                                    <div class="input-field-group">
+                                        <div class="field-label-row">
+                                            <span class="field-label">Total Shots</span>
+                                            <span class="field-hint">Shooting volume</span>
+                                        </div>
+                                        <div class="field-controls-row">
+                                            <input type="range" class="field-slider" id="sl-shots" min="0" max="180" step="5" value="118">
+                                            <div class="field-num-stepper">
+                                                <button type="button" class="stepper-btn" onclick="stepField('shots', -5)">-</button>
+                                                <input type="number" id="in-shots" value="118" min="0" max="220">
+                                                <button type="button" class="stepper-btn" onclick="stepField('shots', 5)">+</button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Key Passes -->
+                                    <div class="input-field-group">
+                                        <div class="field-label-row">
+                                            <span class="field-label">Key Passes</span>
+                                            <span class="field-hint">Chances created</span>
+                                        </div>
+                                        <div class="field-controls-row">
+                                            <input type="range" class="field-slider" id="sl-key_passes" min="0" max="120" step="2" value="32">
+                                            <div class="field-num-stepper">
+                                                <button type="button" class="stepper-btn" onclick="stepField('key_passes', -2)">-</button>
+                                                <input type="number" id="in-key_passes" value="32" min="0" max="140">
+                                                <button type="button" class="stepper-btn" onclick="stepField('key_passes', 2)">+</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- SECTION: PROGRESSION & DEFENDING -->
+                            <div id="section-defending" style="display:flex; flex-direction:column; gap:16px; border-top:1px solid var(--color-border); padding-top:16px;">
+                                <div style="font-size:12px; font-weight:800; color:var(--color-ink-soft); text-transform:uppercase; letter-spacing:0.04em;">
+                                    Progression & Defensive Contributions
+                                </div>
+
+                                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px;">
+                                    <!-- Progressive Carries -->
+                                    <div class="input-field-group">
+                                        <div class="field-label-row">
+                                            <span class="field-label">Prog. Carries</span>
+                                            <span class="field-hint">10+ yards forward</span>
+                                        </div>
+                                        <div class="field-controls-row">
+                                            <input type="range" class="field-slider" id="sl-progressive_carries" min="0" max="180" step="5" value="48">
+                                            <div class="field-num-stepper">
+                                                <button type="button" class="stepper-btn" onclick="stepField('progressive_carries', -5)">-</button>
+                                                <input type="number" id="in-progressive_carries" value="48" min="0" max="220">
+                                                <button type="button" class="stepper-btn" onclick="stepField('progressive_carries', 5)">+</button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Progressive Passes -->
+                                    <div class="input-field-group">
+                                        <div class="field-label-row">
+                                            <span class="field-label">Prog. Passes</span>
+                                            <span class="field-hint">Line-breaking distribution</span>
+                                        </div>
+                                        <div class="field-controls-row">
+                                            <input type="range" class="field-slider" id="sl-progressive_passes" min="0" max="280" step="5" value="42">
+                                            <div class="field-num-stepper">
+                                                <button type="button" class="stepper-btn" onclick="stepField('progressive_passes', -5)">-</button>
+                                                <input type="number" id="in-progressive_passes" value="42" min="0" max="320">
+                                                <button type="button" class="stepper-btn" onclick="stepField('progressive_passes', 5)">+</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px;">
+                                    <!-- Tackles -->
+                                    <div class="input-field-group">
+                                        <div class="field-label-row">
+                                            <span class="field-label">Tackles Won</span>
+                                            <span class="field-hint">Ground challenges</span>
+                                        </div>
+                                        <div class="field-controls-row">
+                                            <input type="range" class="field-slider" id="sl-tackles" min="0" max="120" step="2" value="14">
+                                            <div class="field-num-stepper">
+                                                <button type="button" class="stepper-btn" onclick="stepField('tackles', -2)">-</button>
+                                                <input type="number" id="in-tackles" value="14" min="0" max="150">
+                                                <button type="button" class="stepper-btn" onclick="stepField('tackles', 2)">+</button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Clean Sheets -->
+                                    <div class="input-field-group">
+                                        <div class="field-label-row">
+                                            <span class="field-label">Clean Sheets</span>
+                                            <span class="field-hint">DEF / GK shutouts</span>
+                                        </div>
+                                        <div class="field-controls-row">
+                                            <input type="range" class="field-slider" id="sl-clean_sheets" min="0" max="25" step="1" value="0">
+                                            <div class="field-num-stepper">
+                                                <button type="button" class="stepper-btn" onclick="stepField('clean_sheets', -1)">-</button>
+                                                <input type="number" id="in-clean_sheets" value="0" min="0" max="30">
+                                                <button type="button" class="stepper-btn" onclick="stepField('clean_sheets', 1)">+</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="card">
-                        <div class="card-header">
+                    <!-- RIGHT COLUMN: STICKY RESULTS PANEL -->
+                    <div class="result-sticky-panel">
+                        <!-- VALUATION SUMMARY CARD -->
+                        <div class="result-card">
+                            <div class="result-header-row">
+                                <span class="model-badge">
+                                    <i class="ph ph-sparkle"></i> v2.0 XGBoost Engine
+                                </span>
+                                <span style="font-size:12px; font-weight:700; color:var(--color-ink-muted);">80% CI Bounded</span>
+                            </div>
+
+                            <div style="font-size:12px; font-weight:700; color:var(--color-ink-muted); text-transform:uppercase; letter-spacing:0.04em;">
+                                Model-Implied Fair Valuation
+                            </div>
+
+                            <div class="result-big-number" id="pred-big-valuation">€--.-M</div>
+
+                            <!-- Horizontal Confidence Range Bar -->
+                            <div class="confidence-range-box">
+                                <div class="range-label-row">
+                                    <span>80% Confidence Interval</span>
+                                    <span>Low → High</span>
+                                </div>
+                                <div class="range-track">
+                                    <div class="range-bar" id="pred-range-fill"></div>
+                                    <div class="range-marker" id="pred-range-marker"></div>
+                                </div>
+                                <div class="range-values-row">
+                                    <span id="pred-range-low">€--M</span>
+                                    <span id="pred-range-high">€--M</span>
+                                </div>
+                            </div>
+
+                            <!-- SHAP Feature Contributions -->
                             <div>
-                                <h3 class="card-title">Key Value Drivers</h3>
-                                <p class="card-subtitle">Features influencing this model valuation</p>
+                                <div style="display:flex; justify-content:space-between; align-items:center;">
+                                    <div style="font-size:13px; font-weight:800; color:var(--color-ink);">Key Value Drivers (Tree-SHAP)</div>
+                                    <span style="font-size:11px; color:var(--color-ink-muted);">Euro Impact</span>
+                                </div>
+                                <div class="shap-factors-list" id="shap-factors-container">
+                                    <div style="font-size:12px; color:var(--color-ink-muted); padding:12px 0;">Computing feature contributions...</div>
+                                </div>
                             </div>
                         </div>
-                        <div id="pred-drivers-container" style="display:flex; flex-direction:column; gap:8px;">
-                            <div style="font-size:13px; color:var(--color-ink-muted)">Submit stat profile to view attribution weights.</div>
+
+                        <!-- "WHAT WOULD CHANGE THIS VALUATION?" BOX -->
+                        <div class="what-if-box">
+                            <div class="what-if-title">What would change this valuation?</div>
+                            <div id="what-if-container">
+                                <div style="font-size:12px; color:var(--color-ink-muted);">Analyzing marginal impact deltas...</div>
+                            </div>
+                        </div>
+
+                        <!-- SIMILAR PLAYERS STRIP -->
+                        <div class="what-if-box">
+                            <div class="what-if-title">Top 3 Nearest Comparable Players</div>
+                            <div class="comparables-list" id="comparables-container">
+                                <div style="font-size:12px; color:var(--color-ink-muted);">Finding statistical comps...</div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -148,91 +378,10 @@
 
     <script src="js/api.js"></script>
     <script src="js/utils.js"></script>
+    <script src="js/player_photos_data.js"></script>
+    <script src="js/club_logos_data.js"></script>
     <script src="js/components.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            initPage('predictor');
-            runPrediction();
-        });
-
-        const PRESETS = {
-            haaland: {
-                position: 'ST', age: 24, league_strength: 5.0, minutes: 2600,
-                goals: 32, assists: 6, xg: 29.5, xa: 5.2, shots: 110, kp: 32,
-                progressive_carries: 45, progressive_passes: 40, tackles: 12
-            }
-        };
-
-        function loadPreset(key) {
-            const p = PRESETS[key];
-            if (!p) return;
-            document.getElementById('p-position').value = p.position;
-            document.getElementById('p-age').value = p.age;
-            document.getElementById('p-league').value = p.league_strength;
-            document.getElementById('p-minutes').value = p.minutes;
-            document.getElementById('p-goals').value = p.goals;
-            document.getElementById('p-assists').value = p.assists;
-            document.getElementById('p-xg').value = p.xg;
-            document.getElementById('p-xa').value = p.xa;
-            document.getElementById('p-shots').value = p.shots;
-            document.getElementById('p-kp').value = p.kp;
-            document.getElementById('p-prgc').value = p.progressive_carries;
-            document.getElementById('p-prgp').value = p.progressive_passes;
-            document.getElementById('p-tkl').value = p.tackles;
-            runPrediction();
-        }
-
-        async function runPrediction(e) {
-            if (e) e.preventDefault();
-            const payload = {
-                position: document.getElementById('p-position').value,
-                age: parseInt(document.getElementById('p-age').value) || 22,
-                league_strength: parseFloat(document.getElementById('p-league').value) || 5.0,
-                minutes: parseInt(document.getElementById('p-minutes').value) || 1800,
-                goals: parseInt(document.getElementById('p-goals').value) || 0,
-                assists: parseInt(document.getElementById('p-assists').value) || 0,
-                xg: parseFloat(document.getElementById('p-xg').value) || 0.0,
-                xa: parseFloat(document.getElementById('p-xa').value) || 0.0,
-                shots: parseFloat(document.getElementById('p-shots').value) || 0.0,
-                key_passes: parseFloat(document.getElementById('p-kp').value) || 0.0,
-                progressive_carries: parseFloat(document.getElementById('p-prgc').value) || 0.0,
-                progressive_passes: parseFloat(document.getElementById('p-prgp').value) || 0.0,
-                tackles: parseFloat(document.getElementById('p-tkl').value) || 0.0,
-                interceptions: 5.0, aerial_wins: 10.0, recoveries: 20.0, clean_sheets: 0
-            };
-
-            const valElem = document.getElementById('pred-result-val');
-            const rangeElem = document.getElementById('pred-range-val');
-            const driversElem = document.getElementById('pred-drivers-container');
-
-            valElem.textContent = 'Calculating...';
-
-            try {
-                const res = await fetch('/api/model/predict', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                const data = await res.json();
-
-                valElem.textContent = formatCurrency(data.predicted_value_eur);
-                rangeElem.textContent = `${formatCurrency(data.confidence_range_eur.low)} – ${formatCurrency(data.confidence_range_eur.high)}`;
-
-                if (data.top_factors && data.top_factors.length > 0) {
-                    driversElem.innerHTML = data.top_factors.map(f => `
-                        <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 14px; border-radius:var(--radius-sm); background:var(--color-surface-alt); font-size:12.5px;">
-                            <span style="font-weight:600; color:var(--color-ink)">${f.feature}</span>
-                            <span class="badge ${f.direction === 'positive' ? 'val-badge positive' : 'val-badge negative'}">
-                                ${f.direction === 'positive' ? '+' : '-'} ${f.importance}% Weight
-                            </span>
-                        </div>
-                    `).join('');
-                }
-            } catch (err) {
-                console.error(err);
-                valElem.textContent = 'Error';
-            }
-        }
-    </script>
+    <script src="js/predictor_presets.js"></script>
+    <script src="js/predictor.js"></script>
 </body>
 </html>

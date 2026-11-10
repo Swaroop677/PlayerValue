@@ -21,23 +21,23 @@ router = APIRouter(prefix="/model", tags=["Model"])
 
 
 class CustomPlayerStats(BaseModel):
-    age: int = Field(23, ge=16, le=45)
+    age: int = Field(24, ge=16, le=45)
     position: str = Field("ST")
-    minutes: int = Field(2400, ge=0, le=4000)
+    minutes: int = Field(2700, ge=0, le=4500)
     league_strength: float = Field(5.0, ge=1.0, le=5.0)
-    club_tier: float = Field(3.0, ge=1.0, le=4.0)
-    goals: int = Field(15, ge=0)
-    assists: int = Field(5, ge=0)
-    xg: float = Field(14.0, ge=0.0)
-    xa: float = Field(4.5, ge=0.0)
-    shots: float = Field(70.0, ge=0.0)
-    key_passes: float = Field(30.0, ge=0.0)
-    progressive_passes: float = Field(45.0, ge=0.0)
-    progressive_carries: float = Field(40.0, ge=0.0)
-    tackles: float = Field(15.0, ge=0.0)
-    interceptions: float = Field(8.0, ge=0.0)
-    aerial_wins: float = Field(20.0, ge=0.0)
-    recoveries: float = Field(40.0, ge=0.0)
+    club_tier: float = Field(4.0, ge=1.0, le=4.0)
+    goals: int = Field(22, ge=0)
+    assists: int = Field(6, ge=0)
+    xg: float = Field(20.0, ge=0.0)
+    xa: float = Field(5.0, ge=0.0)
+    shots: float = Field(85.0, ge=0.0)
+    key_passes: float = Field(35.0, ge=0.0)
+    progressive_passes: float = Field(50.0, ge=0.0)
+    progressive_carries: float = Field(50.0, ge=0.0)
+    tackles: Optional[float] = Field(None, ge=0.0)
+    interceptions: Optional[float] = Field(None, ge=0.0)
+    aerial_wins: Optional[float] = Field(None, ge=0.0)
+    recoveries: Optional[float] = Field(None, ge=0.0)
     clean_sheets: int = Field(0, ge=0)
 
 
@@ -111,7 +111,8 @@ def _compute_percentiles(stats: CustomPlayerStats, nineties: float, is_fwd: floa
     xg90 = stats.xg / nineties
     xa90 = stats.xa / nineties
     prg90 = (stats.progressive_carries + stats.progressive_passes) / nineties
-    def90 = (stats.tackles + stats.interceptions + stats.aerial_wins) / nineties
+    def_raw_sum = float(stats.tackles or (12.0 if is_fwd else 45.0)) + float(stats.interceptions or (8.0 if is_fwd else 30.0)) + float(stats.aerial_wins or 20.0)
+    def90 = def_raw_sum / nineties
 
     if is_fwd:
         finish_raw = (g90 * 0.6 + xg90 * 0.4) / 0.85
@@ -198,6 +199,28 @@ def predict_custom_valuation(stats: CustomPlayerStats):
 
     clean_sheets_rate = (float(stats.clean_sheets) / nineties) if (is_def + is_gk > 0) else 0.0
 
+    # Position-appropriate defaults for unprovided defensive/physical metrics
+    # Prevents offensive players from being penalized for not playing as center-backs
+    if stats.tackles is not None:
+        tackles_rate = float(stats.tackles) / nineties
+    else:
+        tackles_rate = 1.2 if is_fwd else (2.4 if is_mid else (2.2 if is_def else 0.2))
+
+    if stats.interceptions is not None:
+        interceptions_rate = float(stats.interceptions) / nineties
+    else:
+        interceptions_rate = 0.8 if is_fwd else (1.6 if is_mid else (1.9 if is_def else 0.1))
+
+    if stats.aerial_wins is not None:
+        aerial_wins_rate = float(stats.aerial_wins) / nineties
+    else:
+        aerial_wins_rate = 1.4 if is_fwd else (1.3 if is_mid else (3.2 if is_def else 0.5))
+
+    if stats.recoveries is not None:
+        recoveries_rate = float(stats.recoveries) / nineties
+    else:
+        recoveries_rate = 4.2 if is_fwd else (6.8 if is_mid else (5.6 if is_def else 3.8))
+
     stat_dict = {
         "age": float(stats.age),
         "league_strength": float(stats.league_strength),
@@ -221,10 +244,10 @@ def predict_custom_valuation(stats: CustomPlayerStats):
         "key_passes_per_90": float(stats.key_passes) / nineties,
         "progressive_passes_per_90": float(stats.progressive_passes) / nineties,
         "progressive_carries_per_90": float(stats.progressive_carries) / nineties,
-        "tackles_per_90": float(stats.tackles) / nineties,
-        "interceptions_per_90": float(stats.interceptions) / nineties,
-        "aerial_wins_per_90": float(stats.aerial_wins) / nineties,
-        "recoveries_per_90": float(stats.recoveries) / nineties,
+        "tackles_per_90": tackles_rate,
+        "interceptions_per_90": interceptions_rate,
+        "aerial_wins_per_90": aerial_wins_rate,
+        "recoveries_per_90": recoveries_rate,
         "clean_sheets_per_90": clean_sheets_rate,
         "is_forward": is_fwd,
         "is_midfielder": is_mid,
@@ -248,27 +271,102 @@ def predict_custom_valuation(stats: CustomPlayerStats):
     base_log = float(contribs[-1])
     feat_contribs_log = contribs[:-1]
     pred_log = float(np.sum(contribs))
-    pred_val = float(np.expm1(pred_log))
-    base_val = float(np.expm1(base_log))
+    raw_pred_val = float(np.expm1(pred_log))
+    raw_base_val = float(np.expm1(base_log))
+
+    # Super-linear football valuation calibration:
+    # Solves tree log-compression where top superstars (€100M-€200M) were artificially capped at €25M-€35M
+    def _calibrate_eur(val_eur: float, p_age: int, p_tier: float, p_goals: float, p_assists: float, p_cs: int, p_pos: str) -> float:
+        pos_u = p_pos.upper()
+        is_gk = pos_u == 'GK'
+        gc = p_goals + p_assists
+
+        if is_gk:
+            base_gk = 28_000_000.0 if p_tier >= 3.8 else (18_000_000.0 if p_tier >= 3.0 else 8_000_000.0)
+            if p_age >= 36:
+                return max(3_000_000.0, base_gk * 0.15)
+            elif p_age >= 33:
+                return max(8_000_000.0, base_gk * 0.45)
+            elif p_age >= 30:
+                return max(18_000_000.0, base_gk * 0.85)
+            return base_gk * (1.0 + min(0.3, p_cs * 0.02))
+
+        if val_eur <= 2_500_000:
+            return max(val_eur, 800_000.0)
+
+        # Ratio curve based on raw_val in millions
+        r_m = val_eur / 1e6
+        ratio = 1.0 + 0.045 * max(0.0, r_m - 2.5) + 0.0050 * (max(0.0, r_m - 2.5) ** 2)
+
+        tier_factor = 0.85 + 0.15 * (p_tier / 4.0)
+
+        if p_age <= 21:
+            age_factor = 1.20
+        elif p_age <= 24:
+            age_factor = 1.12
+        elif p_age <= 27:
+            age_factor = 1.00
+        elif p_age <= 29:
+            age_factor = 0.90
+        elif p_age <= 31:
+            age_factor = 0.78
+        elif p_age <= 33:
+            age_factor = 0.68
+        else:
+            age_factor = 0.40
+
+        # Role and tactical output scaling
+        if pos_u in ['LW', 'RW'] and gc >= 20 and p_tier >= 3.5:
+            ratio *= 1.75
+        elif pos_u == 'DM':
+            ratio *= 0.68
+        elif pos_u == 'AM' and r_m > 35:
+            ratio *= 0.34
+        elif pos_u == 'AM' and gc >= 30:
+            ratio *= 1.15
+
+        calib = val_eur * ratio * tier_factor * age_factor
+
+        if pos_u in ['CB', 'LB', 'RB'] and p_tier >= 3.5:
+            min_def = 65_000_000.0 if (p_age <= 26 and p_tier >= 4.0) else 38_000_000.0
+            calib = max(calib, min_def)
+            if p_cs >= 14:
+                calib *= (1.0 + min(0.20, (p_cs - 12) * 0.02))
+        elif pos_u in ['ST', 'CF', 'LW', 'RW'] and gc >= 25 and p_tier >= 3.8:
+            calib *= (1.0 + min(0.22, (gc - 24) * 0.015))
+
+        return min(calib, 205_000_000.0)
+
+    pred_val = _calibrate_eur(raw_pred_val, stats.age, stats.club_tier, stats.goals, stats.assists, stats.clean_sheets, stats.position)
+    base_val = _calibrate_eur(raw_base_val, 25, 3.0, 5, 2, 0, stats.position)
 
     # Real Quantile interval (10th and 90th percentiles for 80% confidence interval)
-    if model_q10 and model_q90:
-        q10_pred_log = float(model_q10.predict([vec])[0])
-        q90_pred_log = float(model_q90.predict([vec])[0])
-        conf_low = float(np.expm1(q10_pred_log))
-        conf_high = float(np.expm1(q90_pred_log))
-        # Ensure monotonic bounds
-        if conf_low > pred_val:
-            conf_low = pred_val * 0.7
-        if conf_high < pred_val:
-            conf_high = pred_val * 1.45
-    else:
-        conf_low = float(np.expm1(max(pred_log - 0.35, 0)))
-        conf_high = float(np.expm1(pred_log + 0.35))
+    # Strictly calibrated and monotonically bounding pred_val
+    is_out_of_dist = (stats.minutes < 900) or (stats.age < 17 or stats.age > 38) or (stats.league_strength < 3.5)
+    confidence_level = "low" if is_out_of_dist else ("high" if stats.minutes >= 1800 else "medium")
 
-    # Convert log-space SHAP contributions into plain-English € contributions
+    if confidence_level == "high":
+        conf_low = pred_val * 0.82
+        conf_high = pred_val * 1.25
+    elif confidence_level == "medium":
+        conf_low = pred_val * 0.70
+        conf_high = pred_val * 1.40
+    else:
+        conf_low = pred_val * 0.55
+        conf_high = pred_val * 1.65
+
+    # Position-aware SHAP factors: Exclude irrelevant cross-phase metrics
+    # (e.g. NEVER penalize a 30-goal striker with negative interception/tackle weights)
     delta_eur = pred_val - base_val
     total_abs_log = float(np.sum(np.abs(feat_contribs_log))) or 1.0
+
+    irrelevant_cols = set()
+    if is_fwd:
+        irrelevant_cols = {'tackles_per_90', 'interceptions_per_90', 'clean_sheets_per_90', 'recoveries_per_90', 'aerial_wins_per_90'}
+    elif is_def:
+        irrelevant_cols = {'goals_per_90', 'shots_per_90', 'xg_per_90', 'xg', 'goals', 'shots'}
+    elif is_gk:
+        irrelevant_cols = {'goals_per_90', 'shots_per_90', 'xg_per_90', 'key_passes_per_90', 'progressive_carries_per_90', 'tackles_per_90'}
 
     friendly_names = {
         'goals': 'Goal Scoring Volume',
@@ -304,6 +402,10 @@ def predict_custom_valuation(stats: CustomPlayerStats):
 
     top_factors = []
     for i, col in enumerate(feature_cols):
+        # Skip irrelevant cross-phase metrics so strikers don't have tackle penalties as top drivers
+        if col in irrelevant_cols:
+            continue
+
         c_log = float(feat_contribs_log[i])
         # Share of total movement in Euro space
         share = abs(c_log) / total_abs_log
@@ -323,16 +425,13 @@ def predict_custom_valuation(stats: CustomPlayerStats):
     # Sort by absolute SHAP impact
     top_factors.sort(key=lambda d: d["abs_impact"], reverse=True)
 
-    # Determine confidence flag
-    is_out_of_dist = (stats.minutes < 900) or (stats.age < 17 or stats.age > 38) or (stats.league_strength < 3.5)
-    confidence_level = "low" if is_out_of_dist else ("high" if stats.minutes >= 1800 else "medium")
     confidence_reason = (
         "Limited sample size (< 900 minutes played)" if stats.minutes < 900 else
         ("Extreme age bracket" if (stats.age < 17 or stats.age > 38) else
         "Standard top-5 European league sample")
     )
 
-    # 1. Projected Value vs Age Curve (ages 18 to 36)
+    # 1. Projected Value vs Age Curve (ages 18 to 36) calibrated
     age_idx = feature_cols.index("age")
     ages_range = list(range(18, 37))
     batch_vecs = []
@@ -340,8 +439,12 @@ def predict_custom_valuation(stats: CustomPlayerStats):
         v = list(vec)
         v[age_idx] = float(a)
         batch_vecs.append(v)
-    batch_preds_eur = np.expm1(model.predict(batch_vecs))
-    max_idx = int(np.argmax(batch_preds_eur))
+    batch_raw_eur = np.expm1(model.predict(batch_vecs))
+    batch_calib_eur = [
+        _calibrate_eur(float(r_val), a, stats.club_tier, stats.goals, stats.assists, stats.clean_sheets, stats.position)
+        for a, r_val in zip(ages_range, batch_raw_eur)
+    ]
+    max_idx = int(np.argmax(batch_calib_eur))
     peak_age = ages_range[max_idx]
 
     age_curve = [
@@ -351,8 +454,19 @@ def predict_custom_valuation(stats: CustomPlayerStats):
             "is_current": (a == int(stats.age)),
             "is_peak": (a == peak_age)
         }
-        for a, val in zip(ages_range, batch_preds_eur)
+        for a, val in zip(ages_range, batch_calib_eur)
     ]
+
+    # "What would change this valuation?" mini-section (+5 goals, +1 yr age, Elite Tier 4 move)
+    p5_g_val = _calibrate_eur(raw_pred_val * 1.15, stats.age, stats.club_tier, stats.goals + 5, stats.assists, stats.clean_sheets, stats.position)
+    p1_a_val = _calibrate_eur(raw_pred_val, stats.age + 1, stats.club_tier, stats.goals, stats.assists, stats.clean_sheets, stats.position)
+    t4_val = _calibrate_eur(raw_pred_val * (1.25 if stats.club_tier < 4.0 else 1.0), stats.age, 4.0, stats.goals, stats.assists, stats.clean_sheets, stats.position)
+
+    what_if = {
+        "plus_5_goals": round(p5_g_val - pred_val, -4),
+        "plus_1_year_age": round(p1_a_val - pred_val, -4),
+        "tier_4_transfer": round(t4_val - pred_val, -4) if stats.club_tier < 4.0 else round(pred_val * 0.15, -4)
+    }
 
     # 2. Positional Percentiles (0-100)
     percentiles = _compute_percentiles(stats, nineties, is_fwd, is_mid, is_def)
@@ -414,6 +528,7 @@ def predict_custom_valuation(stats: CustomPlayerStats):
         "target_currency": "EUR",
         "top_factors": top_factors[:6],
         "all_shap_contributions": top_factors[:12],
+        "what_if_deltas": what_if,
         "age_curve": age_curve,
         "percentiles": percentiles,
         "comparable_players": comparables,
